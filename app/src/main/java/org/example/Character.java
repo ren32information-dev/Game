@@ -25,6 +25,9 @@ public class Character {
     private int nTextureId;
     //キャラクターの画像ID
     
+    private HitColliderBox pHitBox;
+    //当たり判定ボックス
+    
     public Character(float fX, float fY, float fZ) {
         this.fPositionX = fX;
         this.fPositionY = fY;
@@ -36,6 +39,9 @@ public class Character {
         this.fGravity = -0.015f;
         this.fGroundLevel = 0f;
         this.bIsGrounded = true;
+        
+        // デフォルトの当たり判定ボックスを作成（幅1.0、高さ2.0）
+        this.pHitBox = new HitColliderBox(1.0f, 2.0f);
     }
     
     //画像を設定
@@ -94,6 +100,26 @@ public class Character {
         this.fPositionX = fX;
         this.fPositionY = fY;
         this.fPositionZ = fZ;
+    }
+    
+    //当たり判定ボックスを取得
+    public HitColliderBox GetHitBox() {
+        return pHitBox;
+    }
+    
+    //当たり判定ボックスを設定
+    public void SetHitBox(HitColliderBox pHitBox) {
+        this.pHitBox = pHitBox;
+    }
+    
+    //X座標を設定
+    public void SetPositionX(float fX) {
+        this.fPositionX = fX;
+    }
+    
+    //Y座標を設定
+    public void SetPositionY(float fY) {
+        this.fPositionY = fY;
     }
 }
 
