@@ -4,7 +4,9 @@ import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 
 public class App {
+    
     public static void main(String[] args) {
+        final int MAX_FPS = 60; // 最大FPS
         Window window = new Window();
         window.create(800, 600, "3D Texture Cube");
 
@@ -37,6 +39,8 @@ public class App {
         while (!window.shouldClose()) {
             double currentTime = org.lwjgl.glfw.GLFW.glfwGetTime();
             float delta = (float) (currentTime - lastTime);
+            if(delta <= 1.0f / MAX_FPS) continue; // FPS制限
+
             lastTime = currentTime;
 
             // キー入力
