@@ -2,76 +2,107 @@ package org.example;
 
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL11;
 
 public class App {
-    
     public static void main(String[] args) {
         final int MAX_FPS = 60; // 最大FPS
-        Window window = new Window();
-        window.create(800, 600, "3D Texture Cube");
+        Window pWindow = new Window();
+        //ウィンドウオブジェクト
+        pWindow.create(1280, 720, "2D Fighting Game Prototype");
 
-        Camera camera = new Camera();
-        camera.setPerspective(true);
-        camera.setPosition(0, 2, 6);
-        camera.lookAt(0, 0, 0);
+        // カメラ設定（2D格ゲー用に平行投影）
+        Camera pCamera = new Camera();
+        //カメラオブジェクト
+        pCamera.setPerspective(false); // 平行投影に設定
+        pCamera.setPosition(0, 5, 15);
+        pCamera.lookAt(0, 5, 0);
 
-        Renderer renderer = new Renderer(camera);
-        renderer.init();
+        // キャラクターレンダラー作成
+        CharacterRenderer pCharacterRenderer = new CharacterRenderer(pCamera);
+        //キャラクターレンダラー
+        pCharacterRenderer.Initialize("app/Image/St001.png");
 
-        double lastTime = org.lwjgl.glfw.GLFW.glfwGetTime();
-
-        boolean forward, backward, left, right;
-
-
-        Renderer renderer1 = new Renderer(camera);
-            renderer1.init();
-        Renderer renderer2 = new Renderer(camera);
-            renderer2.init();
-            Renderer renderer3 = new Renderer(camera);
-            renderer3.init();
-            Renderer renderer4 = new Renderer(camera);
-            renderer4.init();
-            Renderer renderer5 = new Renderer(camera); 
-            renderer5.init();
-            Renderer renderer6 = new Renderer(camera);
-            renderer6.init();
-
-        while (!window.shouldClose()) {
-            double currentTime = org.lwjgl.glfw.GLFW.glfwGetTime();
-            float delta = (float) (currentTime - lastTime);
-            if(delta <= 1.0f / MAX_FPS) continue; // FPS制限
-
-            lastTime = currentTime;
-
-            // キー入力
-            forward = window.isKeyPressed(GLFW.GLFW_KEY_W);
-            backward = window.isKeyPressed(GLFW.GLFW_KEY_S);
-            left = window.isKeyPressed(GLFW.GLFW_KEY_A);
-            right = window.isKeyPressed(GLFW.GLFW_KEY_D);
-
-            camera.moveCamera(forward, backward, left, right);
-
-            // Update / Draw
-            renderer1.update(delta);
-            renderer1.draw();
-
-            renderer2.update(delta);
-            renderer2.draw();
-            renderer3.update(delta);
-            renderer3.draw();
-            renderer4.update(delta);
-            renderer4.draw();
-            renderer5.update(delta);
-            renderer5.draw();
-            renderer6.update(delta);
-            renderer6.draw();
-            
-            //renderer1.setPosition(1, 1, 1);
-
-            window.update();
+        // ゲームパッドが接続されている場合の情報表示
+        System.out.println("=== ゲームパッド検出 ===");
+        for (int i = GLFW.GLFW_JOYSTICK_1; i <= GLFW.GLFW_JOYSTICK_4; i++) {
+            if (InputManager.IsGamepadConnected(i)) {
+                System.out.println("ゲームパッド " + i + ": " + InputManager.GetGamepadName(i));
+            }
         }
 
-        renderer.release();
-        window.destroy();
+        // プレイヤースロット管理システムを作成
+        PlayerSlotManager pSlotManager = new PlayerSlotManager(pWindow);
+        //プレイヤースロット管理システム
+
+        double dLastTime = org.lwjgl.glfw.GLFW.glfwGetTime();
+        //前フレームの時刻
+
+        while (!pWindow.shouldClose()) {
+            double dCurrentTime = org.lwjgl.glfw.GLFW.glfwGetTime();
+            //現在の時刻
+            float fDeltaTime = (float) (dCurrentTime - dLastTime);
+            //デルタタイム
+            
+            // FPS制限
+            if(fDeltaTime < 1.0f / MAX_FPS) continue;
+            
+            dLastTime = dCurrentTime;
+
+            // プレイヤースロット管理の更新（接続/切断の検出）
+            pSlotManager.Update(fDeltaTime);
+
+            // 各プレイヤーの入力処理と更新
+            for (PlayerSlot pSlot : pSlotManager.GetAllSlots()) {
+                if (pSlot.IsOccupied()) {
+                    InputManager pInputManager = pSlot.GetInputManager();
+                    Character pCharacter = pSlot.GetCharacter();
+                    
+                    // キャラクター操作
+                    boolean bLeftMove = pInputManager.GetInput(InputType.LEFT);
+                    boolean bRightMove = pInputManager.GetInput(InputType.RIGHT);
+                    boolean bJump = pInputManager.GetInput(InputType.JUMP);
+                    
+                    if (bLeftMove) pCharacter.MoveLeft(fDeltaTime);
+                    if (bRightMove) pCharacter.MoveRight(fDeltaTime);
+                    if (bJump) pCharacter.Jump();
+                    
+                    // キャラクター更新
+                    pCharacter.Update(fDeltaTime);
+                }
+            }
+            
+            // プレイヤー同士の衝突判定
+            // ここで衝突時の処理を追加してください（例：ダメージ、押し出し、エフェクトなど）
+            PlayerSlot pSlot1 = pSlotManager.GetSlot(1);
+            PlayerSlot pSlot2 = pSlotManager.GetSlot(2);
+            if (pSlot1 != null && pSlot2 != null && pSlot1.IsOccupied() && pSlot2.IsOccupied()) {
+                Character pChar1 = pSlot1.GetCharacter();
+                Character pChar2 = pSlot2.GetCharacter();
+                
+                // 衝突判定
+                if (CollisionManager.CheckCharacterCollision(pChar1, pChar2)) {
+                    // 衝突を検出したことを表示
+                    System.out.println("[衝突] プレイヤー同士が衝突しました！");
+                    // TODO: ここに追加の処理を実装できます（ダメージ、押し出し、エフェクトなど）
+                }
+            }
+
+            // 描画
+            GL11.glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
+            GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+
+            // 各プレイヤーのキャラクターを描画
+            for (PlayerSlot pSlot : pSlotManager.GetAllSlots()) {
+                if (pSlot.IsOccupied()) {
+                    pCharacterRenderer.DrawCharacter(pSlot.GetCharacter());
+                }
+            }
+
+            pWindow.update();
+        }
+
+        pCharacterRenderer.Release();
+        pWindow.destroy();
     }
 }
