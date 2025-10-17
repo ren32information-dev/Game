@@ -196,10 +196,5 @@ public class InputManager {
     public void SetGamepadId(int nGamepadId) {
         this.nGamepadId = nGamepadId;
     }
-    
-    //ゲームパッドIDを取得
-    public int GetGamepadId() {
-        return nGamepadId;
-    }
 }
 

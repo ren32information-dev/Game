@@ -6,7 +6,7 @@ import org.lwjgl.opengl.GL11;
 
 public class App {
     public static void main(String[] args) {
-        final int MAX_FPS = 60; // 最大FPS
+         final int MAX_FPS = 60; // 最大FPS
         Window pWindow = new Window();
         //ウィンドウオブジェクト
         pWindow.create(1280, 720, "2D Fighting Game Prototype");
@@ -18,10 +18,16 @@ public class App {
         pCamera.setPosition(0, 5, 15);
         pCamera.lookAt(0, 5, 0);
 
-        // キャラクターレンダラー作成
+        // キャラクター作成
+        Character pCharacter = new Character(-3f, 0f, 0f);
+        //キャラクターオブジェクト
         CharacterRenderer pCharacterRenderer = new CharacterRenderer(pCamera);
         //キャラクターレンダラー
         pCharacterRenderer.Initialize("app/Image/St001.png");
+
+        // 入力マネージャー作成（プレイヤー1: キーボード）
+        InputManager pInputManager1 = new InputManager(pWindow, 1);
+        //プレイヤー1の入力マネージャー
 
         // ゲームパッドが接続されている場合の情報表示
         System.out.println("=== ゲームパッド検出 ===");
@@ -31,12 +37,11 @@ public class App {
             }
         }
 
-        // プレイヤースロット管理システムを作成
-        PlayerSlotManager pSlotManager = new PlayerSlotManager(pWindow);
-        //プレイヤースロット管理システム
-
         double dLastTime = org.lwjgl.glfw.GLFW.glfwGetTime();
         //前フレームの時刻
+        
+        boolean bPreviousEnterKey = false;
+        //前フレームのEnterキー状態
 
         while (!pWindow.shouldClose()) {
             double dCurrentTime = org.lwjgl.glfw.GLFW.glfwGetTime();
@@ -49,55 +54,47 @@ public class App {
             
             dLastTime = dCurrentTime;
 
-            // プレイヤースロット管理の更新（接続/切断の検出）
-            pSlotManager.Update(fDeltaTime);
+            // 入力デバイス切り替え（Enterキー）
+            boolean bCurrentEnterKey = pWindow.isKeyPressed(GLFW.GLFW_KEY_ENTER);
+            //現在のEnterキー状態
+            if (bCurrentEnterKey && !bPreviousEnterKey) {
+                // Enterキーが押された瞬間
+                pInputManager1.SwitchInputDevice();
+            }
+            bPreviousEnterKey = bCurrentEnterKey;
 
-            // 各プレイヤーの入力処理と更新
-            for (PlayerSlot pSlot : pSlotManager.GetAllSlots()) {
-                if (pSlot.IsOccupied()) {
-                    InputManager pInputManager = pSlot.GetInputManager();
-                    Character pCharacter = pSlot.GetCharacter();
-                    
-                    // キャラクター操作
-                    boolean bLeftMove = pInputManager.GetInput(InputType.LEFT);
-                    boolean bRightMove = pInputManager.GetInput(InputType.RIGHT);
-                    boolean bJump = pInputManager.GetInput(InputType.JUMP);
-                    
-                    if (bLeftMove) pCharacter.MoveLeft(fDeltaTime);
-                    if (bRightMove) pCharacter.MoveRight(fDeltaTime);
-                    if (bJump) pCharacter.Jump();
-                    
-                    // キャラクター更新
-                    pCharacter.Update(fDeltaTime);
-                }
-            }
-            
-            // プレイヤー同士の衝突判定
-            // ここで衝突時の処理を追加してください（例：ダメージ、押し出し、エフェクトなど）
-            PlayerSlot pSlot1 = pSlotManager.GetSlot(1);
-            PlayerSlot pSlot2 = pSlotManager.GetSlot(2);
-            if (pSlot1 != null && pSlot2 != null && pSlot1.IsOccupied() && pSlot2.IsOccupied()) {
-                Character pChar1 = pSlot1.GetCharacter();
-                Character pChar2 = pSlot2.GetCharacter();
-                
-                // 衝突判定
-                if (CollisionManager.CheckCharacterCollision(pChar1, pChar2)) {
-                    // 衝突を検出したことを表示
-                    System.out.println("[衝突] プレイヤー同士が衝突しました！");
-                    // TODO: ここに追加の処理を実装できます（ダメージ、押し出し、エフェクトなど）
-                }
-            }
+            // キャラクター操作（InputManager経由）
+            boolean bLeftMove = pInputManager1.GetInput(InputType.LEFT);
+            //左移動入力
+            boolean bRightMove = pInputManager1.GetInput(InputType.RIGHT);
+            //右移動入力
+            boolean bJump = pInputManager1.GetInput(InputType.JUMP);
+            //ジャンプ入力
+
+            if (bLeftMove) pCharacter.MoveLeft(fDeltaTime);
+            if (bRightMove) pCharacter.MoveRight(fDeltaTime);
+            if (bJump) pCharacter.Jump();
+
+            // カメラ操作（矢印キー）
+            boolean bUpKey = pWindow.isKeyPressed(GLFW.GLFW_KEY_UP);
+            //上キー
+            boolean bDownKey = pWindow.isKeyPressed(GLFW.GLFW_KEY_DOWN);
+            //下キー
+            boolean bLeftKey = pWindow.isKeyPressed(GLFW.GLFW_KEY_LEFT);
+            //左キー
+            boolean bRightKey = pWindow.isKeyPressed(GLFW.GLFW_KEY_RIGHT);
+            //右キー
+
+            pCamera.MoveCamera(bUpKey, bDownKey, bLeftKey, bRightKey, fDeltaTime);
+
+            // 更新
+            pCharacter.Update(fDeltaTime);
 
             // 描画
             GL11.glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
             GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
-            // 各プレイヤーのキャラクターを描画
-            for (PlayerSlot pSlot : pSlotManager.GetAllSlots()) {
-                if (pSlot.IsOccupied()) {
-                    pCharacterRenderer.DrawCharacter(pSlot.GetCharacter());
-                }
-            }
+            pCharacterRenderer.DrawCharacter(pCharacter);
 
             pWindow.update();
         }
