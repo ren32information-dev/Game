@@ -16,7 +16,8 @@ public class Renderer {
     // 初期化（画像読み込み）
     //===========================
     public void init() {
-        textureId = TextureLoader.loadTexture("app/Image/GG.png"); // ←画像を読み込む
+        textureId = TextureLoader.loadTexture("app/Image/灰.png"); // ←画像を読み込む
+
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glEnable(GL11.GL_DEPTH_TEST);
     }
@@ -26,10 +27,11 @@ public class Renderer {
     //===========================
     public void update(float deltaTime) {
         // 例：時間経過で回転させる
-        float t = (System.currentTimeMillis() % 10000L) / 1000.0f;
+        /*float t = (System.currentTimeMillis() % 10000L) / 1000.0f;
         model.identity()
              .translate(0.0f, 0.0f, -5.0f)
              .rotateY(t);
+        */
     }
 
     //===========================
