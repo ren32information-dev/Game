@@ -101,7 +101,7 @@ public class App {
 
             pWindow.update();
         }
-
+        
         pCharacterRenderer.Release();
         pWindow.destroy();
     }

@@ -9,8 +9,6 @@ public class Renderer
     float PosX, PosY, PosZ;
     float RtX, RtY, RtZ;
     float ColorR, ColorG, ColorB;
-
-    public static final int MAX_UI = 4;
     
     private final Camera camera;
 
@@ -23,12 +21,31 @@ public class Renderer
         this.camera = camera;
     }
 
+    private void updateModelMatrix()
+    {  
+        // Model行列を単位行列にリセット
+        model.identity();
+
+        // 1. 平行移動 (Translation: 位置の適用)
+        // まず中心位置へ移動します
+        model.translate(PosX, PosY, PosZ);
+        
+        // 2. 回転 (Rotation) 
+        // 回転がある場合はここで行います
+        // model.rotateX((float)Math.toRadians(RtX));
+        // model.rotateY((float)Math.toRadians(RtY));
+        // model.rotateZ((float)Math.toRadians(RtZ));
+        
+        // 3. スケーリング (Scaling: サイズの適用)
+        // 中心位置からの相対的なサイズを設定します
+        model.scale(SizeX, SizeY, SizeZ);
+    }
     //===========================
     // 初期化（画像読み込み）
     //===========================
-    public void init() 
+    public void Init(String SUimageName) 
     {
-        textureId = TextureLoader.loadTexture("UI/灰.png"); // ←画像を読み込む
+        textureId = TextureLoader.loadTexture(SUimageName);
 
         SizeX = 0;
         SizeY = 0;
@@ -43,13 +60,7 @@ public class Renderer
         RtY = 0.0f;
         RtZ = 0.0f;
 
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-    }
-    
-    public void Init(String SUimageName) 
-    {
-        textureId = TextureLoader.loadTexture(SUimageName);
+
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glEnable(GL11.GL_BLEND);
@@ -59,7 +70,7 @@ public class Renderer
     //===========================
     // 更新処理
     //===========================
-    public void update(float deltaTime) 
+    public void Update(float deltaTime) 
     {
     
     }
@@ -68,15 +79,12 @@ public class Renderer
     // 描画
     //===========================
 
-    public void draw() 
+    public void Draw() 
     {
         Matrix4f mvp = new Matrix4f();
         camera.getProjectionMatrix().mul(camera.getViewMatrix(), mvp).mul(model);
         float[] mat = new float[16];
         mvp.get(mat);
-
-        GL11.glClearColor(ColorR, ColorG, ColorB, 1.0f);
-        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
         GL11.glPushMatrix();
         GL11.glLoadMatrixf(mat);
@@ -97,25 +105,29 @@ public class Renderer
     }
 
    public void UISize(float x, float y, float z)
-{
-	SizeX = x;
-	SizeY = y;
-	SizeZ = z;
-}
+    {
+	    SizeX = x;
+	    SizeY = y;
+	    SizeZ = z;
+        // サイズが変わったら Model 行列を更新！
+        updateModelMatrix();
+    }
 
-public void UIPos(float x, float y, float z)
-{
-	PosX = x;
-	PosY = y;
-	PosZ = z;
-}
+    public void UIPos(float x, float y, float z)
+    {   
+	    PosX = x;
+	    PosY = y;
+	    PosZ = z;
+        // 位置が変わったら Model 行列を更新！
+        updateModelMatrix();
+    }
 
-public void UIColor(float r, float g, float b)
-{
-	ColorR = r;
-	ColorG = g;
-	ColorB = b;
-}
+    public void UIColor(float r, float g, float b)
+    {
+	    ColorR = r;
+	    ColorG = g;
+	    ColorB = b;
+    }
 
     //===========================
     // 解放
