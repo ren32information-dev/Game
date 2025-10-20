@@ -1,32 +1,15 @@
 package org.example;
 
-// 移除 import org.lwjgl.glfw.GLFW; (因為現在交給 HealthController 處理)
-
 public class UIManager {
     // 註解：UI 要素の数を必要に応じて調整できます
     private static final int MAX_UI_ELEMENTS = 10; 
     private Renderer[] uiElements; // 複数の Renderer オブジェクトを格納する配列
     private Camera mainCamera; 
 
-    // 新增：HealthController オブジェクト（HPデータを取得するため）
-    private final HP Hp; 
-
-    // ============== HP バーのパラメータ (幾何サイズと位置のみ) ==============
-    private final float MAX_BAR_WIDTH = 4.0f; // HP バーの最大幅 (SizeX)
-    private final float BAR_HEIGHT = 0.4f; // HP バーの高さ (SizeY)
-    private final float BAR_CENTER_X = 0.0f; // HP バーの X 軸中心位置
-    private final float BAR_CENTER_Y = 3.5f; // HP バーの Y 軸位置 (画面上部)
-    // ==========================================
-
-    /**
-     * 構造関数。
-     * @param camera メインカメラ
-     * @param controller HPデータを管理する
-     */
-    public UIManager(Camera camera, HP controller) {
+    // 構造関数：Camera のみを受け取る（HPコントローラーへの依存を排除）
+    public UIManager(Camera camera) {
         this.mainCamera = camera;
         this.uiElements = new Renderer[MAX_UI_ELEMENTS];
-        this.Hp = controller; // コントローラーを保存
     }
 
     //===========================
@@ -39,50 +22,38 @@ public class UIManager {
         }
 
         // =================================================
-        // UI 要素 [0]: 赤いHPバー (現在のHP)
+        // UI 要素 [0]: 赤いHPバー (現在のHP) - 固定の初期値
         // =================================================
-        uiElements[0].Init("UI/赤.png"); 
-        // 紋理が白/灰色の場合に、赤く表示させるために色を設定
-        uiElements[0].UIColor(1.0f, 0.0f, 0.0f); 
+        uiElements[0].Init("UI/red.png"); 
+        // 暫定的な初期位置とサイズを設定 (後に外部から変更されることを想定)
+        uiElements[0].UIPos(0.0f, 3.5f, 0.0f); 
+        uiElements[0].UISize(4.0f, 0.4f, 1.0f);
+
 
         // =================================================
-        // UI 要素 [1]: 灰色HPバーの背景 (最大HP)
+        // UI 要素 [1]: 灰色HPバーの背景 (最大HP) - 固定
         // =================================================
-        uiElements[1].Init("UI/灰.png"); 
-        uiElements[1].UIColor(0.5f, 0.5f, 0.5f); // 灰色に設定
-        
+        uiElements[1].Init("UI/gray.png");      
         // 最大 HP バー (灰色): サイズと位置は固定
-        uiElements[1].UIPos(BAR_CENTER_X, BAR_CENTER_Y, 0.0f);
-        uiElements[1].UISize(MAX_BAR_WIDTH, BAR_HEIGHT, 1.0f); 
+        uiElements[1].UIPos(0.0f, 3.5f, 0.0f);
+        uiElements[1].UISize(4.0f, 0.4f, 1.0f); 
 
         // 例：UI 要素 [2]: キャラクター画像
-        uiElements[2].Init("UI/青.png"); 
+        uiElements[2].Init("UI/blue.png"); 
         uiElements[2].UIPos(-2.0f, 0.0f, 0.0f);
         uiElements[2].UISize(1.5f, 1.5f, 1.0f);
     }
 
     //===========================
-    // 全てのUI要素を更新 (主にHPバーのサイズと位置の調整)
+    // 全てのUI要素を更新 (HPバーのロジックを完全に削除)
     //===========================
     public void update(float deltaTime) {
+        
+        // 【重要】: ここから HP バーの計算ロジックを完全に削除しました。
+        // 赤いHPバーの位置やサイズを更新したい場合は、
+        // 外部のクラス（例: App.java や別の Manager クラス）から
+        // uiElements[0].UIPos(...) や uiElements[0].UISize(...) を呼び出す必要があります。
 
-        // 1. HP から現在の HP 割合を取得
-        float currentRatio = Hp.getHealthRatio();
-
-        // 2. 赤い HP バーの現在の幅を計算: (最大幅 * HP 割合)
-        float currentBarWidth = MAX_BAR_WIDTH * currentRatio;
-        
-        // 3. 右側を固定するために、中心点の新しい X 座標を計算
-        // X 軸の位移量 = (最大幅 - 現在の幅) / 2
-        float xOffset = (MAX_BAR_WIDTH - currentBarWidth) / 2.0f;
-        
-        // 赤い HP バーの中心 X 座標 = 最大 HP バー中心 X 座標 - 位移量
-        float currentBarX = BAR_CENTER_X - xOffset; 
-        
-        // 4. 新しいサイズと位置を赤い HP バーに適用
-        uiElements[0].UIPos(currentBarX, BAR_CENTER_Y, 0.0f);
-        uiElements[0].UISize(currentBarWidth, BAR_HEIGHT, 1.0f);
-        
         
         // 全 Renderer の Update メソッドを呼び出す
         for (Renderer renderer : uiElements) {
@@ -124,5 +95,15 @@ public class UIManager {
                 renderer.release();
             }
         }
+    }
+    
+    //===========================
+    // 外部から Renderer にアクセスするためのゲッター (必要に応じて追加)
+    //===========================
+    public Renderer getRenderer(int index) {
+        if (index >= 0 && index < MAX_UI_ELEMENTS) {
+            return uiElements[index];
+        }
+        return null;
     }
 }

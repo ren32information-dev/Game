@@ -11,6 +11,7 @@ public class App {
     private static Camera pCamera;
     private static CharacterRenderer pCharacterRenderer;
     private static PlayerSlotManager pSlotManager;
+    private static UIManager pUI;
 
     public static void Init() {
         // 初期化コード（必要に応じて追加）
@@ -26,8 +27,12 @@ public class App {
 
         // キャラクターレンダラー作成
         pCharacterRenderer = new CharacterRenderer(pCamera);
+
+        pUI = new UIManager(pCamera);
         // キャラクターレンダラー
         pCharacterRenderer.Initialize("Image/St001.png");
+
+        pUI.initUI();
 
                 // ゲームパッドが接続されている場合の情報表示
         System.out.println("=== ゲームパッド検出 ===");
@@ -39,7 +44,7 @@ public class App {
 
         // プレイヤースロット管理システムを作成
         pSlotManager = new PlayerSlotManager(pWindow);
-
+        
     }
 
     public static void Uninit() {
@@ -51,6 +56,10 @@ public class App {
         if (pCharacterRenderer != null) {
             pCharacterRenderer.Release();
             pCharacterRenderer = null;
+        }
+        if (pUI != null) {
+            pUI.release();
+            pUI = null;
         }
     }
 
@@ -93,6 +102,8 @@ public class App {
                 pChar2.OnCollision(pChar1);
             }
         }
+
+        pUI.update(fDeltaTime);
     }
 
     public static void Draw() {
@@ -102,11 +113,14 @@ public class App {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
         // 各プレイヤーのキャラクターを描画
-        for (PlayerSlot pSlot : pSlotManager.GetAllSlots()) {
+        for (PlayerSlot pSlot : pSlotManager.GetAllSlots()) 
+        {
             if (pSlot.IsOccupied()) {
                 pCharacterRenderer.DrawCharacter(pSlot.GetCharacter());
             }
         }
+
+        pUI.drawUI();
 
         pWindow.update();
     }
