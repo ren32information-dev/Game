@@ -16,7 +16,8 @@ public class Character {
     //ジャンプ力
     private float fGravity;
     //重力
-    
+    private HP pHP;
+
     private boolean bIsGrounded;
     //地面に接地しているか
     private float fGroundLevel;
@@ -42,6 +43,9 @@ public class Character {
         
         // デフォルトの当たり判定ボックスを作成（幅1.0、高さ2.0）
         this.pHitBox = new HitColliderBox(1.0f, 2.0f);
+
+        // HP オブジェクトを初期化
+        this.pHP = new HP();
     }
     
     //画像を設定
@@ -59,6 +63,7 @@ public class Character {
         // 重力を適用
         fVelocityY += fGravity;
         fPositionY += fVelocityY;
+        pHP.update();
         
         // 地面判定
         if (fPositionY <= fGroundLevel) {
@@ -86,6 +91,21 @@ public class Character {
             fVelocityY = fJumpPower;
             bIsGrounded = false;
         }
+    }
+
+    // ダメージが入る　デバッグ用
+    public void DamageHP() {
+        pHP.DamageHP(10);
+    }
+
+    // 回復が入る　デバッグ用
+    public void HealHP() {
+        pHP.HealHP(10);
+    }   
+
+    // 取得 HP オブジェクト
+    public HP GetHP() {
+        return pHP;
     }
     
     //X座標を取得
