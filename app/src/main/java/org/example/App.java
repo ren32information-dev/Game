@@ -89,9 +89,8 @@ public class App {
                 
             // 衝突判定
             if (CollisionManager.CheckCharacterCollision(pChar1, pChar2)) {
-                // 衝突を検出したことを表示
-                System.out.println("[衝突] プレイヤー同士が衝突しました！");
-                // TODO: ここに追加の処理を実装できます（ダメージ、押し出し、エフェクトなど）
+                pChar1.OnCollision(pChar2);
+                pChar2.OnCollision(pChar1);
             }
         }
     }
