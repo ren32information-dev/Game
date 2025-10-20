@@ -13,6 +13,7 @@ public class HitColliderBox {
     private float fOffsetY;
     //キャラクターの中心からのY方向オフセット
     
+    //コンストラクタ（オフセットなし）
     public HitColliderBox(float fWidth, float fHeight) {
         this.fWidth = fWidth;
         this.fHeight = fHeight;
@@ -20,6 +21,7 @@ public class HitColliderBox {
         this.fOffsetY = 0f;
     }
     
+    //コンストラクタ（オフセットあり）
     public HitColliderBox(float fWidth, float fHeight, float fOffsetX, float fOffsetY) {
         this.fWidth = fWidth;
         this.fHeight = fHeight;
@@ -63,44 +65,32 @@ public class HitColliderBox {
         this.fOffsetY = fOffsetY;
     }
     
-    /**
-     * 指定された位置での当たり判定の左端を取得
-     */
+    //指定された位置での当たり判定の左端を取得
     public float GetLeft(float fCenterX) {
         return fCenterX + fOffsetX - fWidth / 2.0f;
     }
     
-    /**
-     * 指定された位置での当たり判定の右端を取得
-     */
+    //指定された位置での当たり判定の右端を取得
     public float GetRight(float fCenterX) {
         return fCenterX + fOffsetX + fWidth / 2.0f;
     }
     
-    /**
-     * 指定された位置での当たり判定の下端を取得
-     */
+    //指定された位置での当たり判定の下端を取得
     public float GetBottom(float fCenterY) {
         return fCenterY + fOffsetY - fHeight / 2.0f;
     }
     
-    /**
-     * 指定された位置での当たり判定の上端を取得
-     */
+    //指定された位置での当たり判定の上端を取得
     public float GetTop(float fCenterY) {
         return fCenterY + fOffsetY + fHeight / 2.0f;
     }
     
-    /**
-     * 指定された位置での当たり判定の中心Xを取得
-     */
+    //指定された位置での当たり判定の中心Xを取得
     public float GetCenterX(float fCharacterX) {
         return fCharacterX + fOffsetX;
     }
     
-    /**
-     * 指定された位置での当たり判定の中心Yを取得
-     */
+    //指定された位置での当たり判定の中心Yを取得
     public float GetCenterY(float fCharacterY) {
         return fCharacterY + fOffsetY;
     }

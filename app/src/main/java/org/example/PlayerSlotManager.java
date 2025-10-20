@@ -32,6 +32,7 @@ public class PlayerSlotManager {
     private boolean[] bGamepadLongPressHandled;
     //ゲームパッドの長押し切断を処理済みか
     
+    //コンストラクタ
     public PlayerSlotManager(Window pWindow) {
         this.pWindow = pWindow;
         this.pSlots = new PlayerSlot[2];

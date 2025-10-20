@@ -18,7 +18,7 @@ public class UI {
         frame.setSize(800, 600);
 
         try {
-            BufferedImage image = ImageIO.read(new File("app/Image/GG.png"));
+            BufferedImage image = ImageIO.read(new File("Image/GG.png"));
             panel = new ImagePanel(image);
             frame.add(panel);
         } catch (IOException e) {

@@ -5,43 +5,43 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 
 public class Window {
-    private long window;
+    private long pWindow;
 
     public void create(int width, int height, String title) {
         if (!GLFW.glfwInit())
             throw new IllegalStateException("GLFW init failed");
 
-        window = GLFW.glfwCreateWindow(width, height, title, 0, 0);
-        if (window == 0)
+        pWindow = GLFW.glfwCreateWindow(width, height, title, 0, 0);
+        if (pWindow == 0)
             throw new RuntimeException("Failed to create window");
 
-        GLFW.glfwMakeContextCurrent(window);
+        GLFW.glfwMakeContextCurrent(pWindow);
         GL.createCapabilities();
 
         GL11.glEnable(GL11.GL_DEPTH_TEST);
-        GLFW.glfwShowWindow(window);
+        GLFW.glfwShowWindow(pWindow);
     }
 
     public long getHandle() {
-        return window;
+        return pWindow;
     }
 
     public boolean shouldClose() {
-        return GLFW.glfwWindowShouldClose(window);
+        return GLFW.glfwWindowShouldClose(pWindow);
     }
 
     public void update() {
-        GLFW.glfwSwapBuffers(window);
+        GLFW.glfwSwapBuffers(pWindow);
         GLFW.glfwPollEvents();
     }
 
     public void destroy() {
-        GLFW.glfwDestroyWindow(window);
+        GLFW.glfwDestroyWindow(pWindow);
         GLFW.glfwTerminate();
     }
 
     // キー入力チェック用メソッドを追加
     public boolean isKeyPressed(int key) {
-        return GLFW.glfwGetKey(window, key) == GLFW.GLFW_PRESS;
+        return GLFW.glfwGetKey(pWindow, key) == GLFW.GLFW_PRESS;
     }
 }

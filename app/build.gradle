@@ -36,6 +36,11 @@ application {
     mainClass = 'org.example.App'
 }
 
+// 実行時の作業ディレクトリを app フォルダに統一
+run {
+    workingDir = projectDir
+}
+
 tasks.test {
     useJUnitPlatform()
 }
