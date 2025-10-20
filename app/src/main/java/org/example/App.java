@@ -10,7 +10,7 @@ public class App {
         Window pWindow = new Window();
         //ウィンドウオブジェクト
         pWindow.create(1280, 720, "2D Fighting Game Prototype");
-
+        
         // カメラ設定（2D格ゲー用に平行投影）
         Camera pCamera = new Camera();
         //カメラオブジェクト
@@ -21,7 +21,7 @@ public class App {
         // キャラクターレンダラー作成
         CharacterRenderer pCharacterRenderer = new CharacterRenderer(pCamera);
         //キャラクターレンダラー
-        pCharacterRenderer.Initialize("app/Image/St001.png");
+        pCharacterRenderer.Initialize("Image/St001.png");
 
         // ゲームパッドが接続されている場合の情報表示
         System.out.println("=== ゲームパッド検出 ===");
