@@ -12,6 +12,8 @@ public class HitColliderBox {
     //キャラクターの中心からのX方向オフセット
     private float fOffsetY;
     //キャラクターの中心からのY方向オフセット
+    private String sTag = "default";
+    //タグ（用途に応じて使用可能、未使用時はdefault）
     
     public HitColliderBox(float fWidth, float fHeight) {
         this.fWidth = fWidth;
@@ -103,6 +105,20 @@ public class HitColliderBox {
      */
     public float GetCenterY(float fCharacterY) {
         return fCharacterY + fOffsetY;
+    }
+
+    /**
+     * タグを設定
+     */
+    public void SetTag(String sTag) {
+        this.sTag = sTag;
+    }
+
+    /**
+     * タグを取得
+     */
+    public String GetTag() {
+        return sTag;
     }
 }
 
