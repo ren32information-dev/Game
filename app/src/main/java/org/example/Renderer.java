@@ -16,7 +16,8 @@ public class Renderer {
     // 初期化（画像読み込み）
     //===========================
     public void init() {
-        textureId = TextureLoader.loadTexture("灰.png"); // ←画像を読み込む
+        textureId = TextureLoader.loadTexture("app/Image/灰.png"); // ←画像を読み込む
+
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glEnable(GL11.GL_DEPTH_TEST);
     }

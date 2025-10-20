@@ -16,7 +16,8 @@ public class Camera {
     private float near = 0.1f;
     private float far = 1000f;
 
-    private float speed = 0.1f; // 移動速度
+    private float speed = 5.0f;
+    //移動速度（1秒あたりのユニット数）
 
     public void setPerspective(boolean perspective) {
         isPerspective = perspective;
@@ -46,18 +47,23 @@ public class Camera {
         return projectionMatrix;
     }
 
-    //カメラ移動
-    public void moveCamera(boolean forward, boolean backward, boolean left, boolean right) {
-        Vector3f forwardDir = new Vector3f(target).sub(position).normalize(); // 前方向ベクトル
-        Vector3f rightDir = new Vector3f(forwardDir).cross(up).normalize();   // 右方向ベクトル
+    //カメラ移動（矢印キー用）
+    public void MoveCamera(boolean bUpKey, boolean bDownKey, boolean bLeftKey, boolean bRightKey, float fDeltaTime) {
+        Vector3f pForwardDirection = new Vector3f(target).sub(position).normalize();
+        //前方向ベクトル
+        Vector3f pRightDirection = new Vector3f(pForwardDirection).cross(up).normalize();
+        //右方向ベクトル
 
-        if (forward)  position.add(new Vector3f(forwardDir).mul(speed));
-        if (backward) position.sub(new Vector3f(forwardDir).mul(speed));
-        if (right)   position.add(new Vector3f(rightDir).mul(speed));
-        if (left)    position.sub(new Vector3f(rightDir).mul(speed));
+        float fMoveAmount = speed * fDeltaTime;
+        //移動量（デルタタイム考慮）
+
+        if (bUpKey)      position.add(new Vector3f(pForwardDirection).mul(fMoveAmount));  // 上キー: 前進
+        if (bDownKey)    position.sub(new Vector3f(pForwardDirection).mul(fMoveAmount));  // 下キー: 後退
+        if (bRightKey)   position.add(new Vector3f(pRightDirection).mul(fMoveAmount));    // 右キー: 右移動
+        if (bLeftKey)    position.sub(new Vector3f(pRightDirection).mul(fMoveAmount));    // 左キー: 左移動
 
         // ターゲットも一緒に動かす
-        target.set(position).add(forwardDir);
+        target.set(position).add(pForwardDirection);
     }
     // カメラの周りでターゲットを回す
     public void rotateTargetAroundCamera(float angle, float radius) {

@@ -1,3 +1,5 @@
+package org.example;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
@@ -20,7 +22,7 @@ public class ImageViewer {
 
         try {
             // 読み込む画像のパス（png/jpg/jpeg対応）
-            BufferedImage image = ImageIO.read(new File("灰.png"));
+            BufferedImage image = ImageIO.read(new File("GG.png"));
             // 例: "images/photo.jpg" などでもOK
 
             // ラベルに貼り付け
