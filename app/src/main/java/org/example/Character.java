@@ -121,5 +121,26 @@ public class Character {
     public void SetPositionY(float fY) {
         this.fPositionY = fY;
     }
+
+    public void OnCollision(Character pOther) {
+        // 衝突時の処理（必要に応じて実装）
+        String sTag1 = pHitBox.GetTag();
+        String sTag2 = pOther.GetHitBox().GetTag();
+
+        if (sTag1.equals("player") && sTag2.equals("player")) {
+            System.out.println("[衝突処理] プレイヤー同士が衝突しました！");
+            // 追加の処理をここに実装できます（例：ダメージ、押し出し、エフェクトなど）
+        }
+
+        if(sTag1.equals("player") && sTag2.equals("attack")) {
+            System.out.println("[衝突処理] プレイヤーが攻撃に当たりました！");
+            // 追加の処理をここに実装できます（例：ダメージ、エフェクトなど）
+        }
+
+        if(sTag1.equals("attack") && sTag2.equals("player")) {
+            System.out.println("[衝突処理] 攻撃がプレイヤーに当たりました！");
+            // 追加の処理をここに実装できます（例：ダメージ、エフェクトなど）
+        }
+    }
 }
 
