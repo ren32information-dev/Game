@@ -64,21 +64,25 @@ public class App {
         // プレイヤースロット管理の更新（接続/切断の検出）
         pSlotManager.Update(fDeltaTime);
 
-        // 各プレイヤーの更新
-        for (PlayerSlot pSlot : pSlotManager.GetAllSlots()) {
-            if (pSlot.IsOccupied()) {
-                Character pCharacter = pSlot.GetCharacter();
-                //CharacterはPlayerを継承しているので、Player型としても扱える
-                pCharacter.Update(fDeltaTime);
-            }
-        }
-        
+               // 各プレイヤーの更新
+               for (PlayerSlot pSlot : pSlotManager.GetAllSlots()) {
+                   if (pSlot.IsOccupied()) {
+                       Character pCharacter = pSlot.GetCharacter();
+                       //CharacterはPlayerを継承しているので、Player型としても扱える
+                       pCharacter.Update(fDeltaTime);
+                   }
+               }
+               
         // 両プレイヤーが存在する場合の処理
         PlayerSlot pSlot1 = pSlotManager.GetSlot(1);
         PlayerSlot pSlot2 = pSlotManager.GetSlot(2);
         if (pSlot1 != null && pSlot2 != null && pSlot1.IsOccupied() && pSlot2.IsOccupied()) {
             Character pChar1 = pSlot1.GetCharacter();
             Character pChar2 = pSlot2.GetCharacter();
+            
+            // 相互に相手を設定
+            pChar1.SetOpponentCharacter(pChar2);
+            pChar2.SetOpponentCharacter(pChar1);
             
             // カメラ更新（2キャラクターの中間点を注視）
             pCamera.UpdateFightingGameCamera(pChar1, pChar2);
