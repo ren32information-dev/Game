@@ -29,6 +29,8 @@ public class PlayerSlot {
         float fStartX = (nSlotNumber == 1) ? -3.0f : 3.0f;
         this.pCharacter = new Character(fStartX, 0f, 0f);
         
+        
+
         String sDeviceType = pInputManager.IsUsingGamepad() ? 
             "ゲームパッド(" + InputManager.GetGamepadName(pInputManager.GetGamepadId()) + ")" : 
             "キーボード";
@@ -69,4 +71,3 @@ public class PlayerSlot {
         return pCharacter;
     }
 }
-

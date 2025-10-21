@@ -24,17 +24,14 @@ public class App {
         pCamera.setPerspective(false); // 平行投影に設定
         pCamera.setPosition(0, 5, 15);
         pCamera.lookAt(0, 5, 0);
-
+        
         // キャラクターレンダラー作成
-        pCharacterRenderer = new CharacterRenderer(pCamera);
-
-        pUI = new UIManager(pCamera);
+        pCharacterRenderer = new CharacterRenderer(pCamera);    
+      
         // キャラクターレンダラー
         pCharacterRenderer.Initialize("Image/St001.png");
 
-        pUI.initUI();
-
-                // ゲームパッドが接続されている場合の情報表示
+        // ゲームパッドが接続されている場合の情報表示
         System.out.println("=== ゲームパッド検出 ===");
         for (int i = GLFW.GLFW_JOYSTICK_1; i <= GLFW.GLFW_JOYSTICK_4; i++) {
             if (InputManager.IsGamepadConnected(i)) {
@@ -44,7 +41,17 @@ public class App {
 
         // プレイヤースロット管理システムを作成
         pSlotManager = new PlayerSlotManager(pWindow);
+        PlayerSlot slot1 = pSlotManager.GetSlot(1);
 
+        if (slot1 != null) 
+        {
+            pUI = new UIManager(pCamera, slot1.GetCharacter());
+        }
+        else 
+        {
+           pUI = new UIManager(pCamera, null);
+        }
+        pUI.initUI();
     }
 
     public static void Uninit() {
