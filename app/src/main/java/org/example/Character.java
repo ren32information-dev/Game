@@ -1,4 +1,7 @@
 package org.example;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class Character {
     private float fPositionX;
@@ -25,9 +28,9 @@ public class Character {
     
     private int nTextureId;
     //キャラクターの画像ID
-    
-    private HitColliderBox pHitBox;
-    //当たり判定ボックス
+
+    private HashMap<String, HitColliderManager> pAllColliders;
+    // 被弾判定、攻撃判定、投げ判定などを管理するマップ
 
     private Gauge pGauge;
     //ゲージオブジェクト
@@ -43,9 +46,18 @@ public class Character {
         this.fGravity = -0.015f;
         this.fGroundLevel = 0f;
         this.bIsGrounded = true;
-        
-        // デフォルトの当たり判定ボックスを作成（幅1.0、高さ2.0）
-        this.pHitBox = new HitColliderBox(1.0f, 2.0f);
+
+        // 当たり判定マネージャーを初期化
+        this.pAllColliders = new HashMap<>();
+        this.pAllColliders.put("my", new HitColliderManager());         // 自身の当たり判定
+        this.pAllColliders.put("attack", new HitColliderManager());     // 攻撃判定
+        this.pAllColliders.put("throw", new HitColliderManager());      // 投げ判定
+
+        // 自身の当たり判定を追加
+        this.pAllColliders.get("my").AddHitCollider(new HitColliderBox(1.0f, 2.0f, 0.5f, 1.0f));
+        this.pAllColliders.get("my").AddHitCollider(new HitColliderBox(1.0f, 2.0f, -0.5f, 1.0f));
+        this.pAllColliders.get("my").AddHitCollider(new HitColliderBox(1.0f, 2.0f, 0.5f, -1.0f));
+        this.pAllColliders.get("my").AddHitCollider(new HitColliderBox(1.0f, 2.0f, -0.5f, -1.0f));
 
         // HP オブジェクトを初期化
         this.pHP = new HP();
@@ -133,13 +145,13 @@ public class Character {
     }
     
     //当たり判定ボックスを取得
-    public HitColliderBox GetHitBox() {
-        return pHitBox;
+    public HashMap<String, HitColliderManager> GetHitBoxs() {
+        return pAllColliders;
     }
     
     //当たり判定ボックスを設定
-    public void SetHitBox(HitColliderBox pHitBox) {
-        this.pHitBox = pHitBox;
+    public void SetHitBox(String sKey, HitColliderBox pHitBox) {
+        this.pAllColliders.get(sKey).AddHitCollider(pHitBox);
     }
     
     //X座標を設定
@@ -152,10 +164,8 @@ public class Character {
         this.fPositionY = fY;
     }
 
-    public void OnCollision(Character pOther) {
+    public void OnCollision(Character pOther, String sTag1, String sTag2) {
         // 衝突時の処理（必要に応じて実装）
-        String sTag1 = pHitBox.GetTag();
-        String sTag2 = pOther.GetHitBox().GetTag();
 
         if (sTag1.equals("player") && sTag2.equals("player")) {
             System.out.println("[衝突処理] プレイヤー同士が衝突しました！");
