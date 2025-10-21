@@ -44,7 +44,7 @@ public class App {
 
         // プレイヤースロット管理システムを作成
         pSlotManager = new PlayerSlotManager(pWindow);
-        
+
     }
 
     public static void Uninit() {
@@ -101,10 +101,7 @@ public class App {
             Character pChar2 = pSlot2.GetCharacter();
                 
             // 衝突判定
-            if (CollisionManager.CheckCharacterCollision(pChar1, pChar2)) {
-                pChar1.OnCollision(pChar2);
-                pChar2.OnCollision(pChar1);
-            }
+            CollisionManager.CheckCharacterCollision(pChar1, pChar2);
         }
 
         pUI.update(fDeltaTime);
