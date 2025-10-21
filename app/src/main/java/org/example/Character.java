@@ -28,6 +28,9 @@ public class Character {
     
     private HitColliderBox pHitBox;
     //当たり判定ボックス
+
+    private Gauge pGauge;
+    //ゲージオブジェクト
     
     public Character(float fX, float fY, float fZ) {
         this.fPositionX = fX;
@@ -46,6 +49,9 @@ public class Character {
 
         // HP オブジェクトを初期化
         this.pHP = new HP();
+
+        // ゲージオブジェクトを初期化
+        this.pGauge = new Gauge();
     }
     
     //画像を設定
@@ -106,6 +112,10 @@ public class Character {
     // 取得 HP オブジェクト
     public HP GetHP() {
         return pHP;
+    }
+
+    public Gauge GetGauge() {
+        return pGauge;
     }
     
     //X座標を取得
