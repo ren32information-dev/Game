@@ -63,8 +63,8 @@ public class App {
         }
     }
 
+    //更新処理
     public static void Update(float fDeltaTime) {
-        // 更新コード（必要に応じて追加）
         // プレイヤースロット管理の更新（接続/切断の検出）
         pSlotManager.Update(fDeltaTime);
 
@@ -93,7 +93,6 @@ public class App {
         }
             
         // プレイヤー同士の衝突判定
-        // ここで衝突時の処理を追加してください（例：ダメージ、押し出し、エフェクトなど）
         PlayerSlot pSlot1 = pSlotManager.GetSlot(1);
         PlayerSlot pSlot2 = pSlotManager.GetSlot(2);
         if (pSlot1 != null && pSlot2 != null && pSlot1.IsOccupied() && pSlot2.IsOccupied()) {
@@ -105,14 +104,18 @@ public class App {
                 pChar1.OnCollision(pChar2);
                 pChar2.OnCollision(pChar1);
             }
+            
+            // カメラを2キャラクターの中間点に向ける（距離に応じてズーム）
+            pCamera.UpdateFightingGameCamera(pChar1, pChar2);
         }
 
+        // UI更新
         pUI.update(fDeltaTime);
     }
 
+    //描画処理
     public static void Draw() {
-        // 描画コード（必要に応じて追加）
-        // 描画
+        // 画面クリア
         GL11.glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
@@ -124,8 +127,10 @@ public class App {
             }
         }
 
+        // UI描画
         pUI.drawUI();
 
+        // ウィンドウ更新
         pWindow.update();
     }
     public static void main(String[] args) {
@@ -136,6 +141,7 @@ public class App {
         double dLastTime = org.lwjgl.glfw.GLFW.glfwGetTime();
         //前フレームの時刻
 
+        // メインループ
         while (!pWindow.shouldClose()) {
             double dCurrentTime = org.lwjgl.glfw.GLFW.glfwGetTime();
             //現在の時刻
@@ -147,31 +153,9 @@ public class App {
             
             dLastTime = dCurrentTime;
 
+            // 更新と描画
             Update(fDeltaTime);
             Draw();
-
-            // 描画
-            GL11.glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
-            GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-
-            // 各プレイヤーのキャラクターを描画
-            for (PlayerSlot pSlot : pSlotManager.GetAllSlots()) {
-                if (pSlot.IsOccupied()) {
-                    pCharacterRenderer.DrawCharacter(pSlot.GetCharacter());
-                }
-            }
-
-            PlayerSlot pSlot1 = pSlotManager.GetSlot(1);
-            PlayerSlot pSlot2 = pSlotManager.GetSlot(2);
-            if (pSlot1 != null && pSlot2 != null && pSlot1.IsOccupied() && pSlot2.IsOccupied()) {
-                Character pChar1 = pSlot1.GetCharacter();
-                Character pChar2 = pSlot2.GetCharacter();
-                
-                // カメラを2キャラクターの中間点に向ける（距離に応じてズーム）
-                pCamera.UpdateFightingGameCamera(pChar1, pChar2);
-            }
-
-            pWindow.update();
         }
         // 解放
 
