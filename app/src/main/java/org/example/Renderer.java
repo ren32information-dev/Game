@@ -129,6 +129,67 @@ public class Renderer
 	    ColorB = b;
     }
 
+    public float GetSizeX()
+    {
+        return SizeX;
+    }
+
+    public float GetSizeY()
+    {
+        return SizeY;
+    }
+
+    public float GetSizeZ()
+    {
+        return SizeZ;
+    }
+
+    public float GetPosX()
+    {
+        return PosX;
+    }
+
+    public float GetPosY()
+    {
+        return PosY;
+    }
+
+    public float GetPosZ()
+    {
+        return PosZ;
+    }
+
+    public float SetSizeX()
+    {
+        return SizeX;
+    }
+
+    public float SetSizeY()
+    {
+        return SizeY;
+    }
+
+    public float SetSizeZ()
+    {
+        return SizeZ;
+    }
+
+    public float SetPosX()
+    {
+        return PosX;
+    }
+
+    public float SetPosY()
+    {
+        return PosY;
+    }
+
+    public float SetPosZ()
+    {
+        return PosZ;
+    }
+
+
     //===========================
     // 解放
     //===========================

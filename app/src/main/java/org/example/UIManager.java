@@ -1,97 +1,130 @@
 package org.example;
+import org.lwjgl.glfw.GLFW;
 
-public class UIManager {
-    // 註解：UI 要素の数を必要に応じて調整できます
-    private static final int MAX_UI_ELEMENTS = 10; 
-    private Renderer[] uiElements; // 複数の Renderer オブジェクトを格納する配列
+public class UIManager 
+{
+    private static final int P1_HP = 0; 
+    private static final int P1_MAXHP = 1;     
+    private static final int MAX_UI_ELEMENTS = 2; 
+    private Renderer[] uiElements; 
     private Camera mainCamera; 
+    
+    private final float HP_BAR_Y = 14.0f; 
+    private final float HP_BAR_MAX_X = -5.0f; // 假設背景條(-5.0f)是 HP 條的中心點
 
-    // 構造関数：Camera のみを受け取る（HPコントローラーへの依存を排除）
-    public UIManager(Camera camera) {
+    // 獲取紅色 HP 條的初始最大寬度 (假設它在 initUI 中設定)
+    final float MAX_HP_BAR_WIDTH = 4.0f; // 這裡我們假設最大寬度是 4.0f
+    
+    private Character playerCharacter;
+
+    public UIManager(Camera camera,Character character) 
+    {
         this.mainCamera = camera;
+        this.playerCharacter = character; // 儲存角色引用
         this.uiElements = new Renderer[MAX_UI_ELEMENTS];
     }
 
     //===========================
     // 全てのUI要素を初期化
     //===========================
-    public void initUI() {
-        // Renderer インスタンスを作成
-        for (int i = 0; i < MAX_UI_ELEMENTS; i++) {
+    public void initUI() 
+    {
+        for (int i = 0; i < MAX_UI_ELEMENTS; i++) 
+        {
             uiElements[i] = new Renderer(mainCamera); 
         }
 
         // =================================================
-        // UI 要素 [0]: 赤いHPバー (現在のHP) - 固定の初期値
+        // 赤いHPバー (現在のHP)
         // =================================================
-        uiElements[0].Init("UI/red.png"); 
-        // 暫定的な初期位置とサイズを設定 (後に外部から変更されることを想定)
-        uiElements[0].UIPos(0.0f, 3.5f, 0.0f); 
-        uiElements[0].UISize(4.0f, 0.4f, 1.0f);
-
-
+        uiElements[P1_HP].Init("UI/red.png");
+        uiElements[P1_HP].UIPos(HP_BAR_MAX_X, HP_BAR_Y, 0.0f); 
+        uiElements[P1_HP].UISize(MAX_HP_BAR_WIDTH, 0.4f, 1.0f);
+        uiElements[P1_HP].UIColor(1.0f, 1.0f, 1.0f);
+        
         // =================================================
-        // UI 要素 [1]: 灰色HPバーの背景 (最大HP) - 固定
+        // 灰色HPバーの背景 (最大HP)
         // =================================================
-        uiElements[1].Init("UI/gray.png");      
-        // 最大 HP バー (灰色): サイズと位置は固定
-        uiElements[1].UIPos(0.0f, 3.5f, 0.0f);
-        uiElements[1].UISize(4.0f, 0.4f, 1.0f); 
-
-        // 例：UI 要素 [2]: キャラクター画像
-        uiElements[2].Init("UI/blue.png"); 
-        uiElements[2].UIPos(-2.0f, 0.0f, 0.0f);
-        uiElements[2].UISize(1.5f, 1.5f, 1.0f);
+        uiElements[P1_MAXHP].Init("UI/gray.png");  
+        uiElements[P1_MAXHP].UIPos(HP_BAR_MAX_X, HP_BAR_Y, 0.0f); 
+        uiElements[P1_MAXHP].UISize(MAX_HP_BAR_WIDTH, 0.4f, 1.0f);
+        uiElements[P1_MAXHP].UIColor(1.0f, 1.0f, 1.0f); 
     }
 
     //===========================
     // 全てのUI要素を更新 (HPバーのロジックを完全に削除)
     //===========================
-    public void update(float deltaTime) {
+    public void update(float deltaTime)
+    {
         
-        // 【重要】: ここから HP バーの計算ロジックを完全に削除しました。
-        // 赤いHPバーの位置やサイズを更新したい場合は、
-        // 外部のクラス（例: App.java や別の Manager クラス）から
-        // uiElements[0].UIPos(...) や uiElements[0].UISize(...) を呼び出す必要があります。
+        if (playerCharacter != null) 
+        {
+            float ratio = playerCharacter.GetHP().getHealthRatio();
+            float currentWidth = MAX_HP_BAR_WIDTH * ratio;
+            float originalPosX = HP_BAR_MAX_X; 
+            float widthDifference = MAX_HP_BAR_WIDTH - currentWidth;
+            float newPosX = originalPosX - (widthDifference / 2.0f);
+             
+            uiElements[P1_HP].UISize(currentWidth, 0.4f, 1.0f);
+            uiElements[P1_HP].UIPos(newPosX, HP_BAR_Y, 0.0f); 
 
-        
-        // 全 Renderer の Update メソッドを呼び出す
-        for (Renderer renderer : uiElements) {
-            if (renderer != null) {
+            long windowID = GLFW.glfwGetCurrentContext();
+            
+            if (GLFW.glfwGetKey(windowID, GLFW.GLFW_KEY_B) == GLFW.GLFW_PRESS) 
+            {
+                currentWidth -= 0.5f;
+            }
+
+            playerCharacter.GetHP().update(); 
+        }
+
+        for (Renderer renderer : uiElements) 
+        {
+            if (renderer != null) 
+            {
                 renderer.Update(deltaTime);
             }
         }
+
+        //=====================DEBUG==========================
+        long windowID = GLFW.glfwGetCurrentContext();
+        
+        if (GLFW.glfwGetKey(windowID, GLFW.GLFW_KEY_N) == GLFW.GLFW_PRESS) 
+        {
+            uiElements[P1_MAXHP].UIPos(-5.0f, 14.0f, 0.0f);
+        }
+
+        if (GLFW.glfwGetKey(windowID, GLFW.GLFW_KEY_M) == GLFW.GLFW_PRESS) 
+        {
+            uiElements[P1_MAXHP].UIPos(-5.0f, 14.0f, 0.0f);
+        }
+        //=====================DEBUG==========================
+
     }
 
     //===========================
     // 全てのUI要素を描画
     //===========================
-    public void drawUI() {
-        // UI 要素 [1] (灰色/最大HP) を先に描画して背景にする
-        if (uiElements[1] != null) {
-            uiElements[1].Draw();
-        }
-        
-        // UI 要素 [0] (赤色/現在HP) をその上に描画する
-        if (uiElements[0] != null) {
-            uiElements[0].Draw();
-        }
-        
-        // 他の UI 要素を描画
-        for (int i = 2; i < MAX_UI_ELEMENTS; i++) {
-            if (uiElements[i] != null) {
-                uiElements[i].Draw();
-            }
-        }
+    public void drawUI() 
+    {
+       for (Renderer renderer : uiElements) 
+       {
+           if (renderer != null) 
+           {
+               renderer.Draw();
+           }
+       }
     }
     
     //===========================
     // リソースを解放
     //===========================
-    public void release() {
+    public void release() 
+    {
         for (Renderer renderer : uiElements) 
         {
-            if (renderer != null) {
+            if (renderer != null)
+            {
                 renderer.release();
             }
         }
@@ -100,7 +133,8 @@ public class UIManager {
     //===========================
     // 外部から Renderer にアクセスするためのゲッター (必要に応じて追加)
     //===========================
-    public Renderer getRenderer(int index) {
+    public Renderer getRenderer(int index) 
+    {
         if (index >= 0 && index < MAX_UI_ELEMENTS) {
             return uiElements[index];
         }
