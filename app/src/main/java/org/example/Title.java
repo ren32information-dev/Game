@@ -12,18 +12,20 @@ public class Title {
     private final Matrix4f projection;
     private boolean PressAnyButtonVisible = true; // 点滅制御用
 
-    int ScreenWidth = 800; //仮
-    int sScreenHeight = 600; //仮
+    private final int SCREEN_WIDTH = 1280;
+    private final int SCREEN_HEIGHT = 720;
+
 
     public Title(int ScreenWidth, int ScreenHeight) {
+        // コンストラクタで受け取ったサイズを保持
         // 2D座標(0〜screenWidth, 0〜screenHeight)で描画する行列を設定
-        this.projection = new Matrix4f().ortho2D(0, ScreenWidth, ScreenHeight, 0); 
+        this.projection = new Matrix4f().ortho2D(0, SCREEN_WIDTH, SCREEN_HEIGHT, 0); 
     }
 
     public void init() {
-        TitleLogoTextureId = TextureLoader.loadTexture("GG.png"); //画像ついかしてないので仮
-
-        PressAnyButtonTextureId = TextureLoader.loadTexture("GG.png"); //画像ついかしてないので仮
+        // 画像はまだないので仮で GG.png を使用
+        TitleLogoTextureId = TextureLoader.loadTexture("Image/GG.png"); 
+        PressAnyButtonTextureId = TextureLoader.loadTexture("Image/GG.png"); 
 
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glDisable(GL11.GL_DEPTH_TEST);
@@ -32,7 +34,7 @@ public class Title {
     public void update(float deltaTime) {
         model.identity().translate(0.0f, 0.0f, 0.0f); 
 
-        //0.5秒ごとに点滅
+        // 0.5秒ごとに点滅
         if (System.currentTimeMillis() % 1000 < 500) { 
             PressAnyButtonVisible = true;
         } else {
@@ -51,11 +53,21 @@ public class Title {
 
         GL11.glPushMatrix();
         GL11.glLoadMatrixf(mat);
+        
+        int logoWidth = 960;
+        int logoHeight = 450;
+        int logoX = (SCREEN_WIDTH - logoWidth) / 2;     // 中央揃え
+        int logoY = 80;                                 // 上端から80px
 
-        drawTexture(TitleLogoTextureId, 100, 50, 600, 300); // (テクスチャID, x, y, 幅, 高さ) 800x600に合わせて調整 あとで変更
+        drawTexture(TitleLogoTextureId, logoX, logoY, logoWidth, logoHeight); 
 
         if (PressAnyButtonVisible) {
-            drawTexture(PressAnyButtonTextureId, 250, 450, 300, 50); //800x600に合わせて調整 あとで変更
+            int buttonWidth = 480;
+            int buttonHeight = 80;
+            int buttonX = (SCREEN_WIDTH - buttonWidth) / 2; // 中央揃え
+            int buttonY = SCREEN_HEIGHT - 120;              // 下端から120px上に配置
+
+            drawTexture(PressAnyButtonTextureId, buttonX, buttonY, buttonWidth, buttonHeight); 
         }
         
         GL11.glPopMatrix();

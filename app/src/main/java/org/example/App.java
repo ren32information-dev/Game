@@ -12,6 +12,12 @@ public class App {
     private static CharacterRenderer pCharacterRenderer;
     private static PlayerSlotManager pSlotManager;
     private static UIManager pUI;
+    private static GameState CurrentState = GameState.TITLE;
+    private static Title pTitleScreen;
+    
+    public static void setGameState(GameState newState) {
+        CurrentState = newState;
+    }
 
     public static void Init() {
         // 初期化コード（必要に応じて追加）
@@ -25,6 +31,9 @@ public class App {
         pCamera.setPosition(0, 5, 15);
         pCamera.lookAt(0, 5, 0);
         
+        pTitleScreen = new Title(1280, 720);
+        pTitleScreen.init();
+
         // キャラクターレンダラー作成
         pCharacterRenderer = new CharacterRenderer(pCamera);    
       
@@ -68,50 +77,99 @@ public class App {
             pUI.release();
             pUI = null;
         }
+        if (pTitleScreen != null) {
+            pTitleScreen.release();
+            pTitleScreen = null;
+        }
     }
 
-    public static void Update(float fDeltaTime) {
+    public static void Update(float fDeltaTime) 
+    {
         // 更新コード（必要に応じて追加）
         // プレイヤースロット管理の更新（接続/切断の検出）
         pSlotManager.Update(fDeltaTime);
 
-        // 各プレイヤーの入力処理と更新
-        for (PlayerSlot pSlot : pSlotManager.GetAllSlots()) {
-           if (pSlot.IsOccupied()) {
-                InputManager pInputManager = pSlot.GetInputManager();
-                Character pCharacter = pSlot.GetCharacter();
-                    
-                // キャラクター操作
-                boolean bLeftMove = pInputManager.GetInput(InputType.LEFT);
-                boolean bRightMove = pInputManager.GetInput(InputType.RIGHT);
-                boolean bJump = pInputManager.GetInput(InputType.JUMP);
-                boolean bDamage = pInputManager.GetInput(InputType.LEFT);   // デバッグ用
-                boolean bHeal = pInputManager.GetInput(InputType.RIGHT);   // デバッグ用
-                    
-                if (bLeftMove) pCharacter.MoveLeft(fDeltaTime);
-                if (bRightMove) pCharacter.MoveRight(fDeltaTime);
-                if (bJump) pCharacter.Jump();
-                if (bDamage) pCharacter.DamageHP(); // デバッグ用
-                if (bHeal) pCharacter.HealHP();     // デバッグ用
-                    
-                // キャラクター更新
-                pCharacter.Update(fDeltaTime);
+        //タイトル
+        if(CurrentState == GameState.TITLE)
+        {
+            pTitleScreen.update(fDeltaTime);
+            if (pWindow.isKeyPressed(GLFW.GLFW_KEY_ENTER)) 
+            {
+                setGameState(GameState.CHARACTERSELECT);
+            } 
+            else if (pWindow.isKeyPressed(GLFW.GLFW_KEY_ESCAPE)) 
+            {
+                GLFW.glfwSetWindowShouldClose(pWindow.getHandle(), true);
             }
         }
-            
-        // プレイヤー同士の衝突判定
-        // ここで衝突時の処理を追加してください（例：ダメージ、押し出し、エフェクトなど）
-        PlayerSlot pSlot1 = pSlotManager.GetSlot(1);
-        PlayerSlot pSlot2 = pSlotManager.GetSlot(2);
-        if (pSlot1 != null && pSlot2 != null && pSlot1.IsOccupied() && pSlot2.IsOccupied()) {
-            Character pChar1 = pSlot1.GetCharacter();
-            Character pChar2 = pSlot2.GetCharacter();
-                
-            // 衝突判定
-            CollisionManager.CheckCharacterCollision(pChar1, pChar2);
-        }
 
-        pUI.update(fDeltaTime);
+        //キャラクターセレクト
+        else if (CurrentState == GameState.CHARACTERSELECT) 
+        {
+            //キャラクター選択画面の更新処理を追加
+
+            //デバッグ用にCキーでINGAMEへ
+            if (pWindow.isKeyPressed(GLFW.GLFW_KEY_C)) 
+            {
+                 setGameState(GameState.INGAME);
+            }
+        }
+        
+        //ゲーム中
+        else if (CurrentState == GameState.INGAME) 
+        {
+             // 各プレイヤーの入力処理と更新
+            for (PlayerSlot pSlot : pSlotManager.GetAllSlots()) 
+            {
+                if (pSlot.IsOccupied()) 
+                {
+                     InputManager pInputManager = pSlot.GetInputManager();
+                     Character pCharacter = pSlot.GetCharacter();
+                    
+                    // キャラクター操作
+                     boolean bLeftMove = pInputManager.GetInput(InputType.LEFT);
+                    boolean bRightMove = pInputManager.GetInput(InputType.RIGHT);
+                    boolean bJump = pInputManager.GetInput(InputType.JUMP);
+                    boolean bDamage = pInputManager.GetInput(InputType.LEFT);   // デバッグ用
+                    boolean bHeal = pInputManager.GetInput(InputType.RIGHT);   // デバッグ用
+                    
+                    if (bLeftMove) pCharacter.MoveLeft(fDeltaTime);
+                    if (bRightMove) pCharacter.MoveRight(fDeltaTime);
+                    if (bJump) pCharacter.Jump();
+                    if (bDamage) pCharacter.DamageHP(); // デバッグ用
+                    if (bHeal) pCharacter.HealHP();     // デバッグ用
+                    
+                    // キャラクター更新
+                    pCharacter.Update(fDeltaTime);
+                }
+            }
+            
+            // プレイヤー同士の衝突判定
+            // ここで衝突時の処理を追加してください（例：ダメージ、押し出し、エフェクトなど）
+            PlayerSlot pSlot1 = pSlotManager.GetSlot(1);
+            PlayerSlot pSlot2 = pSlotManager.GetSlot(2);
+            if (pSlot1 != null && pSlot2 != null && pSlot1.IsOccupied() && pSlot2.IsOccupied()) 
+            {
+                Character pChar1 = pSlot1.GetCharacter();
+                Character pChar2 = pSlot2.GetCharacter();
+                
+                // 衝突判定
+                CollisionManager.CheckCharacterCollision(pChar1, pChar2);
+            }
+            pUI.update(fDeltaTime);
+        } 
+
+        //リザルト画面
+        else if (CurrentState == GameState.RESULT) 
+        {
+            //リザルト画面の更新処理
+        
+            // 任意のキーが押されたら CHARACTERSELECT へ戻る
+            if (pWindow.isKeyPressed(GLFW.GLFW_KEY_ENTER)) 
+            {
+                setGameState(GameState.CHARACTERSELECT);
+            }
+        }
     }
 
     public static void Draw() {
@@ -120,16 +178,30 @@ public class App {
         GL11.glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
-        // 各プレイヤーのキャラクターを描画
-        for (PlayerSlot pSlot : pSlotManager.GetAllSlots()) 
+        // タイトル画面の描画
+        if (CurrentState == GameState.TITLE) 
         {
-            if (pSlot.IsOccupied()) {
-                pCharacterRenderer.DrawCharacter(pSlot.GetCharacter());
-            }
+            pTitleScreen.draw();
         }
 
-        pUI.drawUI();
+        // キャラクターセレクト画面の描画
+        else if (CurrentState == GameState.CHARACTERSELECT)
+        {
+            // ここにキャラクター選択画面の描画処理を追加
+        }
 
+        // ゲーム中の描画
+        else if (CurrentState == GameState.INGAME) 
+        {
+            // 各プレイヤーのキャラクターを描画
+            for (PlayerSlot pSlot : pSlotManager.GetAllSlots()) 
+            {
+                if (pSlot.IsOccupied()) {
+                pCharacterRenderer.DrawCharacter(pSlot.GetCharacter());
+                }
+            }
+            pUI.drawUI();
+        }
         pWindow.update();
     }
     public static void main(String[] args) {
