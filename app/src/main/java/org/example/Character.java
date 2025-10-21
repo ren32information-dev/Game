@@ -122,9 +122,6 @@ public class Character extends Player {
         this.fGravity = -0.015f;
         this.fGroundLevel = 0f;
         this.bIsGrounded = true;
-        
-        // デフォルトの当たり判定ボックスを作成（幅1.0、高さ2.0）
-        this.pHitBox = new HitColliderBox(1.0f, 2.0f);
 
         // HP オブジェクトを初期化
         this.pHP = new HP();

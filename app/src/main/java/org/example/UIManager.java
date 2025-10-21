@@ -59,7 +59,7 @@ public class UIManager
         
         if (playerCharacter != null) 
         {
-            float ratio = playerCharacter.GetHP().getHealthRatio();
+            float ratio = playerCharacter.GetHPObject().getHealthRatio();
             float currentWidth = MAX_HP_BAR_WIDTH * ratio;
             float originalPosX = HP_BAR_MAX_X; 
             float widthDifference = MAX_HP_BAR_WIDTH - currentWidth;
@@ -75,7 +75,7 @@ public class UIManager
                 currentWidth -= 0.5f;
             }
 
-            playerCharacter.GetHP().update(); 
+            playerCharacter.GetHPObject().update(); 
         }
 
         for (Renderer renderer : uiElements) 
