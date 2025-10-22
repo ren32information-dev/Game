@@ -10,6 +10,11 @@ public class Renderer
     float RtX, RtY, RtZ;
     float ColorR, ColorG, ColorB;
     
+    private float uv_u0 = 0.0f, uv_v0 = 0.0f; // 左上
+    private float uv_u1 = 1.0f, uv_v1 = 0.0f; // 右上
+    private float uv_u2 = 1.0f, uv_v2 = 1.0f; // 右下
+    private float uv_u3 = 0.0f, uv_v3 = 1.0f; // 左下
+
     private final Camera camera;
 
     private int textureId;
@@ -26,19 +31,27 @@ public class Renderer
         // Model行列を単位行列にリセット
         model.identity();
 
-        // 1. 平行移動 (Translation: 位置の適用)
+        // 1. 平行移動 Translation
         // まず中心位置へ移動します
         model.translate(PosX, PosY, PosZ);
         
-        // 2. 回転 (Rotation) 
+        // 2. 回転
         // 回転がある場合はここで行います
         // model.rotateX((float)Math.toRadians(RtX));
         // model.rotateY((float)Math.toRadians(RtY));
         // model.rotateZ((float)Math.toRadians(RtZ));
         
-        // 3. スケーリング (Scaling: サイズの適用)
+        // 3. スケーリング Scaling
         // 中心位置からの相対的なサイズを設定します
         model.scale(SizeX, SizeY, SizeZ);
+
+        
+
+        // 4. UV
+        uv_u0 = 0.0f; uv_v0 = 0.0f; 
+        uv_u1 = 1.0f; uv_v1 = 0.0f; 
+        uv_u2 = 1.0f; uv_v2 = 1.0f; 
+        uv_u3 = 0.0f; uv_v3 = 1.0f;
     }
     //===========================
     // 初期化（画像読み込み）
@@ -89,16 +102,22 @@ public class Renderer
         GL11.glPushMatrix();
         GL11.glLoadMatrixf(mat);
 
+        GL11.glColor3f(ColorR, ColorG, ColorB);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
         GL11.glBegin(GL11.GL_QUADS);
 
         //===========================
         // 前面 (UV付き)
         //===========================
-        GL11.glTexCoord2f(0, 0); GL11.glVertex3f(1, 1,  0);
-        GL11.glTexCoord2f(1, 0); GL11.glVertex3f( -1, 1,  0);
-        GL11.glTexCoord2f(1, 1); GL11.glVertex3f( -1,  -1,  0);
-        GL11.glTexCoord2f(0, 1); GL11.glVertex3f(1,  -1,  0);
+             
+        // 左上
+        GL11.glTexCoord2f(uv_u0, uv_v0); GL11.glVertex3f(-1, 1, 0);
+        // 右上
+        GL11.glTexCoord2f(uv_u1, uv_v1); GL11.glVertex3f(1, 1, 0);
+        // 右下
+        GL11.glTexCoord2f(uv_u2, uv_v2); GL11.glVertex3f(1, -1, 0);
+        // 左下
+        GL11.glTexCoord2f(uv_u3, uv_v3); GL11.glVertex3f(-1, -1, 0);
 
         GL11.glEnd();
         GL11.glPopMatrix();
@@ -127,6 +146,18 @@ public class Renderer
 	    ColorR = r;
 	    ColorG = g;
 	    ColorB = b;
+    }
+
+    public void SetUIUV(float u0, float v0, float u2, float v2) 
+    {
+        this.uv_u0 = u0; // 左上 U
+        this.uv_v0 = v0; // 左上 V
+        this.uv_u1 = u2; // 右上 U
+        this.uv_v1 = v0; // 右上 V
+        this.uv_u2 = u2; // 右下 U
+        this.uv_v2 = v2; // 右下 V
+        this.uv_u3 = u0; // 左下 U
+        this.uv_v3 = v2; // 左下 V
     }
 
     public float GetSizeX()
@@ -158,37 +189,6 @@ public class Renderer
     {
         return PosZ;
     }
-
-    public float SetSizeX()
-    {
-        return SizeX;
-    }
-
-    public float SetSizeY()
-    {
-        return SizeY;
-    }
-
-    public float SetSizeZ()
-    {
-        return SizeZ;
-    }
-
-    public float SetPosX()
-    {
-        return PosX;
-    }
-
-    public float SetPosY()
-    {
-        return PosY;
-    }
-
-    public float SetPosZ()
-    {
-        return PosZ;
-    }
-
 
     //===========================
     // 解放
