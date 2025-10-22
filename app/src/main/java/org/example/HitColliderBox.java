@@ -118,16 +118,17 @@ public class HitColliderBox {
             
             debugRenderer = new Renderer(pCamera);
             debugRenderer.Init("UI/gray.png");
-            debugRenderer.UISize(fWidth, fHeight, 1.0f);
-            debugRenderer.UIColor(1.0f, 1.0f, 1.0f); // 緑色
+            
         }
+
+        debugRenderer.UISize(fWidth / 2 + 0.1f, fHeight / 2 + 0.1f, 1.0f);
+        debugRenderer.UIColor(1.0f, 1.0f, 1.0f);
         
         float fPosX = GetCenterX(fCharacterX);
         float fPosY = GetCenterY(fCharacterY);
 
-        debugRenderer.UIPos(fPosX + fOffsetX, fPosY + fOffsetY, 0.0f);
+        debugRenderer.UIPos(fPosX, fPosY, 0.0f);
         debugRenderer.Draw();
-        System.out.println("当たり判定可視化");
     }
 }
 
