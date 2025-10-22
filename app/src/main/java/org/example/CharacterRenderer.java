@@ -42,6 +42,7 @@ public class CharacterRenderer {
         GL11.glPushMatrix();
         GL11.glLoadMatrixf(fMat);
 
+        GL11.glColor3f(1.0f,1.0f,1.0f);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, nTextureId);
         GL11.glBegin(GL11.GL_QUADS);
 
