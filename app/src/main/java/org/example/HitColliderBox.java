@@ -1,4 +1,7 @@
 package org.example;
+import org.joml.Matrix4f;
+import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL11;
 
 /**
  * 当たり判定ボックス（矩形の衝突判定）
@@ -12,6 +15,8 @@ public class HitColliderBox {
     //キャラクターの中心からのX方向オフセット
     private float fOffsetY;
     //キャラクターの中心からのY方向オフセット
+    private Renderer debugRenderer;
+
     
     public HitColliderBox(float fWidth, float fHeight) {
         this.fWidth = fWidth;
@@ -103,6 +108,26 @@ public class HitColliderBox {
      */
     public float GetCenterY(float fCharacterY) {
         return fCharacterY + fOffsetY;
+    }
+
+    /*
+     * 描画処理（デバッグ用）
+     */
+    public void Draw(Camera pCamera, float fCharacterX, float fCharacterY) {
+        if (debugRenderer == null) {
+            
+            debugRenderer = new Renderer(pCamera);
+            debugRenderer.Init("UI/gray.png");
+            debugRenderer.UISize(fWidth, fHeight, 1.0f);
+            debugRenderer.UIColor(1.0f, 1.0f, 1.0f); // 緑色
+        }
+        
+        float fPosX = GetCenterX(fCharacterX);
+        float fPosY = GetCenterY(fCharacterY);
+
+        debugRenderer.UIPos(fPosX + fOffsetX, fPosY + fOffsetY, 0.0f);
+        debugRenderer.Draw();
+        System.out.println("当たり判定可視化");
     }
 }
 
