@@ -24,6 +24,9 @@ public class CollisionManager {
         {
             for(String manager2 : pBox2.keySet())
             {
+                boolean checked = pBox1.get(manager1).IsChecked() || pBox2.get(manager2).IsChecked();
+                if(checked) continue;
+                boolean bIscollided = false;
                 for (HitColliderBox box1 : pBox1.get(manager1).GetHitColliders()) {
                     for (HitColliderBox box2 : pBox2.get(manager2).GetHitColliders()) {
    
@@ -48,9 +51,34 @@ public class CollisionManager {
                             
                             pChar1.OnCollision(pChar2, manager1, manager2);
                             pChar2.OnCollision(pChar1, manager2, manager1);
+                            bIscollided = true;
+                            break;
                         }
                     }
+                    if(bIscollided) {
+                        break;
+                    }
                 }
+            }
+        }
+    }
+
+    public static void DrawCollisionBoxes(Character pChar, Camera pCamera) {
+        HashMap<String, HitColliderManager> pBoxs = pChar.GetHitBoxs();
+
+        
+        if (pBoxs == null) {
+            return;
+            
+        }
+        
+        for(String manager : pBoxs.keySet())
+        {
+            for (HitColliderBox box : pBoxs.get(manager).GetHitColliders()) {
+
+                // 描画コードをここに追加
+                
+                box.Draw(pCamera, pChar.GetPositionX(), pChar.GetPositionY());
             }
         }
     }
