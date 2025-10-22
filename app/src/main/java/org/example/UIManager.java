@@ -10,7 +10,13 @@ public class UIManager
     private static final int P1_MAXGauge = 3;
     private static final int P1_Gauge_Number = 4;
     //===P1===
-    private static final int MAX_UI_ELEMENTS = 5; 
+
+    //===タイマー===
+    private static final int TIMER_DIGIT_TENS = 5;
+    private static final int TIMER_DIGIT_ONES = 6;
+    //===タイマー===
+
+    private static final int MAX_UI_ELEMENTS = 7; 
     
     private Renderer[] uiElements; 
     private Camera mainCamera; 
@@ -24,6 +30,8 @@ public class UIManager
     private static final float UV_UNIT_U = 1.0f / NUMBER_OF_COLUMNS; 
     private static final float UV_UNIT_V = 1.0f / NUMBER_OF_ROWS;
     //===数字UV===
+
+    private float fGameTimer = 99.0f; // タイマー
 
     final float MAX_HP_BAR_WIDTH = 4.0f;        //最大HPの長さ
     final float MAX_Gauge_BAR_WIDTH = 3.0f;     //最大Gaugeの長さ
@@ -89,6 +97,26 @@ public class UIManager
         uiElements[P1_Gauge_Number].UIColor(0.5f, 0.7f, 1.0f);
         
         DisplayNumber(P1_Gauge_Number, 2);
+
+        // =================================================
+        // 十の位
+        // =================================================
+        uiElements[TIMER_DIGIT_TENS].Init("UI/number.png"); 
+        uiElements[TIMER_DIGIT_TENS].UISize(0.8f, 0.8f, 1.0f); 
+        uiElements[TIMER_DIGIT_TENS].UIPos(-0.6f, 14.0f, 0.0f); 
+        uiElements[TIMER_DIGIT_TENS].UIColor(1.0f, 1.0f, 1.0f);
+
+        // =================================================
+        // 一の位
+        // =================================================
+        uiElements[TIMER_DIGIT_ONES].Init("UI/number.png"); 
+        uiElements[TIMER_DIGIT_ONES].UISize(0.8f, 0.8f, 1.0f); 
+        uiElements[TIMER_DIGIT_ONES].UIPos(0.6f, 14.0f, 0.0f); 
+        uiElements[TIMER_DIGIT_ONES].UIColor(1.0f, 1.0f, 1.0f);
+
+        //最初は99
+        DisplayNumber(TIMER_DIGIT_TENS, 9);
+        DisplayNumber(TIMER_DIGIT_ONES, 9);
     }
 
     //===========================
@@ -109,21 +137,6 @@ public class UIManager
             uiElements[P1_HP].UISize(currentWidth, 0.4f, 1.0f);
             uiElements[P1_HP].UIPos(newPosX, 14.0f, 0.0f); 
         }
-        
-        /*
-        //Gauge処理
-        if (playerCharacter != null) 
-        {
-            float ratio = playerCharacter.GetGauge().GetCurrentGauge();
-            float currentWidth = MAX_Gauge_BAR_WIDTH * ratio;
-            float originalPosX = Gauge_BAR_MAX_X; 
-            float widthDifference = MAX_Gauge_BAR_WIDTH - currentWidth;
-            float newPosX = originalPosX - widthDifference;
-            
-            uiElements[P1_Gauge].UISize(currentWidth, 0.4f, 1.0f);
-            uiElements[P1_Gauge].UIPos(newPosX, -3.5f, 0.0f); 
-        }
-        */
 
         if (playerCharacter != null) 
         {
@@ -153,6 +166,29 @@ public class UIManager
             // 現在の整数ゲージ格数を表示
             // 最大が 7 なので、一桁の数字のみが必要です。
             DisplayNumber(P1_Gauge_Number, nBars);
+        }
+
+        // =================================================
+        // タイマー処理
+        // =================================================
+        if (fGameTimer > 0.0f) 
+        {
+            fGameTimer -= deltaTime; 
+
+            if (fGameTimer < 0.0f) 
+            {
+                fGameTimer = 0.0f;
+            }
+
+            int seconds = (int) Math.floor(fGameTimer); //今の秒数取得
+        
+            int tensDigit = seconds / 10;   // 十の位
+            int onesDigit = seconds % 10;   // 一の位
+        
+            // 十の位を表示
+            DisplayNumber(TIMER_DIGIT_TENS, tensDigit);
+            // 一の位を表示
+            DisplayNumber(TIMER_DIGIT_ONES, onesDigit);
         }
 
         for (Renderer renderer : uiElements) 
