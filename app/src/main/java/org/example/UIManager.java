@@ -140,4 +140,12 @@ public class UIManager
         }
         return null;
     }
+
+    //===========================
+    // プレイヤーキャラクターを設定
+    //===========================
+    public void SetPlayerCharacter(Character character) 
+    {
+        this.playerCharacter = character;
+    }
 }

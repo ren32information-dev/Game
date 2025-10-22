@@ -156,6 +156,8 @@ public class App {
                 // 衝突判定
                 CollisionManager.CheckCharacterCollision(pChar1, pChar2);
             }
+            Character playerCharacter = pSlot1.GetCharacter();
+            pUI.SetPlayerCharacter(playerCharacter);
             pUI.update(fDeltaTime);
         } 
 
