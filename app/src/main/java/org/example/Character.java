@@ -79,10 +79,10 @@ public class Character extends Player {
         this.pAllColliders.put("throw", new HitColliderManager());      // 投げ判定
 
         // 自身の当たり判定を追加
-        this.pAllColliders.get("my").AddHitCollider(new HitColliderBox(1.0f, 2.0f, 0.5f, 1.0f));
-        this.pAllColliders.get("my").AddHitCollider(new HitColliderBox(1.0f, 2.0f, -0.5f, 1.0f));
-        this.pAllColliders.get("my").AddHitCollider(new HitColliderBox(1.0f, 2.0f, 0.5f, -1.0f));
-        this.pAllColliders.get("my").AddHitCollider(new HitColliderBox(1.0f, 2.0f, -0.5f, -1.0f));
+        this.pAllColliders.get("my").AddHitCollider(new HitColliderBox(1.0f, 1.0f, 0.5f, 0.5f));
+        this.pAllColliders.get("my").AddHitCollider(new HitColliderBox(1.0f, 1.0f, -0.5f, 0.5f));
+        this.pAllColliders.get("my").AddHitCollider(new HitColliderBox(1.0f, 1.0f, 0.5f, -0.5f));
+        this.pAllColliders.get("my").AddHitCollider(new HitColliderBox(1.0f, 1.0f, -0.5f, -0.5f));
 
         // HP オブジェクトを初期化
         this.pHP = new HP();
@@ -122,6 +122,18 @@ public class Character extends Player {
         this.fGravity = -0.015f;
         this.fGroundLevel = 0f;
         this.bIsGrounded = true;
+
+        // 当たり判定マネージャーを初期化
+        this.pAllColliders = new HashMap<>();
+        this.pAllColliders.put("my", new HitColliderManager());         // 自身の当たり判定
+        this.pAllColliders.put("attack", new HitColliderManager());     // 攻撃判定
+        this.pAllColliders.put("throw", new HitColliderManager());      // 投げ判定
+
+        // 自身の当たり判定を追加
+        this.pAllColliders.get("my").AddHitCollider(new HitColliderBox(1.0f, 1.5f, 0.5f, 0.8f)); // 右下
+        this.pAllColliders.get("my").AddHitCollider(new HitColliderBox(1.0f, 1.5f, -0.5f, 0.8f));   // 左下
+        this.pAllColliders.get("my").AddHitCollider(new HitColliderBox(1.0f, 1.5f, 0.5f, 2.2f));   // 右上
+        this.pAllColliders.get("my").AddHitCollider(new HitColliderBox(1.0f, 1.5f, -0.5f, 2.2f));  // 左上
 
         // HP オブジェクトを初期化
         this.pHP = new HP();
@@ -290,7 +302,7 @@ public class Character extends Player {
     public void OnCollision(Character pOther, String sTag1, String sTag2) {
         // 衝突時の処理（必要に応じて実装）
 
-        if (sTag1.equals("player") && sTag2.equals("player")) {
+        if (sTag1.equals("my") && sTag2.equals("my")) {
             System.out.println("[衝突処理] プレイヤー同士が衝突しました！");
             // 追加の処理をここに実装できます（例：ダメージ、押し出し、エフェクトなど）
         }
