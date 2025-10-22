@@ -80,8 +80,8 @@ public class Camera {
         float fMidPointZ = (pChar1.GetPositionZ() + pChar2.GetPositionZ()) / 2.0f;
         //中間点Z座標
         
-        float fVerticalOffset = 3.0f;
-        //カメラと注視点の縦軸オフセット（画面全体を上にシフト）
+        float fVerticalOffset = 5.0f;
+        //カメラと注視点の縦軸オフセット（マイナスでキャラクターを画面下部に配置）
         
         // 2キャラクター間の距離を計算
         float fDistanceX = pChar1.GetPositionX() - pChar2.GetPositionX();
@@ -93,9 +93,9 @@ public class Camera {
         
         // 距離に応じてカメラのZ位置を調整（距離が遠いほど引く）
         float fMinCameraDistance = 10.0f;
-        //最小カメラ距離（キャラが近い時）
+        //最小カメラ距離（キャラが遠い時、カメラを寄せる）
         float fMaxCameraDistance = 20.0f;
-        //最大カメラ距離（キャラが遠い時）
+        //最大カメラ距離（キャラが近い時、カメラを引く）
         float fDistanceThresholdMin = 2.0f;
         //距離判定の最小閾値
         float fDistanceThresholdMax = 10.0f;
@@ -107,16 +107,16 @@ public class Camera {
         fNormalizedDistance = Math.max(0.0f, Math.min(1.0f, fNormalizedDistance));
         //0.0～1.0にクランプ
         
-        // カメラ距離を計算
-        float fCameraDistance = fMinCameraDistance + (fMaxCameraDistance - fMinCameraDistance) * fNormalizedDistance;
+        // カメラ距離を計算（キャラが近いほどカメラを引く、遠いほど寄せる）
+        float fCameraDistance = fMaxCameraDistance - (fMaxCameraDistance - fMinCameraDistance) * fNormalizedDistance;
         //現在のカメラ距離
         
-        // カメラの位置を設定（中間点の後ろ、少し上から）
-        float fCameraHeightOffset = 2.0f;
-        //カメラの高さオフセット（注視点より少し上）
+        // カメラの位置を設定（中間点の後ろ、上から見下ろす）
+        float fCameraHeightOffset = 6.0f;
+        //カメラの高さオフセット（注視点より上に配置してUIスペースを確保）
         setPosition(fMidPointX, fMidPointY + fVerticalOffset + fCameraHeightOffset, fMidPointZ + fCameraDistance);
         
-        // 注視点を中間点＋縦軸オフセットに設定（画面を上げてUIと重ならないように）
+        // 注視点を中間点＋縦軸オフセットに設定（キャラクターを画面下部に配置してUI領域を確保）
         lookAt(fMidPointX, fMidPointY + fVerticalOffset, fMidPointZ);
     }
 
