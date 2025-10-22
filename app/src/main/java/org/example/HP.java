@@ -5,7 +5,7 @@ import org.lwjgl.glfw.GLFW;
 public class HP {
     
     private float maxHP = 100.0f; // 最大HP
-    private float currentHP = 20.0f; // 當前HP
+    private float currentHP = 100.0f; // 當前HP
     
     // 構造函數：接受視窗ID
     public HP() {
