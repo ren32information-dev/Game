@@ -9,6 +9,8 @@ import org.lwjgl.glfw.GLFWGamepadState;
 public class PlayerSlotManager {
     private Window pWindow;
     //ウィンドウオブジェクト
+    private Camera pCamera;
+    //カメラオブジェクト（境界チェック用）
     private PlayerSlot[] pSlots;
     //プレイヤースロット配列
     
@@ -52,6 +54,48 @@ public class PlayerSlotManager {
         System.out.println("  Switchコントローラー: +ボタン");
         System.out.println("切断方法: 各ボタンを1秒長押し");
         System.out.println("========================================");
+        
+        // 自動的に2体のプレイヤーを作成（表示のみ）
+        AutoConnectPlayers();
+    }
+    
+    //カメラを設定（App.javaから呼び出す）
+    public void SetCamera(Camera pCamera) {
+        this.pCamera = pCamera;
+        
+        // 既存のキャラクターにもカメラを設定
+        for (PlayerSlot pSlot : pSlots) {
+            if (pSlot.IsOccupied()) {
+                pSlot.GetCharacter().SetCamera(pCamera);
+            }
+        }
+        System.out.println("[PlayerSlotManager] カメラを設定しました");
+    }
+    
+    //自動的にプレイヤーを接続（表示のみ、入力は後で接続）
+    private void AutoConnectPlayers() {
+        // プレイヤー1を表示のみで作成
+        pSlots[0].ConnectDisplayOnly();
+        
+        // プレイヤー2を表示のみで作成
+        pSlots[1].ConnectDisplayOnly();
+        
+        // 相手キャラクターの設定
+        if (pSlots[0].IsOccupied() && pSlots[1].IsOccupied()) {
+            Character pChar1 = pSlots[0].GetCharacter();
+            Character pChar2 = pSlots[1].GetCharacter();
+            pChar1.SetOpponentCharacter(pChar2);
+            pChar2.SetOpponentCharacter(pChar1);
+            
+            // カメラが設定されていればキャラクターにも設定
+            if (pCamera != null) {
+                pChar1.SetCamera(pCamera);
+                pChar2.SetCamera(pCamera);
+            }
+        }
+        
+        System.out.println("[自動接続] 2体のプレイヤーを作成しました（表示のみ、入力待機中）");
+        System.out.println("  - キーボードまたはコントローラーを接続して操作を開始してください");
     }
     
     //更新処理（毎フレーム呼び出す）
@@ -139,8 +183,25 @@ public class PlayerSlotManager {
     private void TryConnectKeyboard() {
         // すでにキーボードが接続されているか確認
         for (PlayerSlot pSlot : pSlots) {
-            if (pSlot.IsOccupied() && !pSlot.GetInputManager().IsUsingGamepad()) {
+            if (pSlot.IsOccupied() && pSlot.GetInputManager() != null && !pSlot.GetInputManager().IsUsingGamepad()) {
                 System.out.println("[警告] キーボードは既に接続されています");
+                return;
+            }
+        }
+        
+        // 入力が無効なスロットを探す（表示のみのプレイヤー）
+        for (PlayerSlot pSlot : pSlots) {
+            if (pSlot.IsOccupied() && !pSlot.IsInputEnabled()) {
+                InputManager pInputManager = new InputManager(pWindow, pSlot.GetSlotNumber());
+                pSlot.AttachInputManager(pInputManager);
+                
+                // カメラが設定されていればキャラクターにも設定
+                if (pCamera != null) {
+                    pSlot.GetCharacter().SetCamera(pCamera);
+                }
+                
+                // 相手キャラクターの設定を更新
+                UpdateOpponentReferences();
                 return;
             }
         }
@@ -150,6 +211,14 @@ public class PlayerSlotManager {
             if (!pSlot.IsOccupied()) {
                 InputManager pInputManager = new InputManager(pWindow, pSlot.GetSlotNumber());
                 pSlot.Connect(pInputManager);
+                
+                // カメラが設定されていればキャラクターにも設定
+                if (pCamera != null) {
+                    pSlot.GetCharacter().SetCamera(pCamera);
+                }
+                
+                // 相手キャラクターの設定を更新
+                UpdateOpponentReferences();
                 return;
             }
         }
@@ -162,11 +231,28 @@ public class PlayerSlotManager {
     private void TryConnectGamepad(int nGamepadId) {
         // このゲームパッドが既に接続されているか確認
         for (PlayerSlot pSlot : pSlots) {
-            if (pSlot.IsOccupied() && pSlot.GetInputManager().IsUsingGamepad()) {
+            if (pSlot.IsOccupied() && pSlot.GetInputManager() != null && pSlot.GetInputManager().IsUsingGamepad()) {
                 if (pSlot.GetInputManager().GetGamepadId() == nGamepadId) {
                     System.out.println("[警告] このゲームパッドは既に接続されています");
                     return;
                 }
+            }
+        }
+        
+        // 入力が無効なスロットを探す（表示のみのプレイヤー）
+        for (PlayerSlot pSlot : pSlots) {
+            if (pSlot.IsOccupied() && !pSlot.IsInputEnabled()) {
+                InputManager pInputManager = new InputManager(pWindow, pSlot.GetSlotNumber(), nGamepadId);
+                pSlot.AttachInputManager(pInputManager);
+                
+                // カメラが設定されていればキャラクターにも設定
+                if (pCamera != null) {
+                    pSlot.GetCharacter().SetCamera(pCamera);
+                }
+                
+                // 相手キャラクターの設定を更新
+                UpdateOpponentReferences();
+                return;
             }
         }
         
@@ -175,6 +261,14 @@ public class PlayerSlotManager {
             if (!pSlot.IsOccupied()) {
                 InputManager pInputManager = new InputManager(pWindow, pSlot.GetSlotNumber(), nGamepadId);
                 pSlot.Connect(pInputManager);
+                
+                // カメラが設定されていればキャラクターにも設定
+                if (pCamera != null) {
+                    pSlot.GetCharacter().SetCamera(pCamera);
+                }
+                
+                // 相手キャラクターの設定を更新
+                UpdateOpponentReferences();
                 return;
             }
         }
@@ -186,8 +280,11 @@ public class PlayerSlotManager {
     //キーボードを切断
     private void DisconnectKeyboard() {
         for (PlayerSlot pSlot : pSlots) {
-            if (pSlot.IsOccupied() && !pSlot.GetInputManager().IsUsingGamepad()) {
+            if (pSlot.IsOccupied() && pSlot.GetInputManager() != null && !pSlot.GetInputManager().IsUsingGamepad()) {
                 pSlot.Disconnect();
+                
+                // 相手キャラクターの設定を更新（プレイヤーは表示のみで残る）
+                UpdateOpponentReferences();
                 return;
             }
         }
@@ -196,9 +293,12 @@ public class PlayerSlotManager {
     //ゲームパッドを切断
     private void DisconnectGamepad(int nGamepadId) {
         for (PlayerSlot pSlot : pSlots) {
-            if (pSlot.IsOccupied() && pSlot.GetInputManager().IsUsingGamepad()) {
+            if (pSlot.IsOccupied() && pSlot.GetInputManager() != null && pSlot.GetInputManager().IsUsingGamepad()) {
                 if (pSlot.GetInputManager().GetGamepadId() == nGamepadId) {
                     pSlot.Disconnect();
+                    
+                    // 相手キャラクターの設定を更新（プレイヤーは表示のみで残る）
+                    UpdateOpponentReferences();
                     return;
                 }
             }
@@ -216,6 +316,24 @@ public class PlayerSlotManager {
     //すべてのスロットを取得
     public PlayerSlot[] GetAllSlots() {
         return pSlots;
+    }
+    
+    //相手キャラクターへの参照を更新
+    private void UpdateOpponentReferences() {
+        if (pSlots[0].IsOccupied() && pSlots[1].IsOccupied()) {
+            Character pChar1 = pSlots[0].GetCharacter();
+            Character pChar2 = pSlots[1].GetCharacter();
+            pChar1.SetOpponentCharacter(pChar2);
+            pChar2.SetOpponentCharacter(pChar1);
+        } else {
+            // どちらかが切断されている場合は参照をnullにする
+            if (pSlots[0].IsOccupied()) {
+                pSlots[0].GetCharacter().SetOpponentCharacter(null);
+            }
+            if (pSlots[1].IsOccupied()) {
+                pSlots[1].GetCharacter().SetOpponentCharacter(null);
+            }
+        }
     }
 }
 

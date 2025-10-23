@@ -50,6 +50,7 @@ public class App {
 
         // プレイヤースロット管理システムを作成
         pSlotManager = new PlayerSlotManager(pWindow);
+        pSlotManager.SetCamera(pCamera); // カメラを設定（境界チェック用）
         PlayerSlot slot1 = pSlotManager.GetSlot(1);
 
         if (slot1 != null) 
@@ -123,29 +124,33 @@ public class App {
             {
                 if (pSlot.IsOccupied()) 
                 {
-                     InputManager pInputManager = pSlot.GetInputManager();
                      Character pCharacter = pSlot.GetCharacter();
                     
-                    // キャラクター操作
-                     boolean bLeftMove = pInputManager.GetInput(InputType.LEFT);
-                    boolean bRightMove = pInputManager.GetInput(InputType.RIGHT);
-                    boolean bJump = pInputManager.GetInput(InputType.JUMP);
-                    boolean bDamage = pInputManager.GetInput(InputType.LEFT);   // デバッグ用
-                    boolean bHeal = pInputManager.GetInput(InputType.RIGHT);   // デバッグ用
+                    // 入力が有効な場合のみ手動操作を処理
+                    if (pSlot.IsInputEnabled())
+                    {
+                        InputManager pInputManager = pSlot.GetInputManager();
+                        
+                        // キャラクター操作
+                        boolean bLeftMove = pInputManager.GetInput(InputType.LEFT);
+                        boolean bRightMove = pInputManager.GetInput(InputType.RIGHT);
+                        boolean bJump = pInputManager.GetInput(InputType.JUMP);
+                        boolean bDamage = pInputManager.GetInput(InputType.LEFT);   // デバッグ用
+                        boolean bHeal = pInputManager.GetInput(InputType.RIGHT);   // デバッグ用
+                        
+                        if (bLeftMove) pCharacter.MoveLeft(fDeltaTime);
+                        if (bRightMove) pCharacter.MoveRight(fDeltaTime);
+                        if (bJump) pCharacter.Jump();
+                        if (bDamage) pCharacter.DamageHP(); // デバッグ用
+                        if (bHeal) pCharacter.HealHP();     // デバッグ用
+                    }
                     
-                    if (bLeftMove) pCharacter.MoveLeft(fDeltaTime);
-                    if (bRightMove) pCharacter.MoveRight(fDeltaTime);
-                    if (bJump) pCharacter.Jump();
-                    if (bDamage) pCharacter.DamageHP(); // デバッグ用
-                    if (bHeal) pCharacter.HealHP();     // デバッグ用
-                    
-                    // キャラクター更新
+                    // キャラクター更新（入力無効でも物理演算などは動く）
                     pCharacter.Update(fDeltaTime);
                 }
             }
             
             // プレイヤー同士の衝突判定
-            // ここで衝突時の処理を追加してください（例：ダメージ、押し出し、エフェクトなど）
             PlayerSlot pSlot1 = pSlotManager.GetSlot(1);
             PlayerSlot pSlot2 = pSlotManager.GetSlot(2);
             if (pSlot1 != null && pSlot2 != null && pSlot1.IsOccupied() && pSlot2.IsOccupied()) 
@@ -155,9 +160,16 @@ public class App {
                 
                 // 衝突判定
                 CollisionManager.CheckCharacterCollision(pChar1, pChar2);
+                
+                // カメラを2キャラクターの中間点に向ける（距離に応じてズーム）
+                pCamera.UpdateFightingGameCamera(pChar1, pChar2);
             }
-            Character playerCharacter = pSlot1.GetCharacter();
-            pUI.SetPlayerCharacter(playerCharacter);
+            
+            // UI更新
+            if (pSlot1 != null && pSlot1.IsOccupied()) {
+                Character playerCharacter = pSlot1.GetCharacter();
+                pUI.SetPlayerCharacter(playerCharacter);
+            }
             pUI.update(fDeltaTime);
         } 
 

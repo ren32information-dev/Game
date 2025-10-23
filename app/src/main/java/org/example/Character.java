@@ -56,6 +56,43 @@ public class Character extends Player {
     private Character pOpponentCharacter;
     //相手キャラクターへの参照
     
+    private Camera pCamera;
+    //カメラへの参照（境界チェック用）
+    
+    private JumpType eJumpType;
+    //ジャンプの種類（バックジャンプ、垂直ジャンプ、前ジャンプ）
+    private int nJumpPreparationFrames;
+    //ジャンプ予備動作フレーム数
+    private static final int JUMP_PREPARATION_FRAMES = 3;
+    //ジャンプ予備動作の必要フレーム数（3フレーム待機、4フレーム目にジャンプ）
+    private float fJumpDirectionX;
+    //ジャンプ時の水平方向速度
+    
+    private boolean bAirDashUsed;
+    //空中ダッシュを使用済みか
+    private boolean bIsAirDashing;
+    //現在空中ダッシュ中か
+    private float fAirDashTimer;
+    //空中ダッシュタイマー
+    private float fAirDashSpeed;
+    //空中ダッシュ速度
+    private float fAirDashDuration;
+    //空中ダッシュ持続時間
+    private float fAirDashDirectionX;
+    //空中ダッシュの方向
+    
+    //ジャンプの種類を定義
+    private enum JumpType {
+        NONE,
+        //ジャンプしていない
+        BACK_JUMP,
+        //バックジャンプ（7方向）
+        VERTICAL_JUMP,
+        //垂直ジャンプ（8方向）
+        FORWARD_JUMP
+        //前ジャンプ（9方向）
+    }
+    
     //コンストラクタ（プレイヤー番号と入力マネージャーを受け取る）
     public Character(int nPlayerNumber, InputManager pInputManager, float fX, float fY, float fZ) {
         // 親クラス（Player）のコンストラクタを呼び出し
@@ -103,6 +140,20 @@ public class Character extends Player {
         this.fDashTimer = 0f;
         
         this.pOpponentCharacter = null;
+        this.pCamera = null;
+        
+        // ジャンプパラメータ
+        this.eJumpType = JumpType.NONE;
+        this.nJumpPreparationFrames = 0;
+        this.fJumpDirectionX = 0f;
+        
+        // 空中ダッシュパラメータ（地上ダッシュの半分の距離 2.25 = 15.0 × 0.15）
+        this.bAirDashUsed = false;
+        this.bIsAirDashing = false;
+        this.fAirDashTimer = 0f;
+        this.fAirDashSpeed = 15.0f; // 地上ダッシュと同じ速度
+        this.fAirDashDuration = 0.15f; // 地上ダッシュの半分の時間（距離半減）
+        this.fAirDashDirectionX = 0f;
         
         System.out.println("[Character] キャラクターを作成しました (位置: " + fX + ", " + fY + ", " + fZ + ")");
     }
@@ -154,6 +205,20 @@ public class Character extends Player {
         this.fDashTimer = 0f;
         
         this.pOpponentCharacter = null;
+        this.pCamera = null;
+        
+        // ジャンプパラメータ
+        this.eJumpType = JumpType.NONE;
+        this.nJumpPreparationFrames = 0;
+        this.fJumpDirectionX = 0f;
+        
+        // 空中ダッシュパラメータ
+        this.bAirDashUsed = false;
+        this.bIsAirDashing = false;
+        this.fAirDashTimer = 0f;
+        this.fAirDashSpeed = 15.0f;
+        this.fAirDashDuration = 0.15f; // 地上ダッシュの半分の時間
+        this.fAirDashDirectionX = 0f;
     }
     
     //画像を設定
@@ -185,7 +250,7 @@ public class Character extends Player {
             boolean bRightMove = pInputManager.GetInput(InputType.RIGHT);
             boolean bJump = pInputManager.GetInput(InputType.JUMP);
             boolean bGuard = pInputManager.GetInput(InputType.GUARD);
-            boolean bUp = pInputManager.GetInput(InputType.JUMP); // 仮で上方向
+            boolean bUp = pInputManager.GetInput(InputType.JUMP); // 上方向
             boolean bDown = false; // TODO: 下入力の実装
             
             // 現在のゲーム時刻を取得
@@ -204,13 +269,26 @@ public class Character extends Player {
             // 相手との相対位置を考慮したダッシュ方向を計算
             boolean[] aDashDirections = CalculateDashDirections(bDashForward, bDashBackward);
             
+            // ジャンプの種類を判定（7,8,9方向）
+            JumpType eRequestedJumpType = JumpType.NONE;
+            if (nDirection == 7) {
+                eRequestedJumpType = JumpType.BACK_JUMP;
+            } else if (nDirection == 8) {
+                eRequestedJumpType = JumpType.VERTICAL_JUMP;
+            } else if (nDirection == 9) {
+                eRequestedJumpType = JumpType.FORWARD_JUMP;
+            }
+            
             // 状態遷移の処理
-            UpdateState(bLeftMove, bRightMove, bJump, bGuard, aDashDirections[0], aDashDirections[1], fDeltaTime);
+            UpdateState(bLeftMove, bRightMove, bJump, bGuard, aDashDirections[0], aDashDirections[1], eRequestedJumpType, fDeltaTime);
         }
         
-        // 重力を適用
-        fVelocityY += fGravity;
-        fPositionY += fVelocityY;
+        // 重力を適用（空中ダッシュ中は無効化）
+        if (!bIsAirDashing) {
+            fVelocityY += fGravity;
+            fPositionY += fVelocityY;
+        }
+        // 空中ダッシュ中はY座標を維持（真横移動のみ）
         
         // 地面判定
         if (fPositionY <= fGroundLevel) {
@@ -225,23 +303,125 @@ public class Character extends Player {
         if (eCurrentState != ePreviousState) {
             System.out.println("[Player" + nPlayerNumber + "] 状態遷移: " + ePreviousState + " → " + eCurrentState);
         }
+        
+        // カメラの視野範囲外に出ないように座標を制限
+        ClampPositionToCameraBounds();
     }
     
-    //左に移動
+    //左に移動（地上のみ、空中では無効。ジャンプ予備動作中は移動可能）
     public void MoveLeft(float fDeltaTime) {
+        // 空中にいる場合のみ移動禁止（地上でのジャンプ予備動作中は移動可能）
+        if (!bIsGrounded) {
+            return;
+        }
         fPositionX -= fMoveSpeed * fDeltaTime;
     }
     
-    //右に移動
+    //右に移動（地上のみ、空中では無効。ジャンプ予備動作中は移動可能）
     public void MoveRight(float fDeltaTime) {
+        // 空中にいる場合のみ移動禁止（地上でのジャンプ予備動作中は移動可能）
+        if (!bIsGrounded) {
+            return;
+        }
         fPositionX += fMoveSpeed * fDeltaTime;
     }
     
-    //ジャンプ
+    //ジャンプ（格闘ゲーム式ジャンプに切り替えたため無効化）
     public void Jump() {
-        if (bIsGrounded) {
-            fVelocityY = fJumpPower;
-            bIsGrounded = false;
+        // 格闘ゲーム式のジャンプはUpdate()内で7,8,9方向入力により処理される
+        // この古いメソッドは呼ばれても何もしない
+        return;
+    }
+    
+    //格闘ゲーム式ジャンプを実行（7,8,9方向）
+    private void ExecuteJump() {
+        if (!bIsGrounded) {
+            return; // 既に空中にいる場合は何もしない
+        }
+        
+        // 垂直速度を設定
+        fVelocityY = fJumpPower;
+        bIsGrounded = false;
+        
+        // ジャンプの種類に応じて水平速度を設定
+        float fHorizontalJumpSpeed = 3.0f; // 水平方向のジャンプ速度
+        
+        switch (eJumpType) {
+            case BACK_JUMP:
+                // バックジャンプ：相手から離れる方向
+                if (nPlayerNumber == 1) {
+                    fJumpDirectionX = -fHorizontalJumpSpeed; // 1Pは左方向
+                } else {
+                    fJumpDirectionX = fHorizontalJumpSpeed; // 2Pは右方向
+                }
+                break;
+                
+            case VERTICAL_JUMP:
+                // 垂直ジャンプ：水平移動なし
+                fJumpDirectionX = 0f;
+                break;
+                
+            case FORWARD_JUMP:
+                // 前ジャンプ：相手に向かう方向
+                if (nPlayerNumber == 1) {
+                    fJumpDirectionX = fHorizontalJumpSpeed; // 1Pは右方向
+                } else {
+                    fJumpDirectionX = -fHorizontalJumpSpeed; // 2Pは左方向
+                }
+                break;
+                
+            default:
+                fJumpDirectionX = 0f;
+                break;
+        }
+    }
+    
+    //空中ダッシュを開始
+    private void StartAirDash(boolean bDashForward, boolean bDashBackward) {
+        // 空中ダッシュ使用済みフラグを立てる
+        bAirDashUsed = true;
+        bIsAirDashing = true;
+        fAirDashTimer = fAirDashDuration;
+        
+        // ジャンプの上昇速度をリセット（ふわっとするのを防ぐ）
+        fVelocityY = 0f;
+        
+        // 斜めジャンプの水平成分をリセット（斜め方向に落ちないようにする）
+        fJumpDirectionX = 0f;
+        
+        // 相手プレイヤーを取得
+        Character pOpponent = GetOpponentCharacter();
+        
+        if (pOpponent != null) {
+            // 相手との相対位置を計算
+            float fDistanceToOpponent = pOpponent.GetPositionX() - this.fPositionX;
+            boolean bIsFacingOpponent = (nPlayerNumber == 1) ? fDistanceToOpponent > 0 : fDistanceToOpponent < 0;
+            
+            if (bDashForward) {
+                // 前方向（相手に向かって）空中ダッシュ
+                if (bIsFacingOpponent) {
+                    fAirDashDirectionX = (nPlayerNumber == 1) ? fAirDashSpeed : -fAirDashSpeed;
+                } else {
+                    fAirDashDirectionX = (nPlayerNumber == 1) ? -fAirDashSpeed : fAirDashSpeed;
+                }
+                System.out.println("[Player" + nPlayerNumber + "] 空中前ダッシュ開始！");
+            } else if (bDashBackward) {
+                // 後方向（相手から離れて）空中ダッシュ
+                if (bIsFacingOpponent) {
+                    fAirDashDirectionX = (nPlayerNumber == 1) ? -fAirDashSpeed : fAirDashSpeed;
+                } else {
+                    fAirDashDirectionX = (nPlayerNumber == 1) ? fAirDashSpeed : -fAirDashSpeed;
+                }
+                System.out.println("[Player" + nPlayerNumber + "] 空中後ダッシュ開始！");
+            }
+        } else {
+            // 相手がいない場合は通常の方向
+            if (bDashForward) {
+                fAirDashDirectionX = (nPlayerNumber == 1) ? fAirDashSpeed : -fAirDashSpeed;
+            } else if (bDashBackward) {
+                fAirDashDirectionX = (nPlayerNumber == 1) ? -fAirDashSpeed : fAirDashSpeed;
+            }
+            System.out.println("[Player" + nPlayerNumber + "] 空中ダッシュ開始！");
         }
     }
 
@@ -392,9 +572,45 @@ public class Character extends Player {
         this.pOpponentCharacter = pOpponent;
     }
     
+    //入力マネージャーを設定（後から接続する場合）
+    public void SetInputManager(InputManager pInputManager) {
+        this.pInputManager = pInputManager;
+        System.out.println("[Character] プレイヤー" + nPlayerNumber + " に入力マネージャーを設定しました");
+    }
+    
+    //プレイヤー番号を設定（後から設定する場合）
+    public void SetPlayerNumber(int nPlayerNumber) {
+        this.nPlayerNumber = nPlayerNumber;
+        System.out.println("[Character] プレイヤー番号を " + nPlayerNumber + " に設定しました");
+    }
+    
+    //カメラを設定（境界チェック用）
+    public void SetCamera(Camera pCamera) {
+        this.pCamera = pCamera;
+    }
+    
+    //X座標を境界内にクランプ（カメラの視野範囲外に出ないようにする）
+    private void ClampPositionToCameraBounds() {
+        if (pCamera == null) {
+            return; // カメラが設定されていない場合は何もしない
+        }
+        
+        float fLeftBound = pCamera.GetViewportLeft();
+        //カメラの左端
+        float fRightBound = pCamera.GetViewportRight();
+        //カメラの右端
+        
+        // X座標を境界内にクランプ
+        if (fPositionX < fLeftBound) {
+            fPositionX = fLeftBound;
+        } else if (fPositionX > fRightBound) {
+            fPositionX = fRightBound;
+        }
+    }
+    
     //状態遷移の処理
     private void UpdateState(boolean bLeftMove, boolean bRightMove, boolean bJump, boolean bGuard, 
-                            boolean bDashForward, boolean bDashBackward, float fDeltaTime) {
+                            boolean bDashForward, boolean bDashBackward, JumpType eRequestedJumpType, float fDeltaTime) {
         switch (eCurrentState) {
             case STAND:
                 // 立ち状態からの遷移
@@ -403,29 +619,33 @@ public class Character extends Player {
                     ChangeState(CharacterState.DASH);
                     fDashTimer = fDashDuration;
                     System.out.println("[Player" + nPlayerNumber + "] ダッシュ開始！");
-                } else if (bJump && bIsGrounded) {
+                } else if (eRequestedJumpType != JumpType.NONE && bIsGrounded) {
+                    // ジャンプ予備動作開始（7,8,9方向の入力を検出）
+                    eJumpType = eRequestedJumpType;
+                    nJumpPreparationFrames = 0;
                     ChangeState(CharacterState.JUMP);
-                    Jump();
+                    System.out.println("[Player" + nPlayerNumber + "] ジャンプ予備動作開始: " + eJumpType);
                 } else if (bGuard) {
                     ChangeState(CharacterState.GUARD);
                 } else if (bLeftMove || bRightMove) {
                     ChangeState(CharacterState.FRONT);
-                    if (bLeftMove) MoveLeft(fDeltaTime);
-                    if (bRightMove) MoveRight(fDeltaTime);
+                    // 移動処理はApp.javaから呼ばれるので、ここでは状態変更のみ
                 }
                 break;
                 
             case FRONT:
                 // 前進状態からの遷移
-                if (bJump && bIsGrounded) {
+                if (eRequestedJumpType != JumpType.NONE && bIsGrounded) {
+                    // ジャンプ予備動作開始
+                    eJumpType = eRequestedJumpType;
+                    nJumpPreparationFrames = 0;
                     ChangeState(CharacterState.JUMP);
-                    Jump();
+                    System.out.println("[Player" + nPlayerNumber + "] ジャンプ予備動作開始: " + eJumpType);
                 } else if (bGuard) {
                     ChangeState(CharacterState.GUARD);
                 } else if (bLeftMove || bRightMove) {
-                    // 移動中
-                    if (bLeftMove) MoveLeft(fDeltaTime);
-                    if (bRightMove) MoveRight(fDeltaTime);
+                    // 移動中（実際の移動処理はApp.javaから呼ばれる）
+                    // 状態はFRONTのまま維持
                 } else {
                     // 移動入力がなくなったら立ち状態に
                     ChangeState(CharacterState.STAND);
@@ -447,14 +667,64 @@ public class Character extends Player {
                 break;
                 
             case JUMP:
-                // ジャンプ状態からの遷移
-                if (bIsGrounded) {
-                    // 着地したら立ち状態に
+                // ジャンプ状態の処理
+                if (nJumpPreparationFrames < JUMP_PREPARATION_FRAMES) {
+                    // 予備動作中（1～3フレーム目、地上で待機）
+                    nJumpPreparationFrames++;
+                    
+                    if (nJumpPreparationFrames >= JUMP_PREPARATION_FRAMES) {
+                        // 3フレーム経過したら次のフレームでジャンプ実行の準備
+                        System.out.println("[Player" + nPlayerNumber + "] 予備動作完了（次フレームでジャンプ実行）");
+                    }
+                } else if (nJumpPreparationFrames == JUMP_PREPARATION_FRAMES && bIsGrounded) {
+                    // 4フレーム目でジャンプ実行
+                    ExecuteJump();
+                    nJumpPreparationFrames++; // カウントを進めて実行済みフラグ化
+                    System.out.println("[Player" + nPlayerNumber + "] ジャンプ実行！ 種類: " + eJumpType);
+                } else if (!bIsGrounded) {
+                    // 空中にいる場合
+                    
+                    // 空中ダッシュの処理
+                    if (bIsAirDashing) {
+                        // 空中ダッシュ中
+                        fAirDashTimer -= fDeltaTime;
+                        
+                        if (fAirDashTimer > 0) {
+                            // 空中ダッシュ方向に移動
+                            fPositionX += fAirDashDirectionX * fDeltaTime;
+                        } else {
+                            // 空中ダッシュ終了
+                            bIsAirDashing = false;
+                            System.out.println("[Player" + nPlayerNumber + "] 空中ダッシュ終了");
+                        }
+                    } else if (!bAirDashUsed && (bDashForward || bDashBackward)) {
+                        // 空中ダッシュ開始（未使用かつダッシュコマンド入力）
+                        StartAirDash(bDashForward, bDashBackward);
+                    } else {
+                        // 通常のジャンプ移動（空中ダッシュ未使用時）
+                        if (eJumpType == JumpType.BACK_JUMP) {
+                            // バックジャンプ：相手から離れる方向
+                            fPositionX += fJumpDirectionX * fDeltaTime;
+                        } else if (eJumpType == JumpType.FORWARD_JUMP) {
+                            // 前ジャンプ：相手に向かう方向
+                            fPositionX += fJumpDirectionX * fDeltaTime;
+                        }
+                        // VERTICAL_JUMPの場合は水平移動なし
+                    }
+                } else if (bIsGrounded && nJumpPreparationFrames > JUMP_PREPARATION_FRAMES) {
+                    // 着地した（予備動作完了後、空中から地上に戻った）
                     ChangeState(CharacterState.STAND);
-                } else {
-                    // 空中での移動
-                    if (bLeftMove) MoveLeft(fDeltaTime);
-                    if (bRightMove) MoveRight(fDeltaTime);
+                    eJumpType = JumpType.NONE;
+                    nJumpPreparationFrames = 0;
+                    fJumpDirectionX = 0f;
+                    
+                    // 空中ダッシュフラグをリセット
+                    bAirDashUsed = false;
+                    bIsAirDashing = false;
+                    fAirDashTimer = 0f;
+                    fAirDashDirectionX = 0f;
+                    
+                    System.out.println("[Player" + nPlayerNumber + "] 着地しました");
                 }
                 break;
                 
