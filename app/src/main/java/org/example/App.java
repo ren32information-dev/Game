@@ -4,6 +4,10 @@ import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class App {
 
 
@@ -14,6 +18,8 @@ public class App {
     private static UIManager pUI;
     private static GameState CurrentState = GameState.TITLE;
     private static Title pTitleScreen;
+
+    private static HashMap<CharacterState, ArrayList<CharacterRenderer>> CharacterRenderers = new HashMap<>();
     
     public static void setGameState(GameState newState) {
         CurrentState = newState;
@@ -34,11 +40,61 @@ public class App {
         pTitleScreen = new Title(1280, 720);
         pTitleScreen.init();
 
-        // キャラクターレンダラー作成
-        pCharacterRenderer = new CharacterRenderer(pCamera);    
+   
+
       
         // キャラクターレンダラー
-        pCharacterRenderer.Initialize("Image/St001.png");
+        pCharacterRenderer = new CharacterRenderer(pCamera, "Image/St001.png");
+        CharacterRenderers.put(CharacterState.STAND, new ArrayList<>());
+        CharacterRenderers.put(CharacterState.JUMP, new ArrayList<>());
+        CharacterRenderers.put(CharacterState.ATTACK, new ArrayList<>());
+        CharacterRenderers.put(CharacterState.DAMAGE, new ArrayList<>());
+        CharacterRenderers.put(CharacterState.DOWN, new ArrayList<>());
+        CharacterRenderers.put(CharacterState.FRONT, new ArrayList<>());
+        CharacterRenderers.put(CharacterState.GUARD, new ArrayList<>());
+        CharacterRenderers.put(CharacterState.CROUCH, new ArrayList<>());
+        CharacterRenderers.put(CharacterState.DASH, new ArrayList<>());
+         
+        // 立ち状態のレンダラーを追加
+        ArrayList<CharacterRenderer> standRenderers = CharacterRenderers.get(CharacterState.STAND);
+        standRenderers.add(new CharacterRenderer(pCamera, "Image/St001.png"));
+
+        // ジャンプ状態のレンダラーを追加
+        ArrayList<CharacterRenderer> jumpRenderers = CharacterRenderers.get(CharacterState.JUMP);
+        jumpRenderers.add(new CharacterRenderer(pCamera, "Image/JpStart001.png"));
+        jumpRenderers.add(new CharacterRenderer(pCamera, "Image/JpStart002.png"));
+        jumpRenderers.add(new CharacterRenderer(pCamera, "Image/Jp001.png"));
+        jumpRenderers.add(new CharacterRenderer(pCamera, "Image/Jp002.png"));
+        jumpRenderers.add(new CharacterRenderer(pCamera, "Image/Jp003.png"));
+        jumpRenderers.add(new CharacterRenderer(pCamera, "Image/JpEnd001.png"));
+
+        // 攻撃状態のレンダラーを追加
+        ArrayList<CharacterRenderer> attackRenderers = CharacterRenderers.get(CharacterState.ATTACK);
+
+        // 被ダメージ状態のレンダラーを追加
+        ArrayList<CharacterRenderer> damageRenderers = CharacterRenderers.get(CharacterState.DAMAGE);
+
+        // ダウン状態のレンダラーを追加
+        ArrayList<CharacterRenderer> downRenderers = CharacterRenderers.get(CharacterState.DOWN);
+
+        // 前進状態のレンダラーを追加
+        ArrayList<CharacterRenderer> frontRenderers = CharacterRenderers.get(CharacterState.FRONT);
+
+        // ガード状態のレンダラーを追加
+        ArrayList<CharacterRenderer> guardRenderers = CharacterRenderers.get(CharacterState.GUARD);
+
+        // しゃがみ状態のレンダラーを追加
+        ArrayList<CharacterRenderer> crouchRenderers = CharacterRenderers.get(CharacterState.CROUCH);
+        crouchRenderers.add(new CharacterRenderer(pCamera, "Image/Cr001.png"));
+        crouchRenderers.add(new CharacterRenderer(pCamera, "Image/CrStart001.png"));
+
+        // ダッシュ状態のレンダラーを追加
+        ArrayList<CharacterRenderer> dashRenderers = CharacterRenderers.get(CharacterState.DASH);
+        dashRenderers.add(new CharacterRenderer(pCamera, "Image/DaStart001.png"));
+        dashRenderers.add(new CharacterRenderer(pCamera, "Image/Da001.png"));
+        dashRenderers.add(new CharacterRenderer(pCamera, "Image/Da002.png"));
+        dashRenderers.add(new CharacterRenderer(pCamera, "Image/Da003.png"));
+
 
         // ゲームパッドが接続されている場合の情報表示
         System.out.println("=== ゲームパッド検出 ===");
