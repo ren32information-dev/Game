@@ -70,6 +70,18 @@ public class Camera {
         lookAt(target.x, target.y, target.z);
     }
 
+    //カメラの視野範囲の左端を取得
+    public float GetViewportLeft() {
+        // 平行投影の左端（-10）にカメラのX座標を加える
+        return position.x - 10.0f;
+    }
+    
+    //カメラの視野範囲の右端を取得
+    public float GetViewportRight() {
+        // 平行投影の右端（+10）にカメラのX座標を加える
+        return position.x + 10.0f;
+    }
+    
     //格闘ゲーム用カメラ更新（2キャラクターの中間点を注視、距離に応じてズーム）
     public void UpdateFightingGameCamera(Character pChar1, Character pChar2) {
         // 2キャラクターの中間点を計算
@@ -80,8 +92,8 @@ public class Camera {
         float fMidPointZ = (pChar1.GetPositionZ() + pChar2.GetPositionZ()) / 2.0f;
         //中間点Z座標
         
-        float fVerticalOffset = 3.0f;
-        //カメラと注視点の縦軸オフセット（画面全体を上にシフト）
+        float fVerticalOffset = 5.0f;
+        //カメラと注視点の縦軸オフセット（画面全体を上にシフト、UIスペース確保）
         
         // 2キャラクター間の距離を計算
         float fDistanceX = pChar1.GetPositionX() - pChar2.GetPositionX();
