@@ -35,9 +35,12 @@ public class UIManager
     private Renderer[] uiElements; 
     private Camera mainCamera; 
     
-    //// P1 UI の座標定数
-    private final float HP_BAR_MAX_X = -5.0f;       // -5.0fはHPX軸の中心
-    private final float Gauge_BAR_MAX_X = -5.0f;    // -6.0fはGaugeX軸の中心
+    //===UIの座標定数===
+    //// P1
+    //HP Gauge
+    private final float HP_BAR_MAX_X = -5.5f;       // -5.0fはHPX軸の中心
+    private final float HP_BAR_MAX_Y = 14.0f;       // -5.0fはHPY軸の中心
+    private final float Gauge_BAR_MAX_X = -5.5f;    // -6.0fはGaugeX軸の中心
     private final float Gauge_BAR_MAX_Y = -3.5f;    // -6.0fはGaugeY軸の中心
     //スキルアイコン
     private final float P1_SKILL_ICON_START_X = -8.0f;
@@ -52,11 +55,13 @@ public class UIManager
     private float fSkillCooldownCurrent2 = 0.0f;
     private float fSkillCooldownCurrent3 = 0.0f;
     
-    //// P2 UI の座標定数
-    private final float P2_HP_BAR_MAX_X = 5.0f; 
-    private final float P2_Gauge_BAR_MAX_X = 5.0f;
-
-
+    //// P2
+    //HP Gauge
+    private final float P2_HP_BAR_MAX_X = 5.5f;
+    private final float P2_HP_BAR_MAX_Y = 14.0f; 
+    private final float P2_Gauge_BAR_MAX_X = 5.5f; 
+    private final float P2_Gauge_BAR_MAX_Y = -3.5f;
+    //===UIの座標定数===
 
     //===数字UV===
     private static final int NUMBER_OF_COLUMNS = 5;
@@ -65,7 +70,7 @@ public class UIManager
     private static final float UV_UNIT_V = 1.0f / NUMBER_OF_ROWS;
     //===数字UV===
 
-    private float fGameTimer = 99.0f; // タイマー
+    private float fGameTimer = 9.0f; // タイマー
 
     final float MAX_HP_BAR_WIDTH = 4.0f;        //最大HPの長さ
     final float MAX_Gauge_BAR_WIDTH = 3.0f;     //最大Gaugeの長さ
@@ -95,7 +100,7 @@ public class UIManager
         // P1赤いHPバー (現在のHP)
         // =================================================
         uiElements[P1_HP].Init("UI/red.png");
-        uiElements[P1_HP].UIPos(HP_BAR_MAX_X, 14.0f, 0.0f); 
+        uiElements[P1_HP].UIPos(HP_BAR_MAX_X, HP_BAR_MAX_Y, 0.0f); 
         uiElements[P1_HP].UISize(MAX_HP_BAR_WIDTH, 0.4f, 1.0f);
         uiElements[P1_HP].UIColor(1.0f, 1.0f, 1.0f);
         
@@ -103,7 +108,7 @@ public class UIManager
         // P1灰色HPバーの背景 (最大HP)
         // =================================================
         uiElements[P1_MAXHP].Init("UI/gray.png");  
-        uiElements[P1_MAXHP].UIPos(HP_BAR_MAX_X, 14.0f, 0.0f); 
+        uiElements[P1_MAXHP].UIPos(HP_BAR_MAX_X, HP_BAR_MAX_Y, 0.0f); 
         uiElements[P1_MAXHP].UISize(MAX_HP_BAR_WIDTH, 0.4f, 1.0f);
         uiElements[P1_MAXHP].UIColor(1.0f, 1.0f, 1.0f); 
 
@@ -221,21 +226,34 @@ public class UIManager
     //===========================
     public void update(float deltaTime)
     {
+        // === カメラの現在の X 座標を取得 ===
+        float cameraX = mainCamera.GetPosX();
+
         ////===P1===
         //HP処理
+        float p1HpPosX = HP_BAR_MAX_X + cameraX;
+        uiElements[P1_MAXHP].UIPos(p1HpPosX, 14.0f, 0.0f);
+        
         if (player1Character != null) 
         {
             float ratio = player1Character.GetHPObject().getHealthRatio();
             float currentWidth = MAX_HP_BAR_WIDTH * ratio;
-            float originalPosX = HP_BAR_MAX_X; 
+            float originalPosX = HP_BAR_MAX_X + cameraX; 
             float widthDifference = MAX_HP_BAR_WIDTH - currentWidth;
             float newPosX = originalPosX - widthDifference;
              
             uiElements[P1_HP].UISize(currentWidth, 0.4f, 1.0f);
-            uiElements[P1_HP].UIPos(newPosX, 14.0f, 0.0f); 
+            uiElements[P1_HP].UIPos(newPosX, HP_BAR_MAX_Y, 0.0f); 
         }
 
         //Gauge処理
+
+        float p1MaxGaugePosX = Gauge_BAR_MAX_X + cameraX;
+        uiElements[P1_MAXGauge].UIPos(p1MaxGaugePosX, Gauge_BAR_MAX_Y, 0.0f); 
+
+        float p1GaugeNumberPosX = (Gauge_BAR_MAX_X - 4.0f) + cameraX; 
+        uiElements[P1_Gauge_Number].UIPos(p1GaugeNumberPosX, Gauge_BAR_MAX_Y, 0.0f);
+
         if (player1Character != null) 
         {
             // ゲージインスタンスを取得 (GetGauge() が存在すると仮定)
@@ -247,7 +265,7 @@ public class UIManager
             float currentWidth = MAX_Gauge_BAR_WIDTH * ratio;
             
             // ゲージバーが幅 0 の時に正しい位置に配置されるように調整
-            float originalPosX = Gauge_BAR_MAX_X; 
+            float originalPosX = Gauge_BAR_MAX_X + cameraX;
             float widthDifference = MAX_Gauge_BAR_WIDTH - currentWidth;
             float newPosX = originalPosX - (widthDifference / 2.0f); // 中心位置調整
             
@@ -265,6 +283,10 @@ public class UIManager
             // 最大が 7 なので、一桁の数字のみが必要です。
             DisplayNumber(P1_Gauge_Number, nBars);
         }
+        //Skill
+        uiElements[P1_SKILL_ICON_1].UIPos(P1_SKILL_ICON_START_X + cameraX, P1_SKILL_ICON_Y, 0.0f); 
+        uiElements[P1_SKILL_ICON_2].UIPos(P1_SKILL_ICON_START_X + 1.5f + cameraX, P1_SKILL_ICON_Y, 0.0f); 
+        uiElements[P1_SKILL_ICON_3].UIPos(P1_SKILL_ICON_START_X + 3.0f + cameraX, P1_SKILL_ICON_Y, 0.0f);
 
         //Skill1CD
         if (fSkillCooldownCurrent1 > 0.0f) 
@@ -315,17 +337,27 @@ public class UIManager
         ///////////////P2の処理今仮にP1のを使ってる
         ////===P2===
         //HP
+
+        float p2HpPosX = P2_HP_BAR_MAX_X + cameraX;
+        uiElements[P2_MAXHP].UIPos(p2HpPosX, P2_HP_BAR_MAX_Y, 0.0f); // 背景も更新
+        
         if (player1Character != null) 
         {
             float ratio = player1Character.GetHPObject().getHealthRatio();
             float currentWidth = MAX_HP_BAR_WIDTH * ratio;
-            float originalPosX = P2_HP_BAR_MAX_X; 
+            float originalPosX = P2_HP_BAR_MAX_X + cameraX; 
             float widthDifference = MAX_HP_BAR_WIDTH - currentWidth;
             float newPosX = originalPosX + widthDifference; // 右寄せで縮小
             
             uiElements[P2_HP].UISize(currentWidth, 0.4f, 1.0f);
-            uiElements[P2_HP].UIPos(newPosX, 14.0f, 0.0f); 
+            uiElements[P2_HP].UIPos(newPosX, P2_HP_BAR_MAX_Y, 0.0f); 
         }
+
+        float p2MaxGaugePosX = P2_Gauge_BAR_MAX_X + cameraX;
+        uiElements[P2_MAXGauge].UIPos(p2MaxGaugePosX, P2_Gauge_BAR_MAX_Y, 0.0f);
+
+        float p2GaugeNumberPosX = (P2_Gauge_BAR_MAX_X + 4.0f) + cameraX; 
+        uiElements[P2_Gauge_Number].UIPos(p2GaugeNumberPosX, P2_Gauge_BAR_MAX_Y, 0.0f);
 
         //Gauge
         if (player1Character != null) 
@@ -337,13 +369,13 @@ public class UIManager
             float ratio = pGauge.GetCurrentGauge(); 
             float currentWidth = MAX_Gauge_BAR_WIDTH * ratio;
             
-            float originalPosX = P2_Gauge_BAR_MAX_X; 
+            float originalPosX = P2_Gauge_BAR_MAX_X + cameraX;; 
             float widthDifference = MAX_Gauge_BAR_WIDTH - currentWidth;
             // P2 は右寄せで縮小
             float newPosX = originalPosX + widthDifference; 
             
             uiElements[P2_Gauge].UISize(currentWidth, 0.4f, 1.0f);
-            uiElements[P2_Gauge].UIPos(newPosX, Gauge_BAR_MAX_Y, 0.0f); 
+            uiElements[P2_Gauge].UIPos(newPosX, P2_Gauge_BAR_MAX_Y, 0.0f); 
 
             // ゲージの数値 (エナジー格数) を更新
             int nBars = pGauge.GetCurrentBars();
@@ -356,6 +388,9 @@ public class UIManager
         // =================================================
         // タイマー処理
         // =================================================
+        uiElements[TIMER_DIGIT_TENS].UIPos(-0.6f + cameraX, 14.0f, 0.0f); 
+        uiElements[TIMER_DIGIT_ONES].UIPos(0.6f + cameraX, 14.0f, 0.0f);
+
         if (fGameTimer > 0.0f) 
         {
             fGameTimer -= deltaTime; 
@@ -374,6 +409,11 @@ public class UIManager
             DisplayNumber(TIMER_DIGIT_TENS, tensDigit);
             // 一の位を表示
             DisplayNumber(TIMER_DIGIT_ONES, onesDigit);
+        }
+        else
+        {
+            DisplayNumber(TIMER_DIGIT_TENS, 0);
+            DisplayNumber(TIMER_DIGIT_ONES, 0);
         }
 
         for (Renderer renderer : uiElements) 
@@ -460,6 +500,7 @@ public class UIManager
         this.player1Character = character;
     }
     
+    //number.png
     private void DisplayNumber(int elementIndex, int number) 
     {
        if (number < 0 || number > 9 || elementIndex >= MAX_UI_ELEMENTS) 

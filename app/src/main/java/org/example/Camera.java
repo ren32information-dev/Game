@@ -4,7 +4,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 public class Camera {
-    private final Vector3f position = new Vector3f(0, 0, 3);
+    final Vector3f position = new Vector3f(0, 0, 3);
     private final Vector3f target = new Vector3f(0, 0, 0);
     private final Vector3f up = new Vector3f(0, 1, 0);
     private final Matrix4f viewMatrix = new Matrix4f();
@@ -47,7 +47,8 @@ public class Camera {
     }
 
     //カメラ移動
-    public void moveCamera(boolean forward, boolean backward, boolean left, boolean right) {
+    public void moveCamera(boolean forward, boolean backward, boolean left, boolean right) 
+    {
         Vector3f forwardDir = new Vector3f(target).sub(position).normalize(); // 前方向ベクトル
         Vector3f rightDir = new Vector3f(forwardDir).cross(up).normalize();   // 右方向ベクトル
 
@@ -82,6 +83,16 @@ public class Camera {
         return position.x + 10.0f;
     }
     
+    public float GetPosX()
+    {
+        return position.x;
+    }
+
+    public float GetPosY()
+    {
+        return position.y;
+    }
+
     //格闘ゲーム用カメラ更新（2キャラクターの中間点を注視、距離に応じてズーム）
     public void UpdateFightingGameCamera(Character pChar1, Character pChar2) {
         // 2キャラクターの中間点を計算
