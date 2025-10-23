@@ -13,8 +13,9 @@ public class CharacterRenderer {
     private float fHeight = 3.0f;
     //キャラクターの高さ
 
-    public CharacterRenderer(Camera pCamera) {
+    public CharacterRenderer(Camera pCamera, String sImagePath) {
         this.pCamera = pCamera;
+        Initialize(sImagePath);
     }
 
     //初期化（画像読み込み）
