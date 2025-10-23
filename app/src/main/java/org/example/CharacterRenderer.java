@@ -28,7 +28,8 @@ public class CharacterRenderer {
     }
 
     //キャラクターを描画
-    public void DrawCharacter(Character pCharacter) {
+    public void DrawCharacter(Character pCharacter) 
+    {
         float fX = pCharacter.GetPositionX();
         float fY = pCharacter.GetPositionY();
         float fZ = pCharacter.GetPositionZ();
