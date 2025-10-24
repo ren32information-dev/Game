@@ -61,6 +61,10 @@ public class UIManager
     private final float P2_HP_BAR_MAX_Y = 14.0f; 
     private final float P2_Gauge_BAR_MAX_X = 5.5f; 
     private final float P2_Gauge_BAR_MAX_Y = -3.5f;
+    
+    float cameraX;
+    float cameraY;
+
     //===UIの座標定数===
 
     //===数字UV===
@@ -227,12 +231,14 @@ public class UIManager
     public void update(float deltaTime)
     {
         // === カメラの現在の X 座標を取得 ===
-        float cameraX = mainCamera.GetPosX();
-
+        cameraX = mainCamera.GetPosX();
+        cameraY = mainCamera.GetPosY() - 7.0f;
+        
         ////===P1===
         //HP処理
         float p1HpPosX = HP_BAR_MAX_X + cameraX;
-        uiElements[P1_MAXHP].UIPos(p1HpPosX, 14.0f, 0.0f);
+        float p1HpPosY = HP_BAR_MAX_Y + cameraY;
+        uiElements[P1_MAXHP].UIPos(p1HpPosX, p1HpPosY, 0.0f);
         
         if (player1Character != null) 
         {
@@ -241,18 +247,21 @@ public class UIManager
             float originalPosX = HP_BAR_MAX_X + cameraX; 
             float widthDifference = MAX_HP_BAR_WIDTH - currentWidth;
             float newPosX = originalPosX - widthDifference;
-             
+            float newPosY = HP_BAR_MAX_Y + cameraY;
+
             uiElements[P1_HP].UISize(currentWidth, 0.4f, 1.0f);
-            uiElements[P1_HP].UIPos(newPosX, HP_BAR_MAX_Y, 0.0f); 
+            uiElements[P1_HP].UIPos(newPosX, newPosY, 0.0f); 
         }
 
         //Gauge処理
 
         float p1MaxGaugePosX = Gauge_BAR_MAX_X + cameraX;
-        uiElements[P1_MAXGauge].UIPos(p1MaxGaugePosX, Gauge_BAR_MAX_Y, 0.0f); 
+        float p1MaxGaugePosY = Gauge_BAR_MAX_Y + cameraY;
+        uiElements[P1_MAXGauge].UIPos(p1MaxGaugePosX, p1MaxGaugePosY, 0.0f); 
 
         float p1GaugeNumberPosX = (Gauge_BAR_MAX_X - 4.0f) + cameraX; 
-        uiElements[P1_Gauge_Number].UIPos(p1GaugeNumberPosX, Gauge_BAR_MAX_Y, 0.0f);
+        float p1GaugeNumberPosY = Gauge_BAR_MAX_Y + cameraY;
+        uiElements[P1_Gauge_Number].UIPos(p1GaugeNumberPosX, p1GaugeNumberPosY, 0.0f);
 
         if (player1Character != null) 
         {
@@ -271,10 +280,10 @@ public class UIManager
             
             // 修正：ゲージバーが幅 0 の時に正しい位置に配置されるように調整
             newPosX = originalPosX - widthDifference;      
-            newPosX = originalPosX - widthDifference;
+            float newPosY = Gauge_BAR_MAX_Y + cameraY;
             
             uiElements[P1_Gauge].UISize(currentWidth, 0.4f, 1.0f);
-            uiElements[P1_Gauge].UIPos(newPosX, Gauge_BAR_MAX_Y, 0.0f); 
+            uiElements[P1_Gauge].UIPos(newPosX, newPosY, 0.0f); 
 
             //ゲージの数値 (エナジー格数) を更新
             int nBars = pGauge.GetCurrentBars();
@@ -284,9 +293,9 @@ public class UIManager
             DisplayNumber(P1_Gauge_Number, nBars);
         }
         //Skill
-        uiElements[P1_SKILL_ICON_1].UIPos(P1_SKILL_ICON_START_X + cameraX, P1_SKILL_ICON_Y, 0.0f); 
-        uiElements[P1_SKILL_ICON_2].UIPos(P1_SKILL_ICON_START_X + 1.5f + cameraX, P1_SKILL_ICON_Y, 0.0f); 
-        uiElements[P1_SKILL_ICON_3].UIPos(P1_SKILL_ICON_START_X + 3.0f + cameraX, P1_SKILL_ICON_Y, 0.0f);
+        uiElements[P1_SKILL_ICON_1].UIPos(P1_SKILL_ICON_START_X + cameraX, P1_SKILL_ICON_Y + cameraY, 0.0f); 
+        uiElements[P1_SKILL_ICON_2].UIPos(P1_SKILL_ICON_START_X + 1.5f + cameraX, P1_SKILL_ICON_Y + cameraY, 0.0f); 
+        uiElements[P1_SKILL_ICON_3].UIPos(P1_SKILL_ICON_START_X + 3.0f + cameraX, P1_SKILL_ICON_Y + cameraY, 0.0f);
 
         //Skill1CD
         if (fSkillCooldownCurrent1 > 0.0f) 
@@ -334,12 +343,16 @@ public class UIManager
         }
         ////===P1===
 
+
+        /* 
+        
         ///////////////P2の処理今仮にP1のを使ってる
         ////===P2===
         //HP
-
+        
         float p2HpPosX = P2_HP_BAR_MAX_X + cameraX;
-        uiElements[P2_MAXHP].UIPos(p2HpPosX, P2_HP_BAR_MAX_Y, 0.0f); // 背景も更新
+        float p2HpPosY = P2_HP_BAR_MAX_Y + cameraY;
+        uiElements[P2_MAXHP].UIPos(p2HpPosX, p2HpPosY, 0.0f); // 背景も更新
         
         if (player1Character != null) 
         {
@@ -350,33 +363,36 @@ public class UIManager
             float newPosX = originalPosX + widthDifference; // 右寄せで縮小
             
             uiElements[P2_HP].UISize(currentWidth, 0.4f, 1.0f);
-            uiElements[P2_HP].UIPos(newPosX, P2_HP_BAR_MAX_Y, 0.0f); 
+            uiElements[P2_HP].UIPos(newPosX, p2HpPosY, 0.0f); 
         }
-
+        
         float p2MaxGaugePosX = P2_Gauge_BAR_MAX_X + cameraX;
-        uiElements[P2_MAXGauge].UIPos(p2MaxGaugePosX, P2_Gauge_BAR_MAX_Y, 0.0f);
-
+        float p2MaxGaugePosY = P2_Gauge_BAR_MAX_Y + cameraY;
+        uiElements[P2_MAXGauge].UIPos(p2MaxGaugePosX, p2MaxGaugePosY, 0.0f);
+        
         float p2GaugeNumberPosX = (P2_Gauge_BAR_MAX_X + 4.0f) + cameraX; 
-        uiElements[P2_Gauge_Number].UIPos(p2GaugeNumberPosX, P2_Gauge_BAR_MAX_Y, 0.0f);
-
+        float p2GaugeNumberPosY = P2_Gauge_BAR_MAX_Y + cameraY; 
+        uiElements[P2_Gauge_Number].UIPos(p2GaugeNumberPosX, p2GaugeNumberPosY, 0.0f);
+        
         //Gauge
         if (player1Character != null) 
         {
             // ゲージインスタンスを取得 
             Gauge pGauge = player1Character.GetGauge();
-
+            
             // ゲージバーの長さ (充填比率) を更新
             float ratio = pGauge.GetCurrentGauge(); 
             float currentWidth = MAX_Gauge_BAR_WIDTH * ratio;
             
-            float originalPosX = P2_Gauge_BAR_MAX_X + cameraX;; 
+            float originalPosX = P2_Gauge_BAR_MAX_X + cameraX; 
             float widthDifference = MAX_Gauge_BAR_WIDTH - currentWidth;
             // P2 は右寄せで縮小
             float newPosX = originalPosX + widthDifference; 
+            float newPosY = P2_Gauge_BAR_MAX_Y + cameraY; 
             
             uiElements[P2_Gauge].UISize(currentWidth, 0.4f, 1.0f);
-            uiElements[P2_Gauge].UIPos(newPosX, P2_Gauge_BAR_MAX_Y, 0.0f); 
-
+            uiElements[P2_Gauge].UIPos(newPosX, newPosY, 0.0f); 
+            
             // ゲージの数値 (エナジー格数) を更新
             int nBars = pGauge.GetCurrentBars();
             
@@ -384,17 +400,18 @@ public class UIManager
             DisplayNumber(P2_Gauge_Number, nBars);
         }
         ////===P2===
+        */
         
         // =================================================
         // タイマー処理
         // =================================================
-        uiElements[TIMER_DIGIT_TENS].UIPos(-0.6f + cameraX, 14.0f, 0.0f); 
-        uiElements[TIMER_DIGIT_ONES].UIPos(0.6f + cameraX, 14.0f, 0.0f);
-
+        uiElements[TIMER_DIGIT_TENS].UIPos(-0.6f + cameraX, 14.0f + cameraY, 0.0f); 
+        uiElements[TIMER_DIGIT_ONES].UIPos(0.6f + cameraX, 14.0f + cameraY, 0.0f);
+        
         if (fGameTimer > 0.0f) 
         {
             fGameTimer -= deltaTime; 
-
+            
             if (fGameTimer < 0.0f) 
             {
                 fGameTimer = 0.0f;
@@ -431,7 +448,7 @@ public class UIManager
         {
             if (fSkillCooldownCurrent1 == 0.0f)
             {
-            fSkillCooldownCurrent1 = SKILL_COOLDOWN_MAX_1;
+            fSkillCooldownCurrent1 = SKILL_COOLDOWN_MAX_3;
             }
         }
 
@@ -439,7 +456,7 @@ public class UIManager
         {
             if (fSkillCooldownCurrent2 == 0.0f)
             {
-            fSkillCooldownCurrent2 = SKILL_COOLDOWN_MAX_2;
+            fSkillCooldownCurrent2 = SKILL_COOLDOWN_MAX_3;
             }
         }
 
