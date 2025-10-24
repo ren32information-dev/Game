@@ -613,6 +613,7 @@ public class Character extends Player {
                             boolean bDashForward, boolean bDashBackward, JumpType eRequestedJumpType, float fDeltaTime) {
         switch (eCurrentState) {
             case STAND:
+                nTextureId = 0; // 立ち状態のテクスチャIDを設定
                 // 立ち状態からの遷移
                 if (bDashForward || bDashBackward) {
                     // ダッシュ開始
@@ -669,6 +670,7 @@ public class Character extends Player {
             case JUMP:
                 // ジャンプ状態の処理
                 if (nJumpPreparationFrames < JUMP_PREPARATION_FRAMES) {
+                    nTextureId = 0;
                     // 予備動作中（1～3フレーム目、地上で待機）
                     nJumpPreparationFrames++;
                     
@@ -678,6 +680,7 @@ public class Character extends Player {
                     }
                 } else if (nJumpPreparationFrames == JUMP_PREPARATION_FRAMES && bIsGrounded) {
                     // 4フレーム目でジャンプ実行
+                    nTextureId = 2; // ジャンプ中のテクスチャIDを設定
                     ExecuteJump();
                     nJumpPreparationFrames++; // カウントを進めて実行済みフラグ化
                     System.out.println("[Player" + nPlayerNumber + "] ジャンプ実行！ 種類: " + eJumpType);
@@ -713,6 +716,7 @@ public class Character extends Player {
                     }
                 } else if (bIsGrounded && nJumpPreparationFrames > JUMP_PREPARATION_FRAMES) {
                     // 着地した（予備動作完了後、空中から地上に戻った）
+                    nTextureId = 5; // 着地後のテクスチャIDを設定
                     ChangeState(CharacterState.STAND);
                     eJumpType = JumpType.NONE;
                     nJumpPreparationFrames = 0;
@@ -731,6 +735,8 @@ public class Character extends Player {
             case DASH:
                 // ダッシュ状態からの遷移
                 fDashTimer -= fDeltaTime;
+
+                nTextureId = 0; // ダッシュ中のテクスチャIDを設定
                 
                 if (fDashTimer > 0) {
                     // 相対方向でのダッシュ移動
