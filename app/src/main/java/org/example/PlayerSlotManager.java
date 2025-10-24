@@ -111,29 +111,29 @@ public class PlayerSlotManager {
         }
     }
     
-    //キーボードの接続/切断をチェック
+    //キーボードの接続/切断をチェック（Enterキーでトグル）
     private void CheckKeyboardConnection(float fDeltaTime) {
         boolean bCurrentButton = pWindow.isKeyPressed(GLFW.GLFW_KEY_ENTER);
         
-        if (bCurrentButton) {
-            // ボタンが押されている
-            fKeyboardPressTime += fDeltaTime;
+        // ボタンが押された瞬間を検出（前フレーム：離されていた、今フレーム：押されている）
+        if (bCurrentButton && !bPrevKeyboardButton) {
+            // Enterキーが押された瞬間
             
-            // 長押し判定（1秒以上）
-            if (fKeyboardPressTime >= LONG_PRESS_DURATION && !bKeyboardLongPressHandled) {
-                // 長押しで切断
-                System.out.println("[デバッグ] キーボード長押し検出: " + String.format("%.2f", fKeyboardPressTime) + "秒");
-                DisconnectKeyboard();
-                bKeyboardLongPressHandled = true;
+            // P1がキーボードで接続されているか確認
+            boolean bP1KeyboardConnected = false;
+            if (pSlots[0].IsOccupied() && pSlots[0].GetInputManager() != null && !pSlots[0].GetInputManager().IsUsingGamepad()) {
+                bP1KeyboardConnected = true;
             }
-        } else {
-            // ボタンが離された
-            if (bPrevKeyboardButton && fKeyboardPressTime < LONG_PRESS_DURATION) {
-                // 短押しで接続
+            
+            if (bP1KeyboardConnected) {
+                // 既にP1にキーボードが接続されている → 切断
+                pSlots[0].Disconnect();
+                UpdateOpponentReferences();
+                System.out.println("[トグル] P1のキーボード入力を切断しました");
+            } else {
+                // P1にキーボードが接続されていない → 接続を試みる
                 TryConnectKeyboard();
             }
-            fKeyboardPressTime = 0f;
-            bKeyboardLongPressHandled = false;
         }
         
         bPrevKeyboardButton = bCurrentButton;

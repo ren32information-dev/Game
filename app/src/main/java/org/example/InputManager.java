@@ -100,23 +100,28 @@ public class InputManager {
         return false;
     }
     
-    //ゲームパッド入力を取得
+    //ゲームパッド入力を取得（Switch純正、PS4コントローラー対応）
     private boolean GetGamepadInput(InputType eInputType) {
         // ゲームパッドが接続されているか確認
         if (!GLFW.glfwJoystickPresent(nGamepadId)) {
             return false;
         }
         
-        // ゲームパッドがGamepad APIに対応しているか確認
-        if (!GLFW.glfwJoystickIsGamepad(nGamepadId)) {
-            return false;
+        // まずGamepad APIを試す（XInput互換コントローラー）
+        if (GLFW.glfwJoystickIsGamepad(nGamepadId)) {
+            GLFWGamepadState pState = GLFWGamepadState.create();
+            if (GLFW.glfwGetGamepadState(nGamepadId, pState)) {
+                // Gamepad APIで取得成功
+                return GetGamepadInputStandard(pState, eInputType);
+            }
         }
         
-        GLFWGamepadState pState = GLFWGamepadState.create();
-        if (!GLFW.glfwGetGamepadState(nGamepadId, pState)) {
-            return false;
-        }
-        
+        // Gamepad APIが使えない場合はDirectInputモード（Switch純正、PS4など）
+        return GetGamepadInputDirect(eInputType);
+    }
+    
+    //標準Gamepad APIでの入力取得
+    private boolean GetGamepadInputStandard(GLFWGamepadState pState, InputType eInputType) {
         switch (eInputType) {
             case LEFT:
                 // 左スティックまたは十字キー左
@@ -147,17 +152,79 @@ public class InputManager {
         }
     }
     
-    //ゲームパッドが接続されているか確認
-    public static boolean IsGamepadConnected(int nGamepadId) {
-        return GLFW.glfwJoystickPresent(nGamepadId) && GLFW.glfwJoystickIsGamepad(nGamepadId);
+    //DirectInputモードでの入力取得（Switch純正プロコン、PS4コントローラー対応）
+    private boolean GetGamepadInputDirect(InputType eInputType) {
+        // 生のボタン配列を取得
+        ByteBuffer pButtons = GLFW.glfwGetJoystickButtons(nGamepadId);
+        if (pButtons == null) {
+            return false;
+        }
+        
+        // 生のアナログスティック配列を取得
+        FloatBuffer pAxes = GLFW.glfwGetJoystickAxes(nGamepadId);
+        if (pAxes == null) {
+            return false;
+        }
+        
+        // Switch純正プロコン、PS4コントローラーのボタンマッピング
+        switch (eInputType) {
+            case LEFT:
+                // 左スティック左（Axis 0が負の値）または十字キー左
+                return (pAxes.capacity() > 0 && pAxes.get(0) < -0.5f) || 
+                       (pButtons.capacity() > 13 && pButtons.get(13) == GLFW.GLFW_PRESS);
+            case RIGHT:
+                // 左スティック右（Axis 0が正の値）または十字キー右
+                return (pAxes.capacity() > 0 && pAxes.get(0) > 0.5f) || 
+                       (pButtons.capacity() > 14 && pButtons.get(14) == GLFW.GLFW_PRESS);
+            case JUMP:
+                // 左スティック上（Axis 1が負の値）または十字キー上
+                return (pAxes.capacity() > 1 && pAxes.get(1) < -0.5f) || 
+                       (pButtons.capacity() > 11 && pButtons.get(11) == GLFW.GLFW_PRESS);
+            case ATTACK:
+                // Aボタン（Switch: B = ボタン1、PS4: × = ボタン1）
+                return pButtons.capacity() > 1 && pButtons.get(1) == GLFW.GLFW_PRESS;
+            case GUARD:
+                // Bボタン（Switch: A = ボタン0、PS4: ○ = ボタン2）
+                return (pButtons.capacity() > 0 && pButtons.get(0) == GLFW.GLFW_PRESS) ||
+                       (pButtons.capacity() > 2 && pButtons.get(2) == GLFW.GLFW_PRESS);
+            case DASH:
+                // Xボタン（Switch: Y = ボタン3、PS4: □ = ボタン0）
+                return (pButtons.capacity() > 3 && pButtons.get(3) == GLFW.GLFW_PRESS) ||
+                       (pButtons.capacity() > 0 && pButtons.get(0) == GLFW.GLFW_PRESS);
+            case SPECIAL:
+                // Yボタン（Switch: X = ボタン2、PS4: △ = ボタン3）
+                return (pButtons.capacity() > 2 && pButtons.get(2) == GLFW.GLFW_PRESS) ||
+                       (pButtons.capacity() > 3 && pButtons.get(3) == GLFW.GLFW_PRESS);
+            default:
+                return false;
+        }
     }
     
-    //接続されているゲームパッドの名前を取得
+    //ゲームパッドが接続されているか確認（Switch純正、PS4対応）
+    public static boolean IsGamepadConnected(int nGamepadId) {
+        // Joystickとして接続されていればOK（Gamepad API非対応でも検出）
+        return GLFW.glfwJoystickPresent(nGamepadId);
+    }
+    
+    //接続されているゲームパッドの名前を取得（Switch純正、PS4対応）
     public static String GetGamepadName(int nGamepadId) {
-        if (IsGamepadConnected(nGamepadId)) {
-            return GLFW.glfwGetGamepadName(nGamepadId);
+        if (!IsGamepadConnected(nGamepadId)) {
+            return "Not Connected";
         }
-        return "Not Connected";
+        
+        // まずGamepad APIの名前を試す
+        String sGamepadName = GLFW.glfwGetGamepadName(nGamepadId);
+        if (sGamepadName != null) {
+            return sGamepadName;
+        }
+        
+        // Gamepad APIで取得できない場合はJoystick名を使う（Switch純正、PS4など）
+        String sJoystickName = GLFW.glfwGetJoystickName(nGamepadId);
+        if (sJoystickName != null) {
+            return sJoystickName;
+        }
+        
+        return "Unknown Device";
     }
     
     //プレイヤー番号を取得
