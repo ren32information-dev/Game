@@ -27,12 +27,14 @@ public class CharacterRenderer {
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    //キャラクターを描画
+    //キャラクターを描画（向きに応じて左右反転）
     public void DrawCharacter(Character pCharacter) 
     {
         float fX = pCharacter.GetPositionX();
         float fY = pCharacter.GetPositionY();
         float fZ = pCharacter.GetPositionZ();
+        boolean bFacingRight = pCharacter.GetIsFacingRight();
+        //キャラクターの向き
 
         Matrix4f pModel = new Matrix4f().translate(fX, fY + fHeight/2, fZ);
         Matrix4f pMvp = new Matrix4f();
@@ -49,10 +51,20 @@ public class CharacterRenderer {
         GL11.glBegin(GL11.GL_QUADS);
 
         // 前面（キャラクター画像）
-        GL11.glTexCoord2f(0, 0); GL11.glVertex3f(-fWidth/2,  fHeight/2, 0);
-        GL11.glTexCoord2f(1, 0); GL11.glVertex3f( fWidth/2,  fHeight/2, 0);
-        GL11.glTexCoord2f(1, 1); GL11.glVertex3f( fWidth/2, -fHeight/2, 0);
-        GL11.glTexCoord2f(0, 1); GL11.glVertex3f(-fWidth/2, -fHeight/2, 0);
+        // 向きに応じてテクスチャ座標を反転（元画像は左向き）
+        if (bFacingRight) {
+            // 右向き（テクスチャを左右反転）
+            GL11.glTexCoord2f(1, 0); GL11.glVertex3f(-fWidth/2,  fHeight/2, 0);
+            GL11.glTexCoord2f(0, 0); GL11.glVertex3f( fWidth/2,  fHeight/2, 0);
+            GL11.glTexCoord2f(0, 1); GL11.glVertex3f( fWidth/2, -fHeight/2, 0);
+            GL11.glTexCoord2f(1, 1); GL11.glVertex3f(-fWidth/2, -fHeight/2, 0);
+        } else {
+            // 左向き（通常、元画像のまま）
+            GL11.glTexCoord2f(0, 0); GL11.glVertex3f(-fWidth/2,  fHeight/2, 0);
+            GL11.glTexCoord2f(1, 0); GL11.glVertex3f( fWidth/2,  fHeight/2, 0);
+            GL11.glTexCoord2f(1, 1); GL11.glVertex3f( fWidth/2, -fHeight/2, 0);
+            GL11.glTexCoord2f(0, 1); GL11.glVertex3f(-fWidth/2, -fHeight/2, 0);
+        }
 
         GL11.glEnd();
         GL11.glPopMatrix();

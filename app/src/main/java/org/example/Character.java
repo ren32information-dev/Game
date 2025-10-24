@@ -59,6 +59,9 @@ public class Character extends Player {
     private Camera pCamera;
     //カメラへの参照（境界チェック用）
     
+    private boolean bIsFacingRight;
+    //右を向いているか（true=右向き、false=左向き）
+    
     private JumpType eJumpType;
     //ジャンプの種類（バックジャンプ、垂直ジャンプ、前ジャンプ）
     private int nJumpPreparationFrames;
@@ -142,6 +145,9 @@ public class Character extends Player {
         this.pOpponentCharacter = null;
         this.pCamera = null;
         
+        // 向きの初期化（1Pは右向き、2Pは左向き）
+        this.bIsFacingRight = (nPlayerNumber == 1);
+        
         // ジャンプパラメータ
         this.eJumpType = JumpType.NONE;
         this.nJumpPreparationFrames = 0;
@@ -206,6 +212,9 @@ public class Character extends Player {
         
         this.pOpponentCharacter = null;
         this.pCamera = null;
+        
+        // 向きの初期化（デフォルトは右向き）
+        this.bIsFacingRight = true;
         
         // ジャンプパラメータ
         this.eJumpType = JumpType.NONE;
@@ -306,6 +315,9 @@ public class Character extends Player {
         
         // カメラの視野範囲外に出ないように座標を制限
         ClampPositionToCameraBounds();
+        
+        // 振り向き処理（地上にいる時のみ）
+        UpdateFacingDirection();
     }
     
     //左に移動（地上のみ、空中では無効。ジャンプ予備動作中は移動可能）
@@ -587,6 +599,39 @@ public class Character extends Player {
     //カメラを設定（境界チェック用）
     public void SetCamera(Camera pCamera) {
         this.pCamera = pCamera;
+    }
+    
+    //向きを取得（描画用）
+    public boolean GetIsFacingRight() {
+        return bIsFacingRight;
+    }
+    
+    //振り向き処理（地上にいる時のみ相手の方を向く）
+    private void UpdateFacingDirection() {
+        // 空中にいる場合は振り向かない
+        if (!bIsGrounded) {
+            return;
+        }
+        
+        // 相手がいない場合は何もしない
+        Character pOpponent = GetOpponentCharacter();
+        if (pOpponent == null) {
+            return;
+        }
+        
+        // 相手との相対位置を計算
+        float fDistanceToOpponent = pOpponent.GetPositionX() - this.fPositionX;
+        //相手までの距離（正=右、負=左）
+        
+        boolean bShouldFaceRight = fDistanceToOpponent > 0;
+        //相手が右にいる場合は右を向くべき
+        
+        // 向きが変わった場合のみログ出力
+        if (bIsFacingRight != bShouldFaceRight) {
+            bIsFacingRight = bShouldFaceRight;
+            String sDirection = bIsFacingRight ? "右" : "左";
+            System.out.println("[Player" + nPlayerNumber + "] " + sDirection + "を向きました");
+        }
     }
     
     //X座標を境界内にクランプ（カメラの視野範囲外に出ないようにする）
