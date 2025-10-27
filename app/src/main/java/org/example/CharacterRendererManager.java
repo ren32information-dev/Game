@@ -47,6 +47,8 @@ public class CharacterRendererManager {
 
         // 前進状態のレンダラーを追加
         ArrayList<CharacterRenderer> frontRenderers = pCharacterRenderers.get(CharacterState.FRONT);
+        frontRenderers.add(new CharacterRenderer(pCamera, "Image/Walk001.png"));
+        frontRenderers.add(new CharacterRenderer(pCamera, "Image/Walk002.png"));
 
         // ガード状態のレンダラーを追加
         ArrayList<CharacterRenderer> guardRenderers = pCharacterRenderers.get(CharacterState.GUARD);
