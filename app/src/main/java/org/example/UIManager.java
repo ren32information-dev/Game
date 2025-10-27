@@ -30,11 +30,17 @@ public class UIManager
     private static final int P1_SKILL_ICON_3 = 14;
     //===P1Skill===
 
+    //===P2Skill===
+    private static final int P2_SKILL_ICON_1 = 15;
+    private static final int P2_SKILL_ICON_2 = 16;
+    private static final int P2_SKILL_ICON_3 = 17;
+    //===P2Skill===
+
     //===背景===
-    private static final int BACKGROUND_IMAGE = 15;
+    private static final int BACKGROUND_IMAGE = 18;
     //===背景===
 
-    private static final int MAX_UI_ELEMENTS = 16; 
+    private static final int MAX_UI_ELEMENTS = 19; 
     
     private Renderer[] uiElements; 
     private Camera mainCamera; 
@@ -65,7 +71,14 @@ public class UIManager
     private final float P2_HP_BAR_MAX_Y = 14.0f; 
     private final float P2_Gauge_BAR_MAX_X = 5.5f; 
     private final float P2_Gauge_BAR_MAX_Y = -3.5f;
-    
+    //スキルアイコン
+    private final float P2_SKILL_ICON_START_X = 8.0f;
+    private final float P2_SKILL_ICON_Y = 12.5f;
+    // P2 スキル今のCD
+    private float fP2SkillCooldownCurrent1 = 0.0f;
+    private float fP2SkillCooldownCurrent2 = 0.0f;
+    private float fP2SkillCooldownCurrent3 = 0.0f;
+
     float cameraX;
     float cameraY;
 
@@ -207,7 +220,26 @@ public class UIManager
         uiElements[P2_Gauge_Number].UIColor(0.5f, 0.7f, 1.0f);
         
         DisplayNumber(P2_Gauge_Number, 2);
+     
+        // P2 Skill1
+        uiElements[P2_SKILL_ICON_1].Init("UI/Watermelon.png"); 
+        uiElements[P2_SKILL_ICON_1].UIPos(P2_SKILL_ICON_START_X, P2_SKILL_ICON_Y, 0.0f); 
+        uiElements[P2_SKILL_ICON_1].UISize(P1_SKILL_ICON_SIZE, P1_SKILL_ICON_SIZE, 1.0f);
+        uiElements[P2_SKILL_ICON_1].UIColor(1.0f, 1.0f, 1.0f);
+        
+        // P2 Skill2
+        uiElements[P2_SKILL_ICON_2].Init("UI/Cherry.png"); 
+        uiElements[P2_SKILL_ICON_2].UIPos(P2_SKILL_ICON_START_X - 1.5f, P2_SKILL_ICON_Y, 0.0f); // X座標を左に移動
+        uiElements[P2_SKILL_ICON_2].UISize(P1_SKILL_ICON_SIZE, P1_SKILL_ICON_SIZE, 1.0f);
+        uiElements[P2_SKILL_ICON_2].UIColor(1.0f, 1.0f, 1.0f);
+        
+        // P2 Skill3
+        uiElements[P2_SKILL_ICON_3].Init("UI/Bell.png"); 
+        uiElements[P2_SKILL_ICON_3].UIPos(P2_SKILL_ICON_START_X - 3.0f, P2_SKILL_ICON_Y, 0.0f); // X座標をさらに左に移動
+        uiElements[P2_SKILL_ICON_3].UISize(P1_SKILL_ICON_SIZE, P1_SKILL_ICON_SIZE, 1.0f);
+        uiElements[P2_SKILL_ICON_3].UIColor(1.0f, 1.0f, 1.0f);
 
+        ////タイマー
         // =================================================
         // 十の位
         // =================================================
@@ -318,11 +350,12 @@ public class UIManager
             {
                 fSkillCooldownCurrent1 = 0.0f;
             }
-            uiElements[P1_SKILL_ICON_1].UIColor(0.5f, 0.5f, 0.5f);
+            uiElements[P1_SKILL_ICON_1].UIColor(0.5f, 0.5f, 0.5f); 
         }
         else 
         {
-            uiElements[P1_SKILL_ICON_1].UIColor(1.0f, 1.0f, 1.0f);
+            // クールダウン完了
+            uiElements[P1_SKILL_ICON_1].UIColor(1.0f, 1.0f, 1.0f); // 色を通常に戻す
         }
         
         //Skill2CD
@@ -360,7 +393,6 @@ public class UIManager
         ///////////////P2の処理今仮にP1のを使ってる
         ////===P2===
         //HP
-        
         float p2HpPosX = P2_HP_BAR_MAX_X + cameraX;
         float p2HpPosY = P2_HP_BAR_MAX_Y + cameraY;
         uiElements[P2_MAXHP].UIPos(p2HpPosX, p2HpPosY, 0.0f); // 背景も更新
@@ -409,6 +441,58 @@ public class UIManager
             
             // 現在の整数ゲージ格数を表示
             DisplayNumber(P2_Gauge_Number, nBars);
+        }
+
+        // =================================================
+        // P2 Skill Icon の位置更新
+        // =================================================
+        uiElements[P2_SKILL_ICON_1].UIPos(P2_SKILL_ICON_START_X + cameraX, P2_SKILL_ICON_Y + cameraY, 0.0f); 
+        uiElements[P2_SKILL_ICON_2].UIPos(P2_SKILL_ICON_START_X - 1.5f + cameraX, P2_SKILL_ICON_Y + cameraY, 0.0f); 
+        uiElements[P2_SKILL_ICON_3].UIPos(P2_SKILL_ICON_START_X - 3.0f + cameraX, P2_SKILL_ICON_Y + cameraY, 0.0f);
+        
+        // P2 Skill1CD 処理
+        if (fP2SkillCooldownCurrent1 > 0.0f) 
+        {
+            fP2SkillCooldownCurrent1 -= deltaTime;
+            if (fP2SkillCooldownCurrent1 < 0.0f) 
+            {
+                fP2SkillCooldownCurrent1 = 0.0f;
+            }
+            uiElements[P2_SKILL_ICON_1].UIColor(0.5f, 0.5f, 0.5f); // グレー化
+        }
+        else 
+        {
+            uiElements[P2_SKILL_ICON_1].UIColor(1.0f, 1.0f, 1.0f); // 通常色
+        }
+        
+        // P2 Skill2CD 処理
+        if (fP2SkillCooldownCurrent2 > 0.0f) 
+        {
+            fP2SkillCooldownCurrent2 -= deltaTime;
+            if (fP2SkillCooldownCurrent2 < 0.0f) 
+            {
+                fP2SkillCooldownCurrent2 = 0.0f;
+            }
+            uiElements[P2_SKILL_ICON_2].UIColor(0.5f, 0.5f, 0.5f);
+        }
+        else 
+        {
+            uiElements[P2_SKILL_ICON_2].UIColor(1.0f, 1.0f, 1.0f);
+        }
+        
+        // P2 Skill3CD 処理
+        if (fP2SkillCooldownCurrent3 > 0.0f) 
+        {
+            fP2SkillCooldownCurrent3 -= deltaTime;
+            if (fP2SkillCooldownCurrent3 < 0.0f) 
+            {
+                fP2SkillCooldownCurrent3 = 0.0f;
+            }
+            uiElements[P2_SKILL_ICON_3].UIColor(0.5f, 0.5f, 0.5f);
+        }
+        else 
+        {
+            uiElements[P2_SKILL_ICON_3].UIColor(1.0f, 1.0f, 1.0f);
         }
         ////===P2===
         

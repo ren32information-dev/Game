@@ -71,7 +71,6 @@ public class Renderer
         RtY = 0.0f;
         RtZ = 0.0f;
 
-
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glEnable(GL11.GL_BLEND);
