@@ -272,6 +272,7 @@ public class Character extends Player {
             boolean bJump = pInputManager.GetInput(InputType.JUMP);
             boolean bGuard = pInputManager.GetInput(InputType.GUARD);
             boolean bUp = pInputManager.GetInput(InputType.JUMP); // 上方向
+            boolean bHeavyAttack5 = pInputManager.GetInput(InputType.HEAVYATTACK5);
             boolean bDown = false; // TODO: 下入力の実装
             
             // 現在のゲーム時刻を取得
@@ -377,10 +378,12 @@ public class Character extends Player {
         
         // ジャンプの種類に応じて水平速度を設定
         float fHorizontalJumpSpeed = 3.0f; // 水平方向のジャンプ速度
+        Character pOpponent = GetOpponentCharacter();
         
         switch (eJumpType) {
             case BACK_JUMP:
                 // バックジャンプ：相手から離れる方向
+                System.out.println("[Player]" + pOpponent.GetPlayerNumber() + "]後ろジャンプ");
                 nTextureId = 4;
                 if(bIsFacingRight) {
                     fJumpDirectionX = -fHorizontalJumpSpeed; // 右向きなら左方向
@@ -391,12 +394,14 @@ public class Character extends Player {
                 
             case VERTICAL_JUMP:
                 // 垂直ジャンプ：水平移動なし
+                System.out.println("[Player" + pOpponent.GetPlayerNumber() + "]垂直ジャンプ");
                 nTextureId = 2;
                 fJumpDirectionX = 0f;
                 break;
                 
             case FORWARD_JUMP:
                 // 前ジャンプ：相手に向かう方向
+                System.out.println("[Player]" + pOpponent.GetPlayerNumber() + "]前ジャンプ");
                 nTextureId = 3;
                 if(bIsFacingRight) {
                     fJumpDirectionX = fHorizontalJumpSpeed; // 右向きなら右方向
@@ -435,17 +440,18 @@ public class Character extends Player {
             if (bDashForward) {
                 // 前方向（相手に向かって）空中ダッシュ
                 if (bIsFacingOpponent) {
-                    fAirDashDirectionX = (nPlayerNumber == 1) ? fAirDashSpeed : -fAirDashSpeed;
+                    //fAirDashDirectionX = (nPlayerNumber == 1) ? fAirDashSpeed : -fAirDashSpeed;
+                    fAirDashDirectionX = fAirDashSpeed;
                 } else {
-                    fAirDashDirectionX = (nPlayerNumber == 1) ? -fAirDashSpeed : fAirDashSpeed;
+                    fAirDashDirectionX = -fAirDashSpeed;
                 }
                 System.out.println("[Player" + nPlayerNumber + "] 空中前ダッシュ開始！");
             } else if (bDashBackward) {
                 // 後方向（相手から離れて）空中ダッシュ
                 if (bIsFacingOpponent) {
-                    fAirDashDirectionX = (nPlayerNumber == 1) ? -fAirDashSpeed : fAirDashSpeed;
+                    fAirDashDirectionX = -fAirDashSpeed;
                 } else {
-                    fAirDashDirectionX = (nPlayerNumber == 1) ? fAirDashSpeed : -fAirDashSpeed;
+                    fAirDashDirectionX = fAirDashSpeed;
                 }
                 System.out.println("[Player" + nPlayerNumber + "] 空中後ダッシュ開始！");
             }
@@ -536,11 +542,13 @@ public class Character extends Player {
     //テンキー方向を取得（1P/2P側で方向を反転）
     private int GetNumpadDirection(boolean bLeft, boolean bRight, boolean bUp, boolean bDown) {
         // 1P側は通常、2P側は左右反転
-        boolean bIsPlayer1 = (nPlayerNumber == 1);
         
         // 左右を1P/2P側に応じて調整
-        boolean bForward = bIsPlayer1 ? bRight : bLeft;
-        boolean bBackward = bIsPlayer1 ? bLeft : bRight;
+        //boolean bForward = bIsPlayer1 ? bRight : bLeft;
+        //boolean bBackward = bIsPlayer1 ? bLeft : bRight;
+
+        boolean bForward = bRight;
+        boolean bBackward = bLeft;
         
         // テンキー方向を計算
         if (bUp && bBackward) return 7;
@@ -843,25 +851,34 @@ public class Character extends Player {
                     if (pOpponent != null) {
                         // 相手との相対位置を計算
                         float fDistanceToOpponent = pOpponent.GetPositionX() - this.fPositionX;
-                        boolean bIsFacingOpponent = (nPlayerNumber == 1) ? fDistanceToOpponent > 0 : fDistanceToOpponent < 0;
+                        boolean bIsFacingOpponent = fDistanceToOpponent > 0;
+
+                        if(pOpponent.GetPlayerNumber() == 1)
+                        {
+                            bIsFacingOpponent = !bIsFacingOpponent;
+                        }
                         
                         if (bDashForward) {
                             // 相手に向かってダッシュ
                             if (bIsFacingOpponent) {
                                 // 相手を向いている場合：相手に向かって
-                                fPositionX += (nPlayerNumber == 1) ? fDashSpeed * fDeltaTime : -fDashSpeed * fDeltaTime;
+                                fPositionX += fDashSpeed * fDeltaTime;
+                                System.out.println("1");
                             } else {
                                 // 相手に背を向けている場合：相手から離れて
-                                fPositionX += (nPlayerNumber == 1) ? -fDashSpeed * fDeltaTime : fDashSpeed * fDeltaTime;
+                                fPositionX += -fDashSpeed * fDeltaTime;
+                                System.out.println("2");
                             }
                         } else if (bDashBackward) {
                             // 相手から離れてダッシュ
                             if (bIsFacingOpponent) {
                                 // 相手を向いている場合：相手から離れて
-                                fPositionX += (nPlayerNumber == 1) ? -fDashSpeed * fDeltaTime : fDashSpeed * fDeltaTime;
+                                fPositionX += -fDashSpeed * fDeltaTime;
+                                System.out.println("3");
                             } else {
                                 // 相手に背を向けている場合：相手に向かって
-                                fPositionX += (nPlayerNumber == 1) ? fDashSpeed * fDeltaTime : -fDashSpeed * fDeltaTime;
+                                fPositionX += fDashSpeed * fDeltaTime;
+                                System.out.println("4");
                             }
                         }
                     } else {
