@@ -54,6 +54,8 @@ public class Character extends Player {
     //ダッシュタイマー
     private float fAnimationTimer;
     //アニメーションのフレーム調整用のタイマー
+    private boolean fWalkloop;
+    // 歩行ループフラグ
     
     private Character pOpponentCharacter;
     //相手キャラクターへの参照
@@ -141,6 +143,7 @@ public class Character extends Player {
 
         // アニメーションのフレーム調整用のタイマー
         this.fAnimationTimer = 0f;
+        this.fWalkloop = false;
         
         // ダッシュパラメータ
         this.fDashSpeed = 15.0f; // 通常移動の3倍速
@@ -212,6 +215,7 @@ public class Character extends Player {
 
         // アニメーションのフレーム調整用のタイマー
         this.fAnimationTimer = 0f;
+        this.fWalkloop = false;
 
         // ダッシュパラメータ
         this.fDashSpeed = 15.0f;
@@ -807,8 +811,31 @@ public class Character extends Player {
             case DASH:
                 // ダッシュ状態からの遷移
                 fDashTimer -= fDeltaTime;
+                this.fAnimationTimer += fDeltaTime;
+                if (this.fAnimationTimer >= 0.1f) {
+                    this.fAnimationTimer = 0f;
 
-                nTextureId = 0; // ダッシュ中のテクスチャIDを設定
+                    if(nTextureId == 3)
+                    {
+                        this.fWalkloop = true;
+                    }    
+
+                    if(nTextureId == 1)
+                    {
+                        this.fWalkloop = false;
+                    }
+
+                    if(this.fWalkloop == false)
+                    {
+                        nTextureId++;
+                    }
+                    else
+                    {
+                        nTextureId--;
+                    }
+                                    
+                }
+                
                 
                 if (fDashTimer > 0) {
                     // 相対方向でのダッシュ移動
@@ -873,6 +900,7 @@ public class Character extends Player {
     //状態を変更
     private void ChangeState(CharacterState eNewState) {
         this.eCurrentState = eNewState;
+        this.fAnimationTimer = 0f; // アニメーションタイマーをリセット
     }
     
     //現在の状態を取得
