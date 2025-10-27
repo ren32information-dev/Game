@@ -62,8 +62,9 @@ public class CharacterRendererManager {
         ArrayList<CharacterRenderer> dashRenderers = pCharacterRenderers.get(CharacterState.DASH);
         dashRenderers.add(new CharacterRenderer(pCamera, "Image/DaStart001.png"));
         dashRenderers.add(new CharacterRenderer(pCamera, "Image/Da001.png"));
-        dashRenderers.add(new CharacterRenderer(pCamera, "Image/Da002.png"));
         dashRenderers.add(new CharacterRenderer(pCamera, "Image/Da003.png"));
+        dashRenderers.add(new CharacterRenderer(pCamera, "Image/Da002.png"));
+        
     }
 
     public void Uninit() {
