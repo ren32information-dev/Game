@@ -217,7 +217,8 @@ public class App {
             // 描画
             GL11.glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
             GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-
+            
+            pUI.drawUI();
             //各プレイヤーのキャラクターを描画
             for (PlayerSlot pSlot : pSlotManager.GetAllSlots()) {
                 if (pSlot.IsOccupied()) {
@@ -236,7 +237,6 @@ public class App {
                 pCamera.UpdateFightingGameCamera(pChar1, pChar2);
             }
 
-            pUI.drawUI();
         }
         pWindow.update();
     }
