@@ -45,8 +45,6 @@ public class Renderer
         // 中心位置からの相対的なサイズを設定します
         model.scale(SizeX, SizeY, SizeZ);
 
-        
-
         // 4. UV
         uv_u0 = 0.0f; uv_v0 = 0.0f; 
         uv_u1 = 1.0f; uv_v1 = 0.0f; 
