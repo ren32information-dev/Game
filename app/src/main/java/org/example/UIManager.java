@@ -4,43 +4,44 @@ import org.lwjgl.glfw.GLFW;
 public class UIManager 
 {
     //===P1===
-    private static final int P1_HP = 0; 
     private static final int P1_MAXHP = 1;
-    private static final int P1_Gauge = 2; 
+    private static final int P1_HP = 2; 
     private static final int P1_MAXGauge = 3;
-    private static final int P1_Gauge_Number = 4;
+    private static final int P1_Gauge = 4; 
+    private static final int P1_Gauge_Number = 5;
     //===P1===
-    
+
     //===タイマー===
-    private static final int TIMER_DIGIT_TENS = 5;
-    private static final int TIMER_DIGIT_ONES = 6;
+    private static final int TIMER_DIGIT_TENS = 6;
+    private static final int TIMER_DIGIT_ONES = 7;
     //===タイマー===
 
     // ===P2===
-    private static final int P2_HP = 7; 
     private static final int P2_MAXHP = 8;
-    private static final int P2_Gauge = 9; 
+    private static final int P2_HP = 9; 
     private static final int P2_MAXGauge = 10;
-    private static final int P2_Gauge_Number = 11;
+    private static final int P2_Gauge = 11; 
+    private static final int P2_Gauge_Number = 12;
     // ===P2===
 
     //===P1Skill===
-    private static final int P1_SKILL_ICON_1 = 12;
-    private static final int P1_SKILL_ICON_2 = 13;
-    private static final int P1_SKILL_ICON_3 = 14;
+    private static final int P1_SKILL_ICON_1 = 13;
+    private static final int P1_SKILL_ICON_2 = 14;
+    private static final int P1_SKILL_ICON_3 = 15;
     //===P1Skill===
 
     //===P2Skill===
-    private static final int P2_SKILL_ICON_1 = 15;
-    private static final int P2_SKILL_ICON_2 = 16;
-    private static final int P2_SKILL_ICON_3 = 17;
+    private static final int P2_SKILL_ICON_1 = 16;
+    private static final int P2_SKILL_ICON_2 = 17;
+    private static final int P2_SKILL_ICON_3 = 18;
     //===P2Skill===
-
+    
     //===背景===
-    private static final int BACKGROUND_IMAGE = 18;
+    private static final int BACKGROUND_IMAGE = 0;
     //===背景===
-
+    
     private static final int MAX_UI_ELEMENTS = 19; 
+    
     
     private Renderer[] uiElements; 
     private Camera mainCamera; 
@@ -263,11 +264,13 @@ public class UIManager
         // =================================================
         // 背景
         // =================================================
+            
         uiElements[BACKGROUND_IMAGE].Init("UI/BackGround.png"); 
         uiElements[BACKGROUND_IMAGE].UIPos(0.0f, 6.0f, -1.0f); 
         uiElements[BACKGROUND_IMAGE].UISize(18.0f, 12.96f, 1.0f);
         uiElements[BACKGROUND_IMAGE].UIColor(1.0f, 1.0f, 1.0f);
         uiElements[BACKGROUND_IMAGE].SetUIUV(1.0f, 0.0f, 0.0f, 1.0f);
+
     }
 
     //===========================
