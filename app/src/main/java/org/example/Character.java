@@ -52,6 +52,10 @@ public class Character extends Player {
     //ダッシュ持続時間
     private float fDashTimer;
     //ダッシュタイマー
+    private float fDashCooldownTimer;
+    //ダッシュのクールダウンタイマー（後隙）
+    private float fDashCooldownDuration;
+    //ダッシュのクールダウン時間（30フレーム ≈ 0.5秒）
     private float fAnimationTimer;
     //アニメーションのフレーム調整用のタイマー
     private boolean fWalkloop;
@@ -149,6 +153,8 @@ public class Character extends Player {
         this.fDashSpeed = 15.0f; // 通常移動の3倍速
         this.fDashDuration = 0.3f; // 0.3秒間ダッシュ
         this.fDashTimer = 0f;
+        this.fDashCooldownTimer = 0f; // クールダウンタイマー初期化
+        this.fDashCooldownDuration = 0.25f; // 15フレーム（60FPS想定で0.25秒）
         
         this.pOpponentCharacter = null;
         this.pCamera = null;
@@ -221,6 +227,8 @@ public class Character extends Player {
         this.fDashSpeed = 15.0f;
         this.fDashDuration = 0.3f;
         this.fDashTimer = 0f;
+        this.fDashCooldownTimer = 0f; // クールダウンタイマー初期化
+        this.fDashCooldownDuration = 0.25f; // 15フレーム（60FPS想定で0.25秒）
         
         this.pOpponentCharacter = null;
         this.pCamera = null;
@@ -260,6 +268,14 @@ public class Character extends Player {
         
         // HPとゲージの更新
         pHP.update();
+        
+        // ダッシュクールダウンタイマーを減算
+        if (fDashCooldownTimer > 0) {
+            fDashCooldownTimer -= fDeltaTime;
+            if (fDashCooldownTimer < 0) {
+                fDashCooldownTimer = 0;
+            }
+        }
         
         // 前フレームの状態を保存
         ePreviousState = eCurrentState;
@@ -691,8 +707,8 @@ public class Character extends Player {
             case STAND:
                 nTextureId = 0; // 立ち状態のテクスチャIDを設定
                 // 立ち状態からの遷移
-                if (bDashForward || bDashBackward) {
-                    // ダッシュ開始
+                if ((bDashForward || bDashBackward) && fDashCooldownTimer <= 0) {
+                    // ダッシュ開始（クールダウンが終わっている場合のみ）
                     ChangeState(CharacterState.DASH);
                     fDashTimer = fDashDuration;
                     System.out.println("[Player" + nPlayerNumber + "] ダッシュ開始！");
@@ -719,7 +735,12 @@ public class Character extends Player {
                     nTextureId++;
                 }
                 nTextureId = nTextureId % 2; // 前進状態のテクスチャIDを設定（0と1を交互に切り替え）
-                if (eRequestedJumpType != JumpType.NONE && bIsGrounded) {
+                if ((bDashForward || bDashBackward) && fDashCooldownTimer <= 0) {
+                    // ダッシュ開始（クールダウンが終わっている場合のみ）
+                    ChangeState(CharacterState.DASH);
+                    fDashTimer = fDashDuration;
+                    System.out.println("[Player" + nPlayerNumber + "] ダッシュ開始！");
+                } else if (eRequestedJumpType != JumpType.NONE && bIsGrounded) {
                     // ジャンプ予備動作開始
                     eJumpType = eRequestedJumpType;
                     nJumpPreparationFrames = 0;
@@ -780,13 +801,25 @@ public class Character extends Player {
                             // 空中ダッシュ方向に移動
                             fPositionX += fAirDashDirectionX * fDeltaTime;
                         } else {
-                            // 空中ダッシュ終了
+                            // 空中ダッシュ終了、慣性を残す
                             bIsAirDashing = false;
-                            System.out.println("[Player" + nPlayerNumber + "] 空中ダッシュ終了");
+                            // 空中ダッシュの方向に慣性を残す（速度は約30%）
+                            float fInertiaSpeed = 2.0f; // 慣性による移動速度
+                            if (fAirDashDirectionX > 0) {
+                                fJumpDirectionX = fInertiaSpeed; // 右方向への慣性
+                            } else if (fAirDashDirectionX < 0) {
+                                fJumpDirectionX = -fInertiaSpeed; // 左方向への慣性
+                            }
+                            System.out.println("[Player" + nPlayerNumber + "] 空中ダッシュ終了（慣性: " + fJumpDirectionX + "）");
                         }
                     } else if (!bAirDashUsed && (bDashForward || bDashBackward)) {
                         // 空中ダッシュ開始（未使用かつダッシュコマンド入力）
                         StartAirDash(bDashForward, bDashBackward);
+                    } else if (bAirDashUsed) {
+                        // 空中ダッシュ使用済み（慣性による移動を適用）
+                        if (fJumpDirectionX != 0f) {
+                            fPositionX += fJumpDirectionX * fDeltaTime;
+                        }
                     } else {
                         // 通常のジャンプ移動（空中ダッシュ未使用時）
                         if (eJumpType == JumpType.BACK_JUMP) {
@@ -892,8 +925,9 @@ public class Character extends Player {
                     }
                 } else {
                     // ダッシュ終了
+                    fDashCooldownTimer = fDashCooldownDuration; // クールダウン開始
                     ChangeState(CharacterState.STAND);
-                    System.out.println("[Player" + nPlayerNumber + "] ダッシュ終了");
+                    System.out.println("[Player" + nPlayerNumber + "] ダッシュ終了（クールダウン開始: " + fDashCooldownDuration + "秒）");
                 }
                 break;
                 
