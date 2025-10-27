@@ -30,7 +30,11 @@ public class UIManager
     private static final int P1_SKILL_ICON_3 = 14;
     //===P1Skill===
 
-    private static final int MAX_UI_ELEMENTS = 15; 
+    //===背景===
+    private static final int BACKGROUND_IMAGE = 15;
+    //===背景===
+
+    private static final int MAX_UI_ELEMENTS = 16; 
     
     private Renderer[] uiElements; 
     private Camera mainCamera; 
@@ -223,6 +227,15 @@ public class UIManager
         //最初は99
         DisplayNumber(TIMER_DIGIT_TENS, 9);
         DisplayNumber(TIMER_DIGIT_ONES, 9);
+        
+        // =================================================
+        // 背景
+        // =================================================
+        uiElements[BACKGROUND_IMAGE].Init("UI/BackGround.png"); 
+        uiElements[BACKGROUND_IMAGE].UIPos(0.0f, 6.0f, -1.0f); 
+        uiElements[BACKGROUND_IMAGE].UISize(18.0f, 12.96f, 1.0f);
+        uiElements[BACKGROUND_IMAGE].UIColor(1.0f, 1.0f, 1.0f);
+        uiElements[BACKGROUND_IMAGE].SetUIUV(1.0f, 0.0f, 0.0f, 1.0f);
     }
 
     //===========================
@@ -344,8 +357,6 @@ public class UIManager
         ////===P1===
 
 
-        /* 
-        
         ///////////////P2の処理今仮にP1のを使ってる
         ////===P2===
         //HP
@@ -400,7 +411,7 @@ public class UIManager
             DisplayNumber(P2_Gauge_Number, nBars);
         }
         ////===P2===
-        */
+        
         
         // =================================================
         // タイマー処理
