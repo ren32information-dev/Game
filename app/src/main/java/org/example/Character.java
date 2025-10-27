@@ -281,11 +281,19 @@ public class Character extends Player {
             // ジャンプの種類を判定（7,8,9方向）
             JumpType eRequestedJumpType = JumpType.NONE;
             if (nDirection == 7) {
-                eRequestedJumpType = JumpType.BACK_JUMP;
+                if(bIsFacingRight == false) {
+                    eRequestedJumpType = JumpType.FORWARD_JUMP;
+                } else {
+                    eRequestedJumpType = JumpType.BACK_JUMP;
+                }
             } else if (nDirection == 8) {
                 eRequestedJumpType = JumpType.VERTICAL_JUMP;
             } else if (nDirection == 9) {
-                eRequestedJumpType = JumpType.FORWARD_JUMP;
+                if(bIsFacingRight == true) {
+                    eRequestedJumpType = JumpType.FORWARD_JUMP;
+                } else {
+                    eRequestedJumpType = JumpType.BACK_JUMP;
+                }
             }
             
             // 状態遷移の処理
@@ -361,24 +369,27 @@ public class Character extends Player {
         switch (eJumpType) {
             case BACK_JUMP:
                 // バックジャンプ：相手から離れる方向
-                if (nPlayerNumber == 1) {
-                    fJumpDirectionX = -fHorizontalJumpSpeed; // 1Pは左方向
+                nTextureId = 4;
+                if(bIsFacingRight) {
+                    fJumpDirectionX = -fHorizontalJumpSpeed; // 右向きなら左方向
                 } else {
-                    fJumpDirectionX = fHorizontalJumpSpeed; // 2Pは右方向
+                    fJumpDirectionX = fHorizontalJumpSpeed; // 左向きなら右方向
                 }
                 break;
                 
             case VERTICAL_JUMP:
                 // 垂直ジャンプ：水平移動なし
+                nTextureId = 2;
                 fJumpDirectionX = 0f;
                 break;
                 
             case FORWARD_JUMP:
                 // 前ジャンプ：相手に向かう方向
-                if (nPlayerNumber == 1) {
-                    fJumpDirectionX = fHorizontalJumpSpeed; // 1Pは右方向
+                nTextureId = 3;
+                if(bIsFacingRight) {
+                    fJumpDirectionX = fHorizontalJumpSpeed; // 右向きなら右方向
                 } else {
-                    fJumpDirectionX = -fHorizontalJumpSpeed; // 2Pは左方向
+                    fJumpDirectionX = -fHorizontalJumpSpeed; // 左向きなら左方向
                 }
                 break;
                 
@@ -715,13 +726,14 @@ public class Character extends Player {
             case JUMP:
                 // ジャンプ状態の処理
                 if (nJumpPreparationFrames < JUMP_PREPARATION_FRAMES) {
-                    nTextureId = 0;
+                    nTextureId = 1;
                     // 予備動作中（1～3フレーム目、地上で待機）
                     nJumpPreparationFrames++;
                     
                     if (nJumpPreparationFrames >= JUMP_PREPARATION_FRAMES) {
                         // 3フレーム経過したら次のフレームでジャンプ実行の準備
                         System.out.println("[Player" + nPlayerNumber + "] 予備動作完了（次フレームでジャンプ実行）");
+                        nTextureId = 0;
                     }
                 } else if (nJumpPreparationFrames == JUMP_PREPARATION_FRAMES && bIsGrounded) {
                     // 4フレーム目でジャンプ実行
