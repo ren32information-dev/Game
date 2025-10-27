@@ -52,6 +52,8 @@ public class Character extends Player {
     //ダッシュ持続時間
     private float fDashTimer;
     //ダッシュタイマー
+    private float fAnimationTimer;
+    //アニメーションのフレーム調整用のタイマー
     
     private Character pOpponentCharacter;
     //相手キャラクターへの参照
@@ -136,6 +138,9 @@ public class Character extends Player {
         
         // 入力コマンド管理を初期化
         this.pInputCommand = new InputCommand();
+
+        // アニメーションのフレーム調整用のタイマー
+        this.fAnimationTimer = 0f;
         
         // ダッシュパラメータ
         this.fDashSpeed = 15.0f; // 通常移動の3倍速
@@ -204,7 +209,10 @@ public class Character extends Player {
         
         // 入力コマンド管理を初期化
         this.pInputCommand = new InputCommand();
-        
+
+        // アニメーションのフレーム調整用のタイマー
+        this.fAnimationTimer = 0f;
+
         // ダッシュパラメータ
         this.fDashSpeed = 15.0f;
         this.fDashDuration = 0.3f;
@@ -692,6 +700,13 @@ public class Character extends Player {
                 
             case FRONT:
                 // 前進状態からの遷移
+                fAnimationTimer += fDeltaTime;
+                if(fAnimationTimer >= 0.2f)
+                {
+                    fAnimationTimer = 0f;
+                    nTextureId++;
+                }
+                nTextureId = nTextureId % 2; // 前進状態のテクスチャIDを設定（0と1を交互に切り替え）
                 if (eRequestedJumpType != JumpType.NONE && bIsGrounded) {
                     // ジャンプ予備動作開始
                     eJumpType = eRequestedJumpType;
