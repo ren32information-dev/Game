@@ -72,7 +72,7 @@ public class Renderer
         RtZ = 0.0f;
 
         GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
+        //GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
     }
@@ -97,6 +97,9 @@ public class Renderer
         mvp.get(mat);
 
         GL11.glPushMatrix();
+
+        GL11.glDepthMask(false);
+
         GL11.glLoadMatrixf(mat);
 
         GL11.glColor3f(ColorR, ColorG, ColorB);
@@ -117,6 +120,7 @@ public class Renderer
         GL11.glTexCoord2f(uv_u3, uv_v3); GL11.glVertex3f(-1, -1, 0);
 
         GL11.glEnd();
+        GL11.glDepthMask(true);
         GL11.glPopMatrix();
     }
 
