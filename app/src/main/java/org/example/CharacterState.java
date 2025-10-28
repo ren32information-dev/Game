@@ -20,7 +20,23 @@ public enum CharacterState {
     //攻撃状態
     DAMAGE,
     //被ダメージ状態
-    DOWN
+    DOWN,
     //ダウン状態
+    HEAVYATTACK5,
+    //強攻撃5
+    MEDIUMATTACK5,
+    //中攻撃5
+    LIGHTATTACK5,
+    //弱攻撃5
+    LIGHTATTACK2,
+    //弱攻撃2
+    HEAVYATTACK2,
+    //強攻撃2
+    MEDIUMATTACK2,
+    //中攻撃2
+    MEDIUMATTACK6,
+    //中攻撃6
+    HEAVYATTACK3,
+    //強攻撃3
 }
 
