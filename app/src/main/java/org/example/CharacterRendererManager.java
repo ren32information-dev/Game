@@ -25,6 +25,9 @@ public class CharacterRendererManager {
         pCharacterRenderers.put(CharacterState.HEAVYATTACK5, new ArrayList<>());
         pCharacterRenderers.put(CharacterState.MEDIUMATTACK5, new ArrayList<>());
         pCharacterRenderers.put(CharacterState.LIGHTATTACK5, new ArrayList<>());
+        pCharacterRenderers.put(CharacterState.LIGHTATTACK2, new ArrayList<>());
+        pCharacterRenderers.put(CharacterState.HEAVYATTACK2, new ArrayList());
+        
 
         // 立ち状態のレンダラーを追加
         ArrayList<CharacterRenderer> standRenderers = pCharacterRenderers.get(CharacterState.STAND);
@@ -88,7 +91,17 @@ public class CharacterRendererManager {
         lightAttack5Renderers.add(new CharacterRenderer(pCamera, "Image/AtkDefoLowStart001.png"));
         lightAttack5Renderers.add(new CharacterRenderer(pCamera, "Image/AtkDefoLow001.png"));
 
-        
+        // しゃがみ弱
+        ArrayList<CharacterRenderer> lightAttack2Renderers = pCharacterRenderers.get(CharacterState.LIGHTATTACK2);
+        lightAttack2Renderers.add(new CharacterRenderer(pCamera, "Image/AtkCrouchLowStart001.png"));
+        lightAttack2Renderers.add(new CharacterRenderer(pCamera, "Image/AtkCrouchLow001.png"));
+
+        // しゃがみ強
+        ArrayList<CharacterRenderer> heavyAttack2Renderers = pCharacterRenderers.get(CharacterState.HEAVYATTACK2);
+        heavyAttack2Renderers.add(new CharacterRenderer(pCamera, "Image/AtkCrouchHighStart002.png"));
+        heavyAttack2Renderers.add(new CharacterRenderer(pCamera, "Image/AtkCrouchHighStart001.png"));
+        heavyAttack2Renderers.add(new CharacterRenderer(pCamera, "Image/AtkCrouchHighEnd001.png"));
+        heavyAttack2Renderers.add(new CharacterRenderer(pCamera, "Image/AtkCrouchHigh001.png"));
     }
 
     public void Uninit() {

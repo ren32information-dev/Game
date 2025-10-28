@@ -170,6 +170,11 @@ public class InputManager {
                        pState.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_X) > -0.5f &&
                        pState.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y) > 0.5f &&
                        pState.buttons(GLFW.GLFW_GAMEPAD_BUTTON_Y) == GLFW.GLFW_PRESS;
+            case HEAVYATTACK2:
+                return pState.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_X) < 0.5f &&
+                       pState.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_X) > -0.5f &&
+                       pState.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y) > 0.5f &&
+                       pState.buttons(GLFW.GLFW_GAMEPAD_BUTTON_A) == GLFW.GLFW_PRESS;
             default:
                 return false;
         }

@@ -103,8 +103,10 @@ public class Character extends Player {
     boolean bHeavyAttack5 = false;
     boolean bMedAttack5 = false;
     boolean bLightAttack5 = false;
-    boolean bDown = false; // TODO: 下入力の実装
+    boolean bDown = false;
     boolean bCrouch = false;
+    boolean bLightAttack2 = false;
+    boolean bHeavyAttack2 = false;
     //コントローラの入力
 
     //ジャンプの種類を定義
@@ -307,6 +309,8 @@ public class Character extends Player {
             bMedAttack5 = pInputManager.GetInput(InputType.MEDIUMATTACK5);
             bLightAttack5 = pInputManager.GetInput(InputType.LIGHTATTACK5);
             bCrouch = pInputManager.GetInput(InputType.CROUCH);
+            bLightAttack2 = pInputManager.GetInput(InputType.LIGHTATTACK2);
+            bHeavyAttack2 = pInputManager.GetInput(InputType.HEAVYATTACK2);
             
             // 現在のゲーム時刻を取得
             float fCurrentTime = (float) org.lwjgl.glfw.GLFW.glfwGetTime();
@@ -802,6 +806,8 @@ public class Character extends Player {
                     nTextureId = 1;
                 }
                 nFrame++;
+                if(bHeavyAttack2) ChangeState(CharacterState.HEAVYATTACK2);
+                if (bLightAttack2) ChangeState(CharacterState.LIGHTATTACK2);
                 if(bCrouch == false) ChangeState(CharacterState.STAND);
                 break;
                 
@@ -1008,6 +1014,24 @@ public class Character extends Player {
                 if(nTextureId == 2)
                 {
                     ChangeState(CharacterState.STAND);
+                } else {
+                    nFrame++;
+                }
+                break;
+            case LIGHTATTACK2:
+                nTextureId = nFrame / 6;
+                if(nTextureId == 2)
+                {
+                    ChangeState(CharacterState.CROUCH);
+                } else {
+                    nFrame++;
+                }
+                break;
+            case HEAVYATTACK2:
+                nTextureId = (nFrame - 2) / 8;
+                if(nTextureId == 4)
+                {
+                    ChangeState(CharacterState.CROUCH);
                 } else {
                     nFrame++;
                 }
