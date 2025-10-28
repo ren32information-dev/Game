@@ -107,6 +107,7 @@ public class Character extends Player {
     boolean bCrouch = false;
     boolean bLightAttack2 = false;
     boolean bHeavyAttack2 = false;
+    boolean bMedAttack6 = false;
     //コントローラの入力
 
     //ジャンプの種類を定義
@@ -311,6 +312,7 @@ public class Character extends Player {
             bCrouch = pInputManager.GetInput(InputType.CROUCH);
             bLightAttack2 = pInputManager.GetInput(InputType.LIGHTATTACK2);
             bHeavyAttack2 = pInputManager.GetInput(InputType.HEAVYATTACK2);
+            bMedAttack6 = pInputManager.GetInput(InputType.MEDIUMATTACK6);
             
             // 現在のゲーム時刻を取得
             float fCurrentTime = (float) org.lwjgl.glfw.GLFW.glfwGetTime();
@@ -784,6 +786,9 @@ public class Character extends Player {
                 } else if (bLeftMove || bRightMove) {
                     // 移動中（実際の移動処理はApp.javaから呼ばれる）
                     // 状態はFRONTのまま維持
+                } else if (bMedAttack6) {
+                    // 前中攻撃
+                    ChangeState(CharacterState.MEDIUMATTACK6);
                 } else {
                     // 移動入力がなくなったら立ち状態に
                     ChangeState(CharacterState.STAND);
@@ -1036,6 +1041,14 @@ public class Character extends Player {
                     nFrame++;
                 }
                 break;
+            case MEDIUMATTACK6:
+                nTextureId = nFrame / 8;
+                if(nTextureId == 5)
+                {
+                    ChangeState(CharacterState.STAND);
+                } else {
+                    nFrame++;
+                }
         }
     }
     
