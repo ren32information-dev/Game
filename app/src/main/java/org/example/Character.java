@@ -92,8 +92,8 @@ public class Character extends Player {
     private float fAirDashDirectionX;
     //空中ダッシュの方向
 
-    private int nAttackFrame = 0;
-    // 攻撃フレーム
+    private int nFrame = 0;
+    // フレームの管理
 
     boolean bLeftMove = false;
     boolean bRightMove = false;
@@ -104,7 +104,9 @@ public class Character extends Player {
     boolean bMedAttack5 = false;
     boolean bLightAttack5 = false;
     boolean bDown = false; // TODO: 下入力の実装
-    
+    boolean bCrouch = false;
+    //コントローラの入力
+
     //ジャンプの種類を定義
     private enum JumpType {
         NONE,
@@ -304,7 +306,7 @@ public class Character extends Player {
             bHeavyAttack5 = pInputManager.GetInput(InputType.HEAVYATTACK5);
             bMedAttack5 = pInputManager.GetInput(InputType.MEDIUMATTACK5);
             bLightAttack5 = pInputManager.GetInput(InputType.LIGHTATTACK5);
-            bDown = false; // TODO: 下入力の実装
+            bCrouch = pInputManager.GetInput(InputType.CROUCH);
             
             // 現在のゲーム時刻を取得
             float fCurrentTime = (float) org.lwjgl.glfw.GLFW.glfwGetTime();
@@ -747,6 +749,9 @@ public class Character extends Player {
                 } else if (bLightAttack5) {
                     System.out.println("弱攻撃");
                     ChangeState(CharacterState.LIGHTATTACK5);
+                } else if (bCrouch) {
+                    System.out.println("しゃがみ");
+                    ChangeState(CharacterState.CROUCH);
                 }
                 break;
                 
@@ -790,9 +795,14 @@ public class Character extends Player {
                 break;
                 
             case CROUCH:
-                // しゃがみ状態からの遷移
-                // TODO: しゃがみ入力の実装後に追加
-                ChangeState(CharacterState.STAND);
+                if(nFrame < 4)
+                {
+                    nTextureId = 0;
+                } else {
+                    nTextureId = 1;
+                }
+                nFrame++;
+                if(bCrouch == false) ChangeState(CharacterState.STAND);
                 break;
                 
             case JUMP:
@@ -970,26 +980,37 @@ public class Character extends Player {
                 // TODO: ダウンの実装後に追加
                 break;
             case HEAVYATTACK5:
-                if(nAttackFrame <= 3)
+                if(nFrame <= 3)
                 {
                     nTextureId = 2;
                 } else {
-                    nTextureId = (nAttackFrame - 4) / 4 + 3;
+                    nTextureId = (nFrame - 4) / 4 + 3;
                 }
 
                 if(nTextureId == 6)
                 {
                     ChangeState(CharacterState.STAND);
+                } else {
+                    nFrame++;
                 }
-                nAttackFrame++;
                 break;
             case MEDIUMATTACK5:
-                nTextureId = nAttackFrame / 4;
-                if(nTextureId == 3) ChangeState(CharacterState.STAND);
-                nAttackFrame++;
+                nTextureId = nFrame / 7;
+                if(nTextureId == 3)
+                {
+                    ChangeState(CharacterState.STAND);
+                } else {
+                    nFrame++;
+                }
                 break;
             case LIGHTATTACK5:
-            
+                nTextureId = nFrame / 6;
+                if(nTextureId == 2)
+                {
+                    ChangeState(CharacterState.STAND);
+                } else {
+                    nFrame++;
+                }
                 break;
         }
     }
@@ -998,7 +1019,7 @@ public class Character extends Player {
     private void ChangeState(CharacterState eNewState) {
         this.eCurrentState = eNewState;
         this.fAnimationTimer = 0f; // アニメーションタイマーをリセット
-        this.nAttackFrame = 0;
+        this.nFrame = 0;
     }
     
     //現在の状態を取得

@@ -14,6 +14,8 @@ public enum InputType {
     //ガード
     DASH,
     //ダッシュ
+    CROUCH,
+    //しゃがみ
     SPECIAL,
     //必殺技
     PAUSE,

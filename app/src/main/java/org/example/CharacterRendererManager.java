@@ -58,8 +58,8 @@ public class CharacterRendererManager {
 
         // しゃがみ状態のレンダラーを追加
         ArrayList<CharacterRenderer> crouchRenderers = pCharacterRenderers.get(CharacterState.CROUCH);
-        crouchRenderers.add(new CharacterRenderer(pCamera, "Image/Cr001.png"));
         crouchRenderers.add(new CharacterRenderer(pCamera, "Image/CrStart001.png"));
+        crouchRenderers.add(new CharacterRenderer(pCamera, "Image/Cr001.png"));
 
         // ダッシュ状態のレンダラーを追加
         ArrayList<CharacterRenderer> dashRenderers = pCharacterRenderers.get(CharacterState.DASH);

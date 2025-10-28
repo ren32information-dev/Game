@@ -135,6 +135,9 @@ public class InputManager {
                 // 上スティックまたは十字キー上
                 return pState.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y) < -0.5f || 
                        pState.buttons(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP) == GLFW.GLFW_PRESS;
+            case CROUCH:
+                return pState.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y) > 0.5f || 
+                       pState.buttons(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN) == GLFW.GLFW_PRESS;
             //case ATTACK:
                 // Aボタン（Switch: B、PS: ×）
                 //return pState.buttons(GLFW.GLFW_GAMEPAD_BUTTON_A) == GLFW.GLFW_PRESS;
@@ -161,6 +164,11 @@ public class InputManager {
                 // 弱攻撃5ボタン
                 return pState.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_X) < 0.5f &&
                        pState.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_X) > -0.5f &&
+                       pState.buttons(GLFW.GLFW_GAMEPAD_BUTTON_Y) == GLFW.GLFW_PRESS;
+            case LIGHTATTACK2:
+                return pState.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_X) < 0.5f &&
+                       pState.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_X) > -0.5f &&
+                       pState.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y) > 0.5f &&
                        pState.buttons(GLFW.GLFW_GAMEPAD_BUTTON_Y) == GLFW.GLFW_PRESS;
             default:
                 return false;
