@@ -739,10 +739,13 @@ public class Character extends Player {
                     // 移動処理はApp.javaから呼ばれるので、ここでは状態変更のみ
                 } else if (bHeavyAttack5)
                 {
+                    System.out.println("強攻撃");
                     ChangeState(CharacterState.HEAVYATTACK5);
                 } else if (bMedAttack5) {
+                    System.out.println("中攻撃");
                     ChangeState(CharacterState.MEDIUMATTACK5);
                 } else if (bLightAttack5) {
+                    System.out.println("弱攻撃");
                     ChangeState(CharacterState.LIGHTATTACK5);
                 }
                 break;
@@ -981,10 +984,12 @@ public class Character extends Player {
                 nAttackFrame++;
                 break;
             case MEDIUMATTACK5:
-
+                nTextureId = nAttackFrame / 4;
+                if(nTextureId == 3) ChangeState(CharacterState.STAND);
+                nAttackFrame++;
                 break;
             case LIGHTATTACK5:
-
+            
                 break;
         }
     }

@@ -80,8 +80,8 @@ public class CharacterRendererManager {
         // 中立攻撃
         ArrayList<CharacterRenderer> mediumAttack5Renderers = pCharacterRenderers.get(CharacterState.MEDIUMATTACK5);
         mediumAttack5Renderers.add(new CharacterRenderer(pCamera, "Image/AtkDefoMidStart001.png"));
-        mediumAttack5Renderers.add(new CharacterRenderer(pCamera, "Image/AtkDefoMid001.png"));
         mediumAttack5Renderers.add(new CharacterRenderer(pCamera, "Image/AtkDefoMid002.png"));
+        mediumAttack5Renderers.add(new CharacterRenderer(pCamera, "Image/AtkDefoMid001.png"));
 
         // 弱攻撃
         ArrayList<CharacterRenderer> lightAttack5Renderers = pCharacterRenderers.get(CharacterState.LIGHTATTACK5);
