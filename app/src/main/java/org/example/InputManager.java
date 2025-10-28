@@ -146,7 +146,7 @@ public class InputManager {
                 return pState.buttons(GLFW.GLFW_GAMEPAD_BUTTON_B) == GLFW.GLFW_PRESS;
             case DASH:
                 // Xボタン（Switch: Y、PS: □）
-                return pState.buttons(GLFW.GLFW_GAMEPAD_BUTTON_X) == GLFW.GLFW_PRESS;
+                //return pState.buttons(GLFW.GLFW_GAMEPAD_BUTTON_X) == GLFW.GLFW_PRESS;
             case SPECIAL:
                 // Yボタン（Switch: X、PS: △）
                 return pState.buttons(GLFW.GLFW_GAMEPAD_BUTTON_Y) == GLFW.GLFW_PRESS;
@@ -175,6 +175,8 @@ public class InputManager {
                        pState.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_X) > -0.5f &&
                        pState.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y) > 0.5f &&
                        pState.buttons(GLFW.GLFW_GAMEPAD_BUTTON_A) == GLFW.GLFW_PRESS;
+            case MEDIUMATTACK6:
+                return pState.buttons(GLFW.GLFW_GAMEPAD_BUTTON_X) == GLFW.GLFW_PRESS;
             default:
                 return false;
         }
