@@ -22,6 +22,9 @@ public class CharacterRendererManager {
         pCharacterRenderers.put(CharacterState.GUARD, new ArrayList<>());
         pCharacterRenderers.put(CharacterState.CROUCH, new ArrayList<>());
         pCharacterRenderers.put(CharacterState.DASH, new ArrayList<>());
+        pCharacterRenderers.put(CharacterState.HEAVYATTACK5, new ArrayList<>());
+        pCharacterRenderers.put(CharacterState.MEDIUMATTACK5, new ArrayList<>());
+        pCharacterRenderers.put(CharacterState.LIGHTATTACK5, new ArrayList<>());
 
         // 立ち状態のレンダラーを追加
         ArrayList<CharacterRenderer> standRenderers = pCharacterRenderers.get(CharacterState.STAND);
@@ -64,6 +67,27 @@ public class CharacterRendererManager {
         dashRenderers.add(new CharacterRenderer(pCamera, "Image/Da001.png"));
         dashRenderers.add(new CharacterRenderer(pCamera, "Image/Da003.png"));
         dashRenderers.add(new CharacterRenderer(pCamera, "Image/Da002.png"));
+
+        // 強立攻撃
+        ArrayList<CharacterRenderer> heavyAttack5Renderers = pCharacterRenderers.get(CharacterState.HEAVYATTACK5);
+        heavyAttack5Renderers.add(new CharacterRenderer(pCamera, "Image/AtkDefoHighStart001.png"));
+        heavyAttack5Renderers.add(new CharacterRenderer(pCamera, "Image/AtkDefoHighStart002.png"));
+        heavyAttack5Renderers.add(new CharacterRenderer(pCamera, "Image/AtkDefoHighStart003.png"));
+        heavyAttack5Renderers.add(new CharacterRenderer(pCamera, "Image/AtkDefoHigh001.png"));
+        heavyAttack5Renderers.add(new CharacterRenderer(pCamera, "Image/AtkDefoHigh002.png"));
+        heavyAttack5Renderers.add(new CharacterRenderer(pCamera, "Image/AtkDefoHighEnd001.png"));
+
+        // 中立攻撃
+        ArrayList<CharacterRenderer> mediumAttack5Renderers = pCharacterRenderers.get(CharacterState.MEDIUMATTACK5);
+        mediumAttack5Renderers.add(new CharacterRenderer(pCamera, "Image/AtkDefoMidStart001.png"));
+        mediumAttack5Renderers.add(new CharacterRenderer(pCamera, "Image/AtkDefoMid001.png"));
+        mediumAttack5Renderers.add(new CharacterRenderer(pCamera, "Image/AtkDefoMid002.png"));
+
+        // 弱攻撃
+        ArrayList<CharacterRenderer> lightAttack5Renderers = pCharacterRenderers.get(CharacterState.LIGHTATTACK5);
+        lightAttack5Renderers.add(new CharacterRenderer(pCamera, "Image/AtkDefoLowStart001.png"));
+        lightAttack5Renderers.add(new CharacterRenderer(pCamera, "Image/AtkDefoLow001.png"));
+
         
     }
 

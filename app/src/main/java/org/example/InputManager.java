@@ -152,6 +152,16 @@ public class InputManager {
                 return pState.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_X) < 0.5f &&
                        pState.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_X) > -0.5f &&
                        pState.buttons(GLFW.GLFW_GAMEPAD_BUTTON_B) == GLFW.GLFW_PRESS;
+            case MEDIUMATTACK5:
+                // 中攻撃5ボタン
+                return pState.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_X) < 0.5f &&
+                       pState.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_X) > -0.5f &&
+                       pState.buttons(GLFW.GLFW_GAMEPAD_BUTTON_Y) == GLFW.GLFW_PRESS;
+            case LIGHTATTACK5:
+                // 弱攻撃5ボタン
+                return pState.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_X) < 0.5f &&
+                       pState.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_X) > -0.5f &&
+                       pState.buttons(GLFW.GLFW_GAMEPAD_BUTTON_X) == GLFW.GLFW_PRESS;
             default:
                 return false;
         }

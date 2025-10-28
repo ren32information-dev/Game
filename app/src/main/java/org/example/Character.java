@@ -91,6 +91,19 @@ public class Character extends Player {
     //空中ダッシュ持続時間
     private float fAirDashDirectionX;
     //空中ダッシュの方向
+
+    private int nAttackFrame = 0;
+    // 攻撃フレーム
+
+    boolean bLeftMove = false;
+    boolean bRightMove = false;
+    boolean bJump = false;
+    boolean bGuard = false;
+    boolean bUp = false;
+    boolean bHeavyAttack5 = false;
+    boolean bMedAttack5 = false;
+    boolean bLightAttack5 = false;
+    boolean bDown = false; // TODO: 下入力の実装
     
     //ジャンプの種類を定義
     private enum JumpType {
@@ -283,13 +296,15 @@ public class Character extends Player {
         // 入力マネージャーがnullの場合は状態遷移をスキップ
         if (pInputManager != null) {
             // 入力取得
-            boolean bLeftMove = pInputManager.GetInput(InputType.LEFT);
-            boolean bRightMove = pInputManager.GetInput(InputType.RIGHT);
-            boolean bJump = pInputManager.GetInput(InputType.JUMP);
-            boolean bGuard = pInputManager.GetInput(InputType.GUARD);
-            boolean bUp = pInputManager.GetInput(InputType.JUMP); // 上方向
-            boolean bHeavyAttack5 = pInputManager.GetInput(InputType.HEAVYATTACK5);
-            boolean bDown = false; // TODO: 下入力の実装
+            bLeftMove = pInputManager.GetInput(InputType.LEFT);
+            bRightMove = pInputManager.GetInput(InputType.RIGHT);
+            bJump = pInputManager.GetInput(InputType.JUMP);
+            bGuard = pInputManager.GetInput(InputType.GUARD);
+            bUp = pInputManager.GetInput(InputType.JUMP); // 上方向
+            bHeavyAttack5 = pInputManager.GetInput(InputType.HEAVYATTACK5);
+            bMedAttack5 = pInputManager.GetInput(InputType.MEDIUMATTACK5);
+            bLightAttack5 = pInputManager.GetInput(InputType.LIGHTATTACK5);
+            bDown = false; // TODO: 下入力の実装
             
             // 現在のゲーム時刻を取得
             float fCurrentTime = (float) org.lwjgl.glfw.GLFW.glfwGetTime();
@@ -326,7 +341,7 @@ public class Character extends Player {
             }
             
             // 状態遷移の処理
-            UpdateState(bLeftMove, bRightMove, bJump, bGuard, aDashDirections[0], aDashDirections[1], eRequestedJumpType, fDeltaTime);
+            UpdateState(aDashDirections[0], aDashDirections[1], eRequestedJumpType, fDeltaTime);
         }
         
         // 重力を適用（空中ダッシュ中は無効化）
@@ -701,8 +716,7 @@ public class Character extends Player {
     }
     
     //状態遷移の処理
-    private void UpdateState(boolean bLeftMove, boolean bRightMove, boolean bJump, boolean bGuard, 
-                            boolean bDashForward, boolean bDashBackward, JumpType eRequestedJumpType, float fDeltaTime) {
+    private void UpdateState(boolean bDashForward, boolean bDashBackward, JumpType eRequestedJumpType, float fDeltaTime) {
         switch (eCurrentState) {
             case STAND:
                 nTextureId = 0; // 立ち状態のテクスチャIDを設定
@@ -723,6 +737,13 @@ public class Character extends Player {
                 } else if (bLeftMove || bRightMove) {
                     ChangeState(CharacterState.FRONT);
                     // 移動処理はApp.javaから呼ばれるので、ここでは状態変更のみ
+                } else if (bHeavyAttack5)
+                {
+                    ChangeState(CharacterState.HEAVYATTACK5);
+                } else if (bMedAttack5) {
+                    ChangeState(CharacterState.MEDIUMATTACK5);
+                } else if (bLightAttack5) {
+                    ChangeState(CharacterState.LIGHTATTACK5);
                 }
                 break;
                 
@@ -945,6 +966,26 @@ public class Character extends Player {
                 // ダウン状態からの遷移
                 // TODO: ダウンの実装後に追加
                 break;
+            case HEAVYATTACK5:
+                if(nAttackFrame <= 3)
+                {
+                    nTextureId = 2;
+                } else {
+                    nTextureId = (nAttackFrame - 4) / 4 + 3;
+                }
+
+                if(nTextureId == 6)
+                {
+                    ChangeState(CharacterState.STAND);
+                }
+                nAttackFrame++;
+                break;
+            case MEDIUMATTACK5:
+
+                break;
+            case LIGHTATTACK5:
+
+                break;
         }
     }
     
@@ -952,6 +993,7 @@ public class Character extends Player {
     private void ChangeState(CharacterState eNewState) {
         this.eCurrentState = eNewState;
         this.fAnimationTimer = 0f; // アニメーションタイマーをリセット
+        this.nAttackFrame = 0;
     }
     
     //現在の状態を取得
