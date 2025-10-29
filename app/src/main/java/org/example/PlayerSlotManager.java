@@ -14,6 +14,9 @@ public class PlayerSlotManager {
     private PlayerSlot[] pSlots;
     //プレイヤースロット配列
     
+    private CPUInputManager[] pCPUManagers;
+    //CPU入力マネージャー配列（各プレイヤーごと）
+    
     // 長押し検出用
     private static final float LONG_PRESS_DURATION = 1.0f;
     //長押し判定時間（秒）
@@ -27,6 +30,8 @@ public class PlayerSlotManager {
     //前フレームのキーボードボタン状態
     private boolean[] bPrevGamepadButton;
     //前フレームのゲームパッドボタン状態
+    private boolean bPrevTabKey;
+    //前フレームのTabキー状態
     
     // 長押し切断済みフラグ
     private boolean bKeyboardLongPressHandled;
@@ -40,10 +45,12 @@ public class PlayerSlotManager {
         this.pSlots[0] = new PlayerSlot(1);
         this.pSlots[1] = new PlayerSlot(2);
         
+        this.pCPUManagers = new CPUInputManager[2];
         this.fKeyboardPressTime = 0f;
         this.fGamepadPressTime = new float[4];
         this.bPrevKeyboardButton = false;
         this.bPrevGamepadButton = new boolean[4];
+        this.bPrevTabKey = false;
         this.bKeyboardLongPressHandled = false;
         this.bGamepadLongPressHandled = new boolean[4];
         
@@ -52,6 +59,7 @@ public class PlayerSlotManager {
         System.out.println("  キーボード: Enterキー");
         System.out.println("  PS5コントローラー: オプションボタン");
         System.out.println("  Switchコントローラー: +ボタン");
+        System.out.println("CPU切り替え: Tabキー");
         System.out.println("切断方法: 各ボタンを1秒長押し");
         System.out.println("========================================");
         
@@ -103,12 +111,18 @@ public class PlayerSlotManager {
         // キーボードのEnterキーをチェック
         CheckKeyboardConnection(fDeltaTime);
         
+        // TabキーでCPU切り替え
+        CheckCPUToggle();
+        
         // ゲームパッドのボタンをチェック
         for (int i = GLFW.GLFW_JOYSTICK_1; i <= GLFW.GLFW_JOYSTICK_4; i++) {
             if (InputManager.IsGamepadConnected(i)) {
                 CheckGamepadConnection(i, fDeltaTime);
             }
         }
+        
+        // CPUの思考を更新
+        UpdateCPUs(fDeltaTime);
     }
     
     //キーボードの接続/切断をチェック（Enterキーでトグル）
@@ -332,6 +346,73 @@ public class PlayerSlotManager {
             }
             if (pSlots[1].IsOccupied()) {
                 pSlots[1].GetCharacter().SetOpponentCharacter(null);
+            }
+        }
+    }
+    
+    //Tabキーでのプレイヤー→CPU切り替えをチェック
+    private void CheckCPUToggle() {
+        boolean bCurrentTabKey = pWindow.isKeyPressed(GLFW.GLFW_KEY_TAB);
+        
+        // Tabキーが押された瞬間を検出
+        if (bCurrentTabKey && !bPrevTabKey) {
+            // 空いているスロット（入力が無効なスロット）を探してCPUに切り替え
+            boolean bToggled = false;
+            
+            for (int i = 0; i < pSlots.length; i++) {
+                PlayerSlot pSlot = pSlots[i];
+                
+                // スロットが占有されていない場合はスキップ
+                if (!pSlot.IsOccupied()) {
+                    continue;
+                }
+                
+                // 既にCPUの場合は人間に戻す（空きに戻す）
+                if (pCPUManagers[i] != null) {
+                    System.out.println("[CPU→空き] プレイヤー" + (i + 1) + "のCPU制御を解除しました（入力待機状態）");
+                    pSlot.Disconnect();
+                    pCPUManagers[i] = null;
+                    bToggled = true;
+                    break;
+                }
+                
+                // 入力が有効な場合はスキップ（人間が操作中）
+                if (pSlot.IsInputEnabled()) {
+                    continue;
+                }
+                
+                // 空いている（入力が無効）場合はCPUに切り替え
+                CPUInputManager pCPU = new CPUInputManager(pWindow, pSlot.GetSlotNumber());
+                pCPU.SetSelfCharacter(pSlot.GetCharacter());
+                
+                // 相手キャラクターを設定
+                int nOpponentIndex = (i == 0) ? 1 : 0;
+                if (pSlots[nOpponentIndex].IsOccupied()) {
+                    pCPU.SetOpponentCharacter(pSlots[nOpponentIndex].GetCharacter());
+                }
+                
+                // CPUマネージャーをスロットに設定
+                pSlot.AttachInputManager(pCPU);
+                pCPUManagers[i] = pCPU;
+                
+                System.out.println("[空き→CPU] プレイヤー" + (i + 1) + "をCPU制御に切り替えました");
+                bToggled = true;
+                break;
+            }
+            
+            if (!bToggled) {
+                System.out.println("[CPU切り替え] 空いているプレイヤースロットがありません（両方とも人間またはCPU操作中）");
+            }
+        }
+        
+        bPrevTabKey = bCurrentTabKey;
+    }
+    
+    //CPUの思考を更新
+    private void UpdateCPUs(float fDeltaTime) {
+        for (int i = 0; i < pCPUManagers.length; i++) {
+            if (pCPUManagers[i] != null) {
+                pCPUManagers[i].Update(fDeltaTime);
             }
         }
     }
