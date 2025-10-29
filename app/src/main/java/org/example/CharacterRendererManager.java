@@ -48,6 +48,7 @@ public class CharacterRendererManager {
 
         // 被ダメージ状態のレンダラーを追加
         ArrayList<CharacterRenderer> damageRenderers = pCharacterRenderers.get(CharacterState.DAMAGE);
+        damageRenderers.add(new CharacterRenderer(pCamera, "Image/Jp003.png"));
 
         // ダウン状態のレンダラーを追加
         ArrayList<CharacterRenderer> downRenderers = pCharacterRenderers.get(CharacterState.DOWN);

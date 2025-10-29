@@ -95,6 +95,15 @@ public class Character extends Player {
     private int nFrame = 0;
     // フレームの管理
 
+    private int nDamageFrame = 0;
+    // ひるんでいるフレーム
+
+    private int nHitCount = 0;
+    // コンボカウンター
+    private int nConboSpanFrame = 120;
+    // コンボカウンターが消えるまでの時間
+    private int nConboSpanCount = 0;
+
     boolean bLeftMove = false;
     boolean bRightMove = false;
     boolean bJump = false;
@@ -294,6 +303,18 @@ public class Character extends Player {
                 fDashCooldownTimer = 0;
             }
         }
+
+        // コンボカウンターの処理
+        if(nConboSpanCount < 120)
+        {
+            nConboSpanCount++;
+        }
+        else
+        {
+            nHitCount = 0;
+        }
+
+        // コンボカウンターを表示させる時間
         
         // 前フレームの状態を保存
         ePreviousState = eCurrentState;
@@ -499,7 +520,7 @@ public class Character extends Player {
     }
 
     // ダメージが入る　デバッグ用
-    public void DamageHP() {
+    public void DamageHP(int value) {
         pHP.DamageHP(10);
     }
 
@@ -552,23 +573,43 @@ public class Character extends Player {
         this.fPositionY = fY;
     }
 
+    public void DamageCollision(Character pOther, String sTag1, String sTag2)
+    {
+        if(sTag1.equals("my") && sTag2.equals("attack")) {
+            System.out.println("[衝突処理] プレイヤーが攻撃に当たりました！");
+            Damage(CharacterState.LIGHTATTACK5, 3, 50);
+            Damage(CharacterState.MEDIUMATTACK5, 7, 16);
+            Damage(CharacterState.HEAVYATTACK5, 9, 24);
+            Damage(CharacterState.LIGHTATTACK2, 2, 9);
+            Damage(CharacterState.HEAVYATTACK2, 10, 28);
+        }
+    }
+
+    public void AttackCollision(Character pOther, String sTag1, String sTag2)
+    {
+        if(sTag1.equals("attack") && sTag2.equals("my")) {
+            System.out.println("[衝突処理] 攻撃がプレイヤーに当たりました！");
+            // 同じ攻撃が２回当たらないように当たり判定を消しておく
+            pAllColliders.get("attack").ClearCollider();
+
+            // コンボカウンター
+            HitCount();
+
+        }
+    }
+
     public void OnCollision(Character pOther, String sTag1, String sTag2) {
         // 衝突時の処理（必要に応じて実装）
+        
 
         if (sTag1.equals("my") && sTag2.equals("my")) {
-            System.out.println("[衝突処理] プレイヤー同士が衝突しました！");
+            //System.out.println("[衝突処理] プレイヤー同士が衝突しました！");
             // 追加の処理をここに実装できます（例：ダメージ、押し出し、エフェクトなど）
         }
 
-        if(sTag1.equals("my") && sTag2.equals("attack")) {
-            System.out.println("[衝突処理] プレイヤーが攻撃に当たりました！");
-            // 追加の処理をここに実装できます（例：ダメージ、エフェクトなど）
-        }
+        
 
-        if(sTag1.equals("attack") && sTag2.equals("my")) {
-            System.out.println("[衝突処理] 攻撃がプレイヤーに当たりました！");
-            // 追加の処理をここに実装できます（例：ダメージ、エフェクトなど）
-        }
+        
     }
     
     //テンキー方向を取得（1P/2P側で方向を反転）
@@ -934,22 +975,18 @@ public class Character extends Player {
                             if (bIsFacingOpponent) {
                                 // 相手を向いている場合：相手に向かって
                                 fPositionX += fDashSpeed * fDeltaTime;
-                                System.out.println("1");
                             } else {
                                 // 相手に背を向けている場合：相手から離れて
                                 fPositionX += -fDashSpeed * fDeltaTime;
-                                System.out.println("2");
                             }
                         } else if (bDashBackward) {
                             // 相手から離れてダッシュ
                             if (bIsFacingOpponent) {
                                 // 相手を向いている場合：相手から離れて
                                 fPositionX += -fDashSpeed * fDeltaTime;
-                                System.out.println("3");
                             } else {
                                 // 相手に背を向けている場合：相手に向かって
                                 fPositionX += fDashSpeed * fDeltaTime;
-                                System.out.println("4");
                             }
                         }
                     } else {
@@ -976,7 +1013,13 @@ public class Character extends Player {
                 
             case DAMAGE:
                 // 被ダメージ状態からの遷移
-                // TODO: ダメージの実装後に追加
+                nTextureId = 0;
+                if(nFrame == nDamageFrame)
+                {
+                    ChangeState(CharacterState.STAND);
+                } else {
+                    nFrame++;
+                }
                 break;
                 
             case DOWN:
@@ -1183,6 +1226,40 @@ public class Character extends Player {
         this.ePreviousState = this.eCurrentState;
         this.eCurrentState = eState;
         System.out.println("[Player" + nPlayerNumber + "] 状態を強制変更: " + eState);
+    }
+
+    public int ComboCount()
+    {
+        return nHitCount;
+    }
+
+    // ダメージの処理をまとめた関数
+    public void Damage(CharacterState state, int damage, int frame)
+    {
+        if(state != GetOpponentCharacter().GetCurrentState()) return;
+        DamageHP(damage);
+        nDamageFrame = frame;
+        ChangeState(CharacterState.DAMAGE);
+    }
+
+    public void HitCount()
+    {
+        nConboSpanCount = 0;
+        if(nHitCount != 0)
+        {
+            if(GetOpponentCharacter().GetCurrentState() == CharacterState.DAMAGE)
+            {
+                nHitCount++;
+            }
+            else
+            {
+                nHitCount = 0;
+            }
+        }
+        // 初ヒットなら状態は関係ない
+        if(nHitCount == 0) nHitCount++;
+        
+        System.out.println("コンボカウンター" + nHitCount);
     }
 }
 
