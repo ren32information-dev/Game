@@ -49,8 +49,10 @@ public class CollisionManager {
                         if(bOverlapX && bOverlapY) {
 
                             
-                            pChar1.OnCollision(pChar2, manager1, manager2);
-                            pChar2.OnCollision(pChar1, manager2, manager1);
+                            pChar1.AttackCollision(pChar2, manager1, manager2);
+                            pChar2.AttackCollision(pChar1, manager2, manager1);
+                            pChar1.DamageCollision(pChar2, manager1, manager2);
+                            pChar2.DamageCollision(pChar1, manager2, manager1);
                             bIscollided = true;
                             break;
                         }
