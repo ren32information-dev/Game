@@ -398,13 +398,6 @@ public class Character extends Player {
         fPositionX += fMoveSpeed * fDeltaTime;
     }
     
-    //ジャンプ（格闘ゲーム式ジャンプに切り替えたため無効化）
-    public void Jump() {
-        // 格闘ゲーム式のジャンプはUpdate()内で7,8,9方向入力により処理される
-        // この古いメソッドは呼ばれても何もしない
-        return;
-    }
-    
     //格闘ゲーム式ジャンプを実行（7,8,9方向）
     private void ExecuteJump() {
         if (!bIsGrounded) {
@@ -998,6 +991,15 @@ public class Character extends Player {
                     nTextureId = (nFrame - 4) / 4 + 3;
                 }
 
+                if(bIsFacingRight == true)  // 右を向いているとき
+                {
+                    fPositionX += 4.0f * fDeltaTime;
+                }
+                else 
+                {
+                    fPositionX -= 4.0f * fDeltaTime;
+                }
+
                 if(nTextureId == 6)
                 {
                     ChangeState(CharacterState.STAND);
@@ -1008,13 +1010,15 @@ public class Character extends Player {
             case MEDIUMATTACK5:
                 nTextureId = nFrame / 7;
 
-                Character pOpponent = GetOpponentCharacter();
-                if (pOpponent == null) break;
-                // 相手との相対位置を計算
-                float fDistanceToOpponent = pOpponent.GetPositionX() - this.fPositionX;
-                boolean bIsFacingOpponent = fDistanceToOpponent > 0;
-
-                if(pOpponent.GetPlayerNumber() == 1) bIsFacingOpponent = !bIsFacingOpponent;
+                if(bIsFacingRight == true)  // 右を向いているとき
+                {
+                    fPositionX += 1.0f * fDeltaTime;
+                }
+                else 
+                {
+                    fPositionX -= 1.0f * fDeltaTime;
+                }
+                
 
 
                 if(nTextureId == 3)
