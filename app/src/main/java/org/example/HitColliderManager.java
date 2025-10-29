@@ -25,4 +25,10 @@ public class HitColliderManager {
     public boolean IsChecked() {
         return bIsChecked;
     }
+
+    // 当たり判定をすべて消去
+    public void ClearCollider()
+    {
+        pHitColliders.clear();
+    }
 }

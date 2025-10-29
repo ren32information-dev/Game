@@ -74,6 +74,7 @@ public class CollisionManager {
         
         for(String manager : pBoxs.keySet())
         {
+            if(manager == "my") continue;
             for (HitColliderBox box : pBoxs.get(manager).GetHitColliders()) {
 
                 // 描画コードをここに追加

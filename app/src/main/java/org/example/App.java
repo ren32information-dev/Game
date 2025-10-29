@@ -217,7 +217,7 @@ public class App {
             for (PlayerSlot pSlot : pSlotManager.GetAllSlots()) {
                 if (pSlot.IsOccupied()) {
                     pCharacterRendererManager.DrawCharacter(pSlot.GetCharacter(), pSlot.GetCharacter().GetTexture());
-                    //CollisionManager.DrawCollisionBoxes(pSlot.GetCharacter(), pCamera);
+                    CollisionManager.DrawCollisionBoxes(pSlot.GetCharacter(), pCamera);
                 }
             }
 

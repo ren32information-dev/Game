@@ -560,12 +560,12 @@ public class Character extends Player {
             // 追加の処理をここに実装できます（例：ダメージ、押し出し、エフェクトなど）
         }
 
-        if(sTag1.equals("player") && sTag2.equals("attack")) {
+        if(sTag1.equals("my") && sTag2.equals("attack")) {
             System.out.println("[衝突処理] プレイヤーが攻撃に当たりました！");
             // 追加の処理をここに実装できます（例：ダメージ、エフェクトなど）
         }
 
-        if(sTag1.equals("attack") && sTag2.equals("player")) {
+        if(sTag1.equals("attack") && sTag2.equals("my")) {
             System.out.println("[衝突処理] 攻撃がプレイヤーに当たりました！");
             // 追加の処理をここに実装できます（例：ダメージ、エフェクトなど）
         }
@@ -984,23 +984,40 @@ public class Character extends Player {
                 // TODO: ダウンの実装後に追加
                 break;
             case HEAVYATTACK5:
-                if(nFrame <= 3)
+                if(nFrame == 0) nTextureId = 0;
+                if(nFrame == 3) nTextureId++;
+                if(nFrame == 7) nTextureId++;
+                if(nFrame == 11)
                 {
-                    nTextureId = 2;
-                } else {
-                    nTextureId = (nFrame - 4) / 4 + 3;
-                }
+                    nTextureId++;
+                    if(bIsFacingRight == true)
+                    {
+                        this.pAllColliders.get("attack").AddHitCollider(new HitColliderBox(0.5f, 0.3f, 0.7f, 1.9f)); // 右下
+                    }
+                    else
+                    {
+                        this.pAllColliders.get("attack").AddHitCollider(new HitColliderBox(0.5f, 0.3f, -0.7f, 1.9f)); // 右下
+                    }
+                } 
+                if(nFrame == 13) nTextureId++;
+                if(nFrame == 15)
+                {
+                    nTextureId++;
+                    this.pAllColliders.get("attack").ClearCollider();
+                } 
 
                 if(bIsFacingRight == true)  // 右を向いているとき
                 {
-                    fPositionX += 4.0f * fDeltaTime;
+                    fPositionX += 2.0f * fDeltaTime;
                 }
                 else 
                 {
-                    fPositionX -= 4.0f * fDeltaTime;
+                    fPositionX -= 2.0f * fDeltaTime;
                 }
 
-                if(nTextureId == 6)
+                
+
+                if(nFrame == 33)
                 {
                     ChangeState(CharacterState.STAND);
                 } else {
@@ -1008,7 +1025,9 @@ public class Character extends Player {
                 }
                 break;
             case MEDIUMATTACK5:
-                nTextureId = nFrame / 7;
+                if(nFrame == 0) nTextureId = 0;
+                if(nFrame == 6) nTextureId = 1;
+                if(nFrame == 9) nTextureId = 2;
 
                 if(bIsFacingRight == true)  // 右を向いているとき
                 {
@@ -1019,9 +1038,26 @@ public class Character extends Player {
                     fPositionX -= 1.0f * fDeltaTime;
                 }
                 
+                if(nFrame == 2)
+                {
+                    
+                    if(bIsFacingRight == true)
+                    {
+                        this.pAllColliders.get("attack").AddHitCollider(new HitColliderBox(0.5f, 0.3f, 0.7f, 1.8f)); // 右下
+                    }
+                    else
+                    {
+                        this.pAllColliders.get("attack").AddHitCollider(new HitColliderBox(0.5f, 0.3f, -0.7f, 1.8f)); // 右下
+                    }
+                }
+
+                if(nFrame == 5)
+                {
+                    this.pAllColliders.get("attack").ClearCollider();
+                }
 
 
-                if(nTextureId == 3)
+                if(nFrame == 21)
                 {
                     ChangeState(CharacterState.STAND);
                 } else {
@@ -1029,8 +1065,29 @@ public class Character extends Player {
                 }
                 break;
             case LIGHTATTACK5:
-                nTextureId = nFrame / 6;
-                if(nTextureId == 2)
+                if(nFrame <= 2) nTextureId = 0;
+                if(nFrame >= 3) nTextureId = 1;
+
+                // 攻撃判定
+                if(nFrame == 2)
+                {
+                    
+                    if(bIsFacingRight == true)
+                    {
+                        this.pAllColliders.get("attack").AddHitCollider(new HitColliderBox(0.5f, 0.3f, 0.7f, 2.1f)); // 右下
+                    }
+                    else
+                    {
+                        this.pAllColliders.get("attack").AddHitCollider(new HitColliderBox(0.5f, 0.3f, -0.7f, 2.1f)); // 右下
+                    }
+                }
+
+                if(nFrame == 4)
+                {
+                    this.pAllColliders.get("attack").ClearCollider();
+                }
+
+                if(nFrame == 13)
                 {
                     ChangeState(CharacterState.STAND);
                 } else {
@@ -1038,8 +1095,26 @@ public class Character extends Player {
                 }
                 break;
             case LIGHTATTACK2:
-                nTextureId = nFrame / 6;
-                if(nTextureId == 2)
+                if(nFrame == 0) nTextureId = 0;
+                if(nFrame == 3)
+                {
+                    nTextureId++;
+                    if(bIsFacingRight == true)
+                    {
+                        this.pAllColliders.get("attack").AddHitCollider(new HitColliderBox(0.5f, 0.3f, 0.7f, 1.5f)); // 右下
+                    }
+                    else
+                    {
+                        this.pAllColliders.get("attack").AddHitCollider(new HitColliderBox(0.5f, 0.3f, -0.7f, 1.5f)); // 右下
+                    }
+                }
+
+                if(nFrame == 5)
+                {
+                    this.pAllColliders.get("attack").ClearCollider();
+                }
+
+                if(nFrame == 12)
                 {
                     ChangeState(CharacterState.CROUCH);
                 } else {
@@ -1047,9 +1122,29 @@ public class Character extends Player {
                 }
                 break;
             case HEAVYATTACK2:
-                nTextureId = (nFrame - 2) / 8;
-                if(nTextureId == 4)
+                if(nFrame == 0) nTextureId = 0;
+                if(nFrame == 5) nTextureId++;
+                if(nFrame == 10)
                 {
+                    nTextureId++;
+                    if(bIsFacingRight == true)
+                    {
+                        this.pAllColliders.get("attack").AddHitCollider(new HitColliderBox(0.5f, 0.3f, 0.7f, 1.5f)); // 右下
+                    }
+                    else
+                    {
+                        this.pAllColliders.get("attack").AddHitCollider(new HitColliderBox(0.5f, 0.3f, -0.7f, 1.5f)); // 右下
+                    }
+                }
+
+                if(nFrame == 14) 
+                {
+                    nTextureId++;
+                    this.pAllColliders.get("attack").ClearCollider();
+                }
+
+
+                if(nFrame == 34) {
                     ChangeState(CharacterState.CROUCH);
                 } else {
                     nFrame++;

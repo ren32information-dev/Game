@@ -121,7 +121,7 @@ public class HitColliderBox {
             
         }
 
-        debugRenderer.UISize(fWidth / 2 + 0.1f, fHeight / 2 + 0.1f, 1.0f);
+        debugRenderer.UISize(fWidth / 2, fHeight / 2, 1.0f);
         debugRenderer.UIColor(1.0f, 1.0f, 1.0f);
         
         float fPosX = GetCenterX(fCharacterX);
