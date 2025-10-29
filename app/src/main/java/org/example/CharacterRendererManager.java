@@ -36,8 +36,8 @@ public class CharacterRendererManager {
 
         // ジャンプ状態のレンダラーを追加
         ArrayList<CharacterRenderer> jumpRenderers = pCharacterRenderers.get(CharacterState.JUMP);
-        jumpRenderers.add(new CharacterRenderer(pCamera, "Image/JpStart001.png"));
         jumpRenderers.add(new CharacterRenderer(pCamera, "Image/JpStart002.png"));
+        jumpRenderers.add(new CharacterRenderer(pCamera, "Image/JpStart001.png"));
         jumpRenderers.add(new CharacterRenderer(pCamera, "Image/Jp001.png"));
         jumpRenderers.add(new CharacterRenderer(pCamera, "Image/Jp002.png"));
         jumpRenderers.add(new CharacterRenderer(pCamera, "Image/Jp003.png"));
@@ -54,8 +54,8 @@ public class CharacterRendererManager {
 
         // 前進状態のレンダラーを追加
         ArrayList<CharacterRenderer> frontRenderers = pCharacterRenderers.get(CharacterState.FRONT);
-        frontRenderers.add(new CharacterRenderer(pCamera, "Image/Walk001.png"));
         frontRenderers.add(new CharacterRenderer(pCamera, "Image/Walk002.png"));
+        frontRenderers.add(new CharacterRenderer(pCamera, "Image/Walk001.png"));
 
         // ガード状態のレンダラーを追加
         ArrayList<CharacterRenderer> guardRenderers = pCharacterRenderers.get(CharacterState.GUARD);
@@ -77,8 +77,8 @@ public class CharacterRendererManager {
         heavyAttack5Renderers.add(new CharacterRenderer(pCamera, "Image/AtkDefoHighStart001.png"));
         heavyAttack5Renderers.add(new CharacterRenderer(pCamera, "Image/AtkDefoHighStart002.png"));
         heavyAttack5Renderers.add(new CharacterRenderer(pCamera, "Image/AtkDefoHighStart003.png"));
-        heavyAttack5Renderers.add(new CharacterRenderer(pCamera, "Image/AtkDefoHigh001.png"));
         heavyAttack5Renderers.add(new CharacterRenderer(pCamera, "Image/AtkDefoHigh002.png"));
+        heavyAttack5Renderers.add(new CharacterRenderer(pCamera, "Image/AtkDefoHigh001.png"));
         heavyAttack5Renderers.add(new CharacterRenderer(pCamera, "Image/AtkDefoHighEnd001.png"));
 
         // 中立攻撃
@@ -101,14 +101,14 @@ public class CharacterRendererManager {
         ArrayList<CharacterRenderer> heavyAttack2Renderers = pCharacterRenderers.get(CharacterState.HEAVYATTACK2);
         heavyAttack2Renderers.add(new CharacterRenderer(pCamera, "Image/AtkCrouchHighStart002.png"));
         heavyAttack2Renderers.add(new CharacterRenderer(pCamera, "Image/AtkCrouchHighStart001.png"));
-        heavyAttack2Renderers.add(new CharacterRenderer(pCamera, "Image/AtkCrouchHighEnd001.png"));
         heavyAttack2Renderers.add(new CharacterRenderer(pCamera, "Image/AtkCrouchHigh001.png"));
+        heavyAttack2Renderers.add(new CharacterRenderer(pCamera, "Image/AtkCrouchHighEnd001.png"));
 
         // 前中
         ArrayList<CharacterRenderer> mediumAttack6Renderers = pCharacterRenderers.get(CharacterState.MEDIUMATTACK6);
         mediumAttack6Renderers.add(new CharacterRenderer(pCamera, "Image/AtkFrontMidStart003.png"));
         mediumAttack6Renderers.add(new CharacterRenderer(pCamera, "Image/AtkFrontMidStart002.png"));
-        mediumAttack6Renderers.add(new CharacterRenderer(pCamera, "Image/AtkFrontMid001.png"));
+        mediumAttack6Renderers.add(new CharacterRenderer(pCamera, "Image/AtkFrontMidStart001.png"));
         mediumAttack6Renderers.add(new CharacterRenderer(pCamera, "Image/AtkFrontMid001.png"));
         mediumAttack6Renderers.add(new CharacterRenderer(pCamera, "Image/AtkFrontMidEnd001.png"));
     }
