@@ -140,11 +140,9 @@ public class App {
                         // キャラクター操作
                         boolean bLeftMove = pInputManager.GetInput(InputType.LEFT);
                         boolean bRightMove = pInputManager.GetInput(InputType.RIGHT);
-                        boolean bJump = pInputManager.GetInput(InputType.JUMP);
                         
                         if (bLeftMove) pCharacter.MoveLeft(fDeltaTime);
                         if (bRightMove) pCharacter.MoveRight(fDeltaTime);
-                        if (bJump) pCharacter.Jump();
                     }
                     
                     // キャラクター更新（入力無効でも物理演算などは動く）
