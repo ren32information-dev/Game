@@ -141,14 +141,10 @@ public class App {
                         boolean bLeftMove = pInputManager.GetInput(InputType.LEFT);
                         boolean bRightMove = pInputManager.GetInput(InputType.RIGHT);
                         boolean bJump = pInputManager.GetInput(InputType.JUMP);
-                        boolean bDamage = pInputManager.GetInput(InputType.LEFT);   // デバッグ用
-                        boolean bHeal = pInputManager.GetInput(InputType.RIGHT);   // デバッグ用
                         
                         if (bLeftMove) pCharacter.MoveLeft(fDeltaTime);
                         if (bRightMove) pCharacter.MoveRight(fDeltaTime);
                         if (bJump) pCharacter.Jump();
-                        if (bDamage) pCharacter.DamageHP(); // デバッグ用
-                        if (bHeal) pCharacter.HealHP();     // デバッグ用
                     }
                     
                     // キャラクター更新（入力無効でも物理演算などは動く）

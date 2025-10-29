@@ -1007,6 +1007,16 @@ public class Character extends Player {
                 break;
             case MEDIUMATTACK5:
                 nTextureId = nFrame / 7;
+
+                Character pOpponent = GetOpponentCharacter();
+                if (pOpponent == null) break;
+                // 相手との相対位置を計算
+                float fDistanceToOpponent = pOpponent.GetPositionX() - this.fPositionX;
+                boolean bIsFacingOpponent = fDistanceToOpponent > 0;
+
+                if(pOpponent.GetPlayerNumber() == 1) bIsFacingOpponent = !bIsFacingOpponent;
+
+
                 if(nTextureId == 3)
                 {
                     ChangeState(CharacterState.STAND);
