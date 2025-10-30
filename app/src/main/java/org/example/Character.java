@@ -588,8 +588,8 @@ public class Character extends Player {
     {
         if(sTag1.equals("my") && sTag2.equals("attack")) {
             System.out.println("[衝突処理] プレイヤーが攻撃に当たりました！");
-            Damage(CharacterState.LIGHTATTACK5, 3, 10);
-            Damage(CharacterState.MEDIUMATTACK5, 7, 16);
+            Damage(CharacterState.LIGHTATTACK5, 3, 15);
+            Damage(CharacterState.MEDIUMATTACK5, 7, 31);
             Damage(CharacterState.HEAVYATTACK5, 9, 24);
             Damage(CharacterState.LIGHTATTACK2, 2, 9);
             Damage(CharacterState.HEAVYATTACK2, 10, 28);
@@ -820,11 +820,23 @@ public class Character extends Player {
                 }
                 nTextureId = nTextureId % 2; // 前進状態のテクスチャIDを設定（0と1を交互に切り替え）
 
+                if (bLeftMove) MoveLeft(fDeltaTime);
+                if (bRightMove) MoveRight(fDeltaTime);
+
                 if(bMedAttack6)
                 {
                     // 前中攻撃
-                    fVelocityY = 0.2f;
-                    ChangeState(CharacterState.MEDIUMATTACK6);
+                    
+                    if(bIsFacingRight && bRightMove)
+                    {
+                        fVelocityY = 0.2f;
+                        ChangeState(CharacterState.MEDIUMATTACK6);
+                    } 
+                    if(!bIsFacingRight && bLeftMove)
+                    {
+                        fVelocityY = 0.2f;
+                        ChangeState(CharacterState.MEDIUMATTACK6);
+                    } 
                 }
 
                 if ((bDashForward || bDashBackward) && fDashCooldownTimer <= 0) {
@@ -845,7 +857,9 @@ public class Character extends Player {
                     // 状態はFRONTのまま維持
                 } else if (bMedAttack6) {
                     // 前中攻撃
-                    ChangeState(CharacterState.MEDIUMATTACK6);
+                    
+                    
+                    
                 } else {
                     // 移動入力がなくなったら立ち状態に
                     ChangeState(CharacterState.STAND);
@@ -1071,8 +1085,8 @@ public class Character extends Player {
             case HEAVYATTACK5:
                 if(nFrame == 0) nTextureId = 0;
                 if(nFrame == 3) nTextureId++;
-                if(nFrame == 7) nTextureId++;
-                if(nFrame == 11)
+                if(nFrame == 6) nTextureId++;
+                if(nFrame == 9)
                 {
                     nTextureId++;
                     if(bIsFacingRight == true)
