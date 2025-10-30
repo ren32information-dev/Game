@@ -20,6 +20,9 @@ public class UIManager
     private static final int P1_SKILL_COOLDOWN_OVERLAY_1 = 27; 
     private static final int P1_SKILL_COOLDOWN_OVERLAY_2 = 28;
     private static final int P1_SKILL_COOLDOWN_OVERLAY_3 = 29;
+    private static final int P1_SKILL_OK_OVERLAY_1 = 33; 
+    private static final int P1_SKILL_OK_OVERLAY_2 = 34;
+    private static final int P1_SKILL_OK_OVERLAY_3 = 35;
     //===Skill===
 
     //===HitCount===
@@ -51,6 +54,9 @@ public class UIManager
     private static final int P2_SKILL_COOLDOWN_OVERLAY_1 = 30; 
     private static final int P2_SKILL_COOLDOWN_OVERLAY_2 = 31;
     private static final int P2_SKILL_COOLDOWN_OVERLAY_3 = 32;
+    private static final int P2_SKILL_OK_OVERLAY_1 = 36;
+    private static final int P2_SKILL_OK_OVERLAY_2 = 37;
+    private static final int P2_SKILL_OK_OVERLAY_3 = 38;
     //===Skill===
     //===HitCount===
     private static final int P2_HIT_COUNT_DIGIT_ONES = 24; // P2 一の位 (個位)
@@ -63,7 +69,7 @@ public class UIManager
     private static final int BACKGROUND_IMAGE = 0;
     //===背景===
     
-    private static final int MAX_UI_ELEMENTS = 33; 
+    private static final int MAX_UI_ELEMENTS = 39; 
     
     
     private Renderer[] uiElements; 
@@ -232,7 +238,25 @@ public class UIManager
         uiElements[P1_SKILL_COOLDOWN_OVERLAY_3].UIPos(P1_SKILL_ICON_START_X + 3.0f, P1_SKILL_ICON_Y, 0.0f); 
         uiElements[P1_SKILL_COOLDOWN_OVERLAY_3].UISize(P1_SKILL_ICON_SIZE, P1_SKILL_ICON_SIZE, 1.0f);
         uiElements[P1_SKILL_COOLDOWN_OVERLAY_3].SetVisibility(false);
-                
+        
+        // P1 Skill OK Overlay 1
+        uiElements[P1_SKILL_OK_OVERLAY_1].Init("UI/GaugeOK.png");
+        uiElements[P1_SKILL_OK_OVERLAY_1].UIPos(P1_SKILL_ICON_START_X, P1_SKILL_ICON_Y, 0.0f); 
+        uiElements[P1_SKILL_OK_OVERLAY_1].UISize(P1_SKILL_ICON_SIZE, P1_SKILL_ICON_SIZE, 1.0f);
+        uiElements[P1_SKILL_OK_OVERLAY_1].SetVisibility(false);
+
+        // P1 Skill OK Overlay 2
+        uiElements[P1_SKILL_OK_OVERLAY_2].Init("UI/GaugeOK.png");
+        uiElements[P1_SKILL_OK_OVERLAY_2].UIPos(P1_SKILL_ICON_START_X + 1.5f, P1_SKILL_ICON_Y, 0.0f); 
+        uiElements[P1_SKILL_OK_OVERLAY_2].UISize(P1_SKILL_ICON_SIZE, P1_SKILL_ICON_SIZE, 1.0f);
+        uiElements[P1_SKILL_OK_OVERLAY_2].SetVisibility(false);
+
+        // P1 Skill OK Overlay 3
+        uiElements[P1_SKILL_OK_OVERLAY_3].Init("UI/GaugeOK.png");
+        uiElements[P1_SKILL_OK_OVERLAY_3].UIPos(P1_SKILL_ICON_START_X + 3.0f, P1_SKILL_ICON_Y, 0.0f); 
+        uiElements[P1_SKILL_OK_OVERLAY_3].UISize(P1_SKILL_ICON_SIZE, P1_SKILL_ICON_SIZE, 1.0f);
+        uiElements[P1_SKILL_OK_OVERLAY_3].SetVisibility(false);
+
         // =================================================
         // Hit Count Label 「HIT」の文字
         // =================================================
@@ -345,6 +369,24 @@ public class UIManager
         uiElements[P2_SKILL_COOLDOWN_OVERLAY_3].UIPos(P2_SKILL_ICON_START_X - 3.0f, P2_SKILL_ICON_Y, 0.0f); 
         uiElements[P2_SKILL_COOLDOWN_OVERLAY_3].UISize(P1_SKILL_ICON_SIZE, P1_SKILL_ICON_SIZE, 1.0f);
         uiElements[P2_SKILL_COOLDOWN_OVERLAY_3].SetVisibility(false);
+
+        // P2 Skill OK Overlay 1
+        uiElements[P2_SKILL_OK_OVERLAY_1].Init("UI/GaugeOK.png");
+        uiElements[P2_SKILL_OK_OVERLAY_1].UIPos(P2_SKILL_ICON_START_X, P2_SKILL_ICON_Y, 0.0f); 
+        uiElements[P2_SKILL_OK_OVERLAY_1].UISize(P1_SKILL_ICON_SIZE, P1_SKILL_ICON_SIZE, 1.0f);
+        uiElements[P2_SKILL_OK_OVERLAY_1].SetVisibility(false);
+
+        // P2 Skill OK Overlay 2
+        uiElements[P2_SKILL_OK_OVERLAY_2].Init("UI/GaugeOK.png");
+        uiElements[P2_SKILL_OK_OVERLAY_2].UIPos(P2_SKILL_ICON_START_X - 1.5f, P2_SKILL_ICON_Y, 0.0f); 
+        uiElements[P2_SKILL_OK_OVERLAY_2].UISize(P1_SKILL_ICON_SIZE, P1_SKILL_ICON_SIZE, 1.0f);
+        uiElements[P2_SKILL_OK_OVERLAY_2].SetVisibility(false);
+
+        // P2 Skill OK Overlay 3
+        uiElements[P2_SKILL_OK_OVERLAY_3].Init("UI/GaugeOK.png");
+        uiElements[P2_SKILL_OK_OVERLAY_3].UIPos(P2_SKILL_ICON_START_X - 3.0f, P2_SKILL_ICON_Y, 0.0f); 
+        uiElements[P2_SKILL_OK_OVERLAY_3].UISize(P1_SKILL_ICON_SIZE, P1_SKILL_ICON_SIZE, 1.0f);
+        uiElements[P2_SKILL_OK_OVERLAY_3].SetVisibility(false);
 
         // =================================================
         // P2 Hit Count Label 「HIT」の文字
@@ -501,6 +543,9 @@ public class UIManager
         uiElements[P1_SKILL_ICON_2].UIPos(p1Skill2X, p1SkillY, 0.0f); 
         uiElements[P1_SKILL_ICON_3].UIPos(p1Skill3X, p1SkillY, 0.0f);
 
+        uiElements[P1_SKILL_OK_OVERLAY_1].UIPos(p1Skill1X, p1SkillY, 0.0f);
+        uiElements[P1_SKILL_OK_OVERLAY_2].UIPos(p1Skill2X, p1SkillY, 0.0f);
+        uiElements[P1_SKILL_OK_OVERLAY_3].UIPos(p1Skill3X, p1SkillY, 0.0f); 
         // Skill1CD
         if (fSkillCooldownCurrent1 > 0.0f) 
         {
@@ -668,11 +713,20 @@ public class UIManager
         // =================================================
         // P2 Skill Icon の位置更新
         // =================================================
-        uiElements[P2_SKILL_ICON_1].UIPos(P2_SKILL_ICON_START_X + cameraX, P2_SKILL_ICON_Y + cameraY, 0.0f); 
-        uiElements[P2_SKILL_ICON_2].UIPos(P2_SKILL_ICON_START_X - 1.5f + cameraX, P2_SKILL_ICON_Y + cameraY, 0.0f); 
-        uiElements[P2_SKILL_ICON_3].UIPos(P2_SKILL_ICON_START_X - 3.0f + cameraX, P2_SKILL_ICON_Y + cameraY, 0.0f);
+        float p2Skill1X = P2_SKILL_ICON_START_X + cameraX;
+        float p2Skill2X = P2_SKILL_ICON_START_X - 1.5f + cameraX;
+        float p2Skill3X = P2_SKILL_ICON_START_X - 3.0f + cameraX;
+        float p2SkillY = P2_SKILL_ICON_Y + cameraY;
+
+        uiElements[P2_SKILL_ICON_1].UIPos(p2Skill1X, p2SkillY, 0.0f); 
+        uiElements[P2_SKILL_ICON_2].UIPos(p2Skill2X, p2SkillY, 0.0f); 
+        uiElements[P2_SKILL_ICON_3].UIPos(p2Skill3X, p2SkillY, 0.0f);
         
-        // P2 Skill1CD 処理
+        uiElements[P2_SKILL_OK_OVERLAY_1].UIPos(p2Skill1X, p2SkillY, 0.0f);
+        uiElements[P2_SKILL_OK_OVERLAY_2].UIPos(p2Skill2X, p2SkillY, 0.0f);
+        uiElements[P2_SKILL_OK_OVERLAY_3].UIPos(p2Skill3X, p2SkillY, 0.0f); 
+
+        // Skill1CD
         if (fP2SkillCooldownCurrent1 > 0.0f) 
         {
             fP2SkillCooldownCurrent1 -= deltaTime;
@@ -680,14 +734,17 @@ public class UIManager
             {
                 fP2SkillCooldownCurrent1 = 0.0f;
             }
-            uiElements[P2_SKILL_ICON_1].UIColor(0.5f, 0.5f, 0.5f); // グレー化
         }
-        else 
-        {
-            uiElements[P2_SKILL_ICON_1].UIColor(1.0f, 1.0f, 1.0f); // 通常色
-        }
-        
-        // P2 Skill2CD 処理
+
+        UpdateSkillCooldown(
+            P2_SKILL_COOLDOWN_OVERLAY_1, 
+            fP2SkillCooldownCurrent1, 
+            SKILL_COOLDOWN_MAX_1, 
+            p2Skill1X, 
+            p2SkillY
+        );
+
+        // Skill2CD
         if (fP2SkillCooldownCurrent2 > 0.0f) 
         {
             fP2SkillCooldownCurrent2 -= deltaTime;
@@ -695,14 +752,17 @@ public class UIManager
             {
                 fP2SkillCooldownCurrent2 = 0.0f;
             }
-            uiElements[P2_SKILL_ICON_2].UIColor(0.5f, 0.5f, 0.5f);
-        }
-        else 
-        {
-            uiElements[P2_SKILL_ICON_2].UIColor(1.0f, 1.0f, 1.0f);
         }
         
-        // P2 Skill3CD 処理
+        UpdateSkillCooldown(
+            P2_SKILL_COOLDOWN_OVERLAY_2, 
+            fP2SkillCooldownCurrent2, 
+            SKILL_COOLDOWN_MAX_2, 
+            p2Skill2X, 
+            p2SkillY
+        );
+        
+        // Skill3CD
         if (fP2SkillCooldownCurrent3 > 0.0f) 
         {
             fP2SkillCooldownCurrent3 -= deltaTime;
@@ -710,12 +770,16 @@ public class UIManager
             {
                 fP2SkillCooldownCurrent3 = 0.0f;
             }
-            uiElements[P2_SKILL_ICON_3].UIColor(0.5f, 0.5f, 0.5f);
         }
-        else 
-        {
-            uiElements[P2_SKILL_ICON_3].UIColor(1.0f, 1.0f, 1.0f);
-        }
+
+        UpdateSkillCooldown(
+            P2_SKILL_COOLDOWN_OVERLAY_3, 
+            fP2SkillCooldownCurrent3, 
+            SKILL_COOLDOWN_MAX_3, 
+            p2Skill3X, 
+            p2SkillY
+        );
+
         // =================================================
         // Hit Count 處理
         // =================================================
@@ -805,9 +869,9 @@ public class UIManager
         
         if (GLFW.glfwGetKey(windowID, GLFW.GLFW_KEY_N) == GLFW.GLFW_PRESS) 
         {
-            if (fSkillCooldownCurrent1 == 0.0f)
+            if (fP2SkillCooldownCurrent1 == 0.0f)
             {
-                fSkillCooldownCurrent1 = SKILL_COOLDOWN_MAX_1;
+                fP2SkillCooldownCurrent1 = SKILL_COOLDOWN_MAX_1;
             }
         }
 
@@ -936,11 +1000,30 @@ public class UIManager
     {
         Renderer overlay = uiElements[overlayID];
 
+        int okOverlayID = -1;
+        if (overlayID == P1_SKILL_COOLDOWN_OVERLAY_1) okOverlayID = P1_SKILL_OK_OVERLAY_1;
+        else if (overlayID == P1_SKILL_COOLDOWN_OVERLAY_2) okOverlayID = P1_SKILL_OK_OVERLAY_2;
+        else if (overlayID == P1_SKILL_COOLDOWN_OVERLAY_3) okOverlayID = P1_SKILL_OK_OVERLAY_3;
+        else if (overlayID == P2_SKILL_COOLDOWN_OVERLAY_1) okOverlayID = P2_SKILL_OK_OVERLAY_1;
+        else if (overlayID == P2_SKILL_COOLDOWN_OVERLAY_2) okOverlayID = P2_SKILL_OK_OVERLAY_2;
+        else if (overlayID == P2_SKILL_COOLDOWN_OVERLAY_3) okOverlayID = P2_SKILL_OK_OVERLAY_3;
+
+        Renderer okOverlay = (okOverlayID != -1) ? uiElements[okOverlayID] : null;
+
         if (currentCD <= 0.0f) 
         {
             overlay.SetVisibility(false);
+            if (okOverlay != null) 
+            {
+                okOverlay.SetVisibility(true);
+            }
             uiElements[overlayID - 14].UIColor(1.0f, 1.0f, 1.0f); 
             return;
+        }
+
+        if (okOverlay != null) 
+        {
+            okOverlay.SetVisibility(false);
         }
 
         overlay.SetVisibility(true);
