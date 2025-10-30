@@ -5,7 +5,7 @@ import org.lwjgl.glfw.GLFW;
 public class HP {
     
     private float maxHP = 100.0f; // 最大HP
-    private float currentHP = 20.0f; // 當前HP
+    private float currentHP = 100.0f; // 當前HP
     
     // 構造函數：接受視窗ID
     public HP() {
@@ -44,11 +44,18 @@ public class HP {
         this.currentHP = newHP;
     }
 
+    // ダメージを与える
     public void DamageHP(float damage) {
         currentHP = Math.max(currentHP - damage, 0);
     }
 
+    // HPを回復する（デバッグ用）
     public void HealHP(float heal) {
         currentHP = Math.min(currentHP + heal, maxHP);
+    }
+
+    // 死んだかどうか判定
+    public boolean IsDieHP() {
+        return currentHP <= 0;
     }
 }
