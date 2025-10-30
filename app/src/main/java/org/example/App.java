@@ -68,14 +68,15 @@ public class App {
         pSlotManager = new PlayerSlotManager(pWindow);
         pSlotManager.SetCamera(pCamera); // カメラを設定（境界チェック用）
         PlayerSlot slot1 = pSlotManager.GetSlot(1);
+        PlayerSlot slot2 = pSlotManager.GetSlot(2);
 
         if (slot1 != null) 
         {
-            pUI = new UIManager(pCamera, slot1.GetCharacter());
+            pUI = new UIManager(pCamera, slot1.GetCharacter(), slot2.GetCharacter());
         }
         else 
         {
-           pUI = new UIManager(pCamera, null);
+           pUI = new UIManager(pCamera, null, null);
         }
         pUI.initUI();
     }
@@ -169,9 +170,6 @@ public class App {
                         
                         if (bLeftMove) pCharacter.MoveLeft(fDeltaTime);
                         if (bRightMove) pCharacter.MoveRight(fDeltaTime);
-                        if (bJump) pCharacter.Jump();
-                        if (bDamage) pCharacter.DamageHP(); // デバッグ用
-                        if (bHeal) pCharacter.HealHP();     // デバッグ用
                     }
                     
                     // キャラクター更新（入力無効でも物理演算などは動く）
