@@ -26,6 +26,7 @@ public class InputManager {
     //プレイヤー1攻撃キー
     private int nKeyGuard1 = GLFW.GLFW_KEY_K;
     //プレイヤー1ガードキー
+    private int nKeyLightAttack5 = GLFW.GLFW_KEY_Q;
     
     // キーボード設定（プレイヤー2）
     private int nKeyLeft2 = GLFW.GLFW_KEY_LEFT;
@@ -78,6 +79,8 @@ public class InputManager {
                     return pWindow.isKeyPressed(nKeyAttack1);
                 case GUARD:
                     return pWindow.isKeyPressed(nKeyGuard1);
+                case LIGHTATTACK5:
+                    return pWindow.isKeyPressed(nKeyLightAttack5);
                 default:
                     return false;
             }
