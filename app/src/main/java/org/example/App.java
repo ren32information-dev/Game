@@ -79,6 +79,9 @@ public class App {
            pUI = new UIManager(pCamera, null, null);
         }
         pUI.initUI();
+
+        pResultScreen = new Result(1280, 720);
+        pResultScreen.init();
     }
 
     public static void Uninit() {
@@ -168,8 +171,7 @@ public class App {
                         boolean bDamage = pInputManager.GetInput(InputType.LEFT);   // デバッグ用
                         boolean bHeal = pInputManager.GetInput(InputType.RIGHT);   // デバッグ用
                         
-                        if (bLeftMove) pCharacter.MoveLeft(fDeltaTime);
-                        if (bRightMove) pCharacter.MoveRight(fDeltaTime);
+
                     }
                     
                     // キャラクター更新（入力無効でも物理演算などは動く）
