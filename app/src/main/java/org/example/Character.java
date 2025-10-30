@@ -577,7 +577,7 @@ public class Character extends Player {
     {
         if(sTag1.equals("my") && sTag2.equals("attack")) {
             System.out.println("[衝突処理] プレイヤーが攻撃に当たりました！");
-            Damage(CharacterState.LIGHTATTACK5, 3, 50);
+            Damage(CharacterState.LIGHTATTACK5, 3, 10);
             Damage(CharacterState.MEDIUMATTACK5, 7, 16);
             Damage(CharacterState.HEAVYATTACK5, 9, 24);
             Damage(CharacterState.LIGHTATTACK2, 2, 9);
@@ -804,6 +804,14 @@ public class Character extends Player {
                     nTextureId++;
                 }
                 nTextureId = nTextureId % 2; // 前進状態のテクスチャIDを設定（0と1を交互に切り替え）
+
+                if(bMedAttack6)
+                {
+                    // 前中攻撃
+                    fVelocityY = 0.2f;
+                    ChangeState(CharacterState.MEDIUMATTACK6);
+                }
+
                 if ((bDashForward || bDashBackward) && fDashCooldownTimer <= 0) {
                     // ダッシュ開始（クールダウンが終わっている場合のみ）
                     ChangeState(CharacterState.DASH);
@@ -1195,6 +1203,20 @@ public class Character extends Player {
                 break;
             case MEDIUMATTACK6:
                 nTextureId = nFrame / 8;
+
+                if(bIsFacingRight == true)  // 右を向いているとき
+                {
+                    fPositionX += 1.0f * fDeltaTime;
+                    fPositionY += fVelocityY * fDeltaTime;
+                }
+                else 
+                {
+                    fPositionX -= 1.0f * fDeltaTime;
+                    fPositionY += fVelocityY * fDeltaTime;
+                }
+                if(!bIsGrounded) fVelocityY -= 0.00005f;
+
+
                 if(nTextureId == 5)
                 {
                     ChangeState(CharacterState.STAND);
