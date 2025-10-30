@@ -23,9 +23,8 @@ public class Title {
     }
 
     public void init() {
-        // 画像はまだないので仮で GG.png を使用
         TitleLogoTextureId = TextureLoader.loadTexture("Image/Title.png"); 
-        PressAnyButtonTextureId = TextureLoader.loadTexture("Image/GG.png"); 
+        PressAnyButtonTextureId = TextureLoader.loadTexture("Image/Start.png"); 
 
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glDisable(GL11.GL_DEPTH_TEST);
