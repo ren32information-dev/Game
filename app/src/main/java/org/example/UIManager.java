@@ -39,9 +39,9 @@ public class UIManager
     //===P2Skill===
     
     //===HitCount===
-    private static final int HIT_COUNT_DIGIT_ONES = 19; // 一の位 (個位)
-    private static final int HIT_COUNT_DIGIT_TENS = 20; // 十の位 (十位)
-    private static final int HIT_LABEL = 21; // 「HIT」の文字画像
+    private static final int P1_HIT_COUNT_DIGIT_ONES = 19; // 一の位 (個位)
+    private static final int P1_HIT_COUNT_DIGIT_TENS = 20; // 十の位 (十位)
+    private static final int P1_HIT_LABEL = 21; // 「HIT」の文字画像
     //===HitCount===
 
     //===背景===
@@ -74,8 +74,8 @@ public class UIManager
     private float fSkillCooldownCurrent2 = 0.0f;
     private float fSkillCooldownCurrent3 = 0.0f;
     //Hit
-    private final float HIT_POS_X = -6.0f;
-    private final float HIT_POS_Y = 10.0f;
+    private final float P1_HIT_POS_X = -8.0f;
+    private final float P1_HIT_POS_Y = 10.0f;
 
     //// P2
     //HP Gauge
@@ -111,11 +111,11 @@ public class UIManager
     private Character player1Character; // P1 キャラクター
     private Character player2Character; // P2 キャラクター
 
-    public UIManager(Camera camera,Character character) 
+    public UIManager(Camera camera,Character character1,Character character2) 
     {
         this.mainCamera = camera;
-        this.player1Character = character;
-        //this.player2Character = character;
+        this.player1Character = character1;
+        this.player2Character = character2;
         this.uiElements = new Renderer[MAX_UI_ELEMENTS];
     }
 
@@ -198,6 +198,31 @@ public class UIManager
         uiElements[P1_SKILL_ICON_3].UIPos(P1_SKILL_ICON_START_X + 3.0f, P1_SKILL_ICON_Y, 0.0f); 
         uiElements[P1_SKILL_ICON_3].UISize(P1_SKILL_ICON_SIZE, P1_SKILL_ICON_SIZE, 1.0f);
         uiElements[P1_SKILL_ICON_3].UIColor(1.0f, 1.0f, 1.0f);
+
+                
+        // =================================================
+        // Hit Count Label 「HIT」の文字
+        // =================================================
+        uiElements[P1_HIT_LABEL].Init("UI/Hit.png"); 
+        uiElements[P1_HIT_LABEL].UIPos(P1_HIT_POS_X + cameraX, P1_HIT_POS_Y + cameraY, 0.0f);
+        uiElements[P1_HIT_LABEL].UISize(2.0f, 1.4f, 1.0f);
+        uiElements[P1_HIT_LABEL].SetVisibility(false);
+
+        // =================================================
+        // Hit Count - 十の位
+        // =================================================
+        uiElements[P1_HIT_COUNT_DIGIT_TENS].Init("UI/number.png"); 
+        uiElements[P1_HIT_COUNT_DIGIT_TENS].UISize(0.6f, 0.6f, 1.0f); 
+        uiElements[P1_HIT_COUNT_DIGIT_TENS].UIPos(P1_HIT_POS_X + 2.0f + cameraX, P1_HIT_POS_Y + cameraY, 0.0f);
+        uiElements[P1_HIT_COUNT_DIGIT_TENS].SetVisibility(false);
+
+        // =================================================
+        // Hit Count - 一の位
+        // =================================================
+        uiElements[P1_HIT_COUNT_DIGIT_ONES].Init("UI/number.png"); 
+        uiElements[P1_HIT_COUNT_DIGIT_ONES].UISize(0.6f, 0.6f, 1.0f); 
+        uiElements[P1_HIT_COUNT_DIGIT_ONES].UIPos(P1_HIT_POS_X + 3.0f + cameraX, P1_HIT_POS_Y + cameraY, 0.0f);
+        uiElements[P1_HIT_COUNT_DIGIT_ONES].SetVisibility(false);
         //===========================================================================================
 
         // =================================================
@@ -290,30 +315,7 @@ public class UIManager
         //最初は99
         DisplayNumber(TIMER_DIGIT_TENS, 9);
         DisplayNumber(TIMER_DIGIT_ONES, 9);
-        
-        // =================================================
-        // Hit Count Label 「HIT」の文字
-        // =================================================
-        uiElements[HIT_LABEL].Init("UI/Hit.png"); 
-        uiElements[HIT_LABEL].UIPos(HIT_POS_X + cameraX, HIT_POS_Y + cameraY, 0.0f);
-        uiElements[HIT_LABEL].UISize(4.0f, 2.0f, 1.0f);
-        uiElements[HIT_LABEL].SetVisibility(false);
 
-        // =================================================
-        // Hit Count - 十の位
-        // =================================================
-        uiElements[HIT_COUNT_DIGIT_TENS].Init("UI/number.png"); 
-        uiElements[HIT_COUNT_DIGIT_TENS].UISize(1.2f, 1.2f, 1.0f); 
-        uiElements[HIT_COUNT_DIGIT_TENS].UIPos(HIT_POS_X + 3.0f + cameraX, HIT_POS_Y + cameraY, 0.0f);
-        uiElements[HIT_COUNT_DIGIT_TENS].SetVisibility(false);
-
-        // =================================================
-        // Hit Count - 一の位
-        // =================================================
-        uiElements[HIT_COUNT_DIGIT_ONES].Init("UI/number.png"); 
-        uiElements[HIT_COUNT_DIGIT_ONES].UISize(1.2f, 1.2f, 1.0f); 
-        uiElements[HIT_COUNT_DIGIT_ONES].UIPos(HIT_POS_X + 4.5f + cameraX, HIT_POS_Y + cameraY, 0.0f);
-        uiElements[HIT_COUNT_DIGIT_ONES].SetVisibility(false);
 
         // =================================================
         // 背景
@@ -466,7 +468,7 @@ public class UIManager
         }
 
         // =================================================
-        // Hit Count 處理 (不隨攝影機移動，固定在畫面上)
+        // Hit Count 處理
         // =================================================
         if (player1Character != null) 
         {
@@ -477,41 +479,46 @@ public class UIManager
             if (hitCount >= 1) 
             {
                 // Hit>1
-                uiElements[HIT_LABEL].SetVisibility(true);
+                uiElements[P1_HIT_LABEL].SetVisibility(true);
                 
-                uiElements[HIT_LABEL].UIPos(HIT_POS_X + cameraX, HIT_POS_Y + cameraY, 0.0f);
+                uiElements[P1_HIT_LABEL].UIPos(P1_HIT_POS_X + cameraX, P1_HIT_POS_Y + cameraY, 0.0f);
 
                 DisplayMultiDigitNumber(hitCount);
                 
-                uiElements[HIT_COUNT_DIGIT_TENS].UIPos(HIT_POS_X + 3.0f + cameraX, HIT_POS_Y + cameraY, 0.0f);
-                uiElements[HIT_COUNT_DIGIT_ONES].UIPos(HIT_POS_X + 4.5f + cameraX, HIT_POS_Y + cameraY, 0.0f);
-                
-                uiElements[HIT_COUNT_DIGIT_ONES].SetVisibility(true);
-                uiElements[HIT_COUNT_DIGIT_TENS].SetVisibility(true);
+                uiElements[P1_HIT_COUNT_DIGIT_TENS].UIPos(P1_HIT_POS_X + 2.0f + cameraX, P1_HIT_POS_Y + cameraY, 0.0f);
+                uiElements[P1_HIT_COUNT_DIGIT_ONES].UIPos(P1_HIT_POS_X + 3.0f + cameraX, P1_HIT_POS_Y + cameraY, 0.0f);
 
+                if(hitCount <= 9)
+                {
+                    uiElements[P1_HIT_COUNT_DIGIT_ONES].SetVisibility(true);
+                    uiElements[P1_HIT_COUNT_DIGIT_TENS].SetVisibility(false);
+                }
+                else
+                {
+                    uiElements[P1_HIT_COUNT_DIGIT_ONES].SetVisibility(true);
+                    uiElements[P1_HIT_COUNT_DIGIT_TENS].SetVisibility(true);
+                }
             } 
             else 
             {
                 // Hit<1
-                uiElements[HIT_LABEL].SetVisibility(false);
-                uiElements[HIT_COUNT_DIGIT_ONES].SetVisibility(false);
-                uiElements[HIT_COUNT_DIGIT_TENS].SetVisibility(false);
+                uiElements[P1_HIT_LABEL].SetVisibility(false);
+                uiElements[P1_HIT_COUNT_DIGIT_ONES].SetVisibility(false);
+                uiElements[P1_HIT_COUNT_DIGIT_TENS].SetVisibility(false);
             }
         }
         ////===P1===
 
-
-        ///////////////P2の処理今仮にP1のを使ってる
         ////===P2===
         //HP
         float p2HpPosX = P2_HP_BAR_MAX_X + cameraX;
         float p2HpPosY = P2_HP_BAR_MAX_Y + cameraY;
         uiElements[P2_MAXHP].UIPos(p2HpPosX, p2HpPosY, 0.0f); // 背景も更新
         
-        if (player1Character != null) 
+        if (player2Character != null) 
         {
-            float ratio = player1Character.GetHPObject().getHealthRatio();
-            float currentHP = player1Character.GetHPObject().getCurrentHP();
+            float ratio = player2Character.GetHPObject().getHealthRatio();
+            float currentHP = player2Character.GetHPObject().getCurrentHP();
             float currentWidth = MAX_HP_BAR_WIDTH * ratio;
             float originalPosX = P2_HP_BAR_MAX_X + cameraX; 
             float widthDifference = MAX_HP_BAR_WIDTH - currentWidth;
@@ -545,10 +552,10 @@ public class UIManager
         uiElements[P2_Gauge_Number].UIPos(p2GaugeNumberPosX, p2GaugeNumberPosY, 0.0f);
         
         //Gauge
-        if (player1Character != null) 
+        if (player2Character != null) 
         {
             // ゲージインスタンスを取得 
-            Gauge pGauge = player1Character.GetGauge();
+            Gauge pGauge = player2Character.GetGauge();
             
             // ゲージバーの長さ (充填比率) を更新
             float ratio = pGauge.GetCurrentGauge(); 
@@ -621,6 +628,10 @@ public class UIManager
         {
             uiElements[P2_SKILL_ICON_3].UIColor(1.0f, 1.0f, 1.0f);
         }
+        // =================================================
+        // Hit Count 處理
+        // =================================================
+   
         ////===P2===
         
         
@@ -762,37 +773,18 @@ public class UIManager
     }
 
     //===========================
-    // 複数桁の数字を表示
+    // P1複数桁の数字を表示
     //===========================
     private void DisplayMultiDigitNumber(int number) 
     {
-        // 最大99まで対応
-        if (number < 0 || number > 99) 
-        {
-            // 範囲外の場合は非表示
-            uiElements[HIT_COUNT_DIGIT_TENS].SetVisibility(false);
-            uiElements[HIT_COUNT_DIGIT_ONES].SetVisibility(false);
-            return;
-        }
-
         int tensDigit = number / 10; // 十の位
         int onesDigit = number % 10; // 一の位
 
         if (tensDigit > 0) 
         {
-            DisplayNumber(HIT_COUNT_DIGIT_TENS, tensDigit);
-            uiElements[HIT_COUNT_DIGIT_TENS].SetVisibility(true);
-            
-            uiElements[HIT_COUNT_DIGIT_ONES].UIPos(5.5f + cameraX, 6.0f + cameraY, 0.0f);
-
+            DisplayNumber(P1_HIT_COUNT_DIGIT_TENS, tensDigit);
         } 
-        else 
-        {
-            uiElements[HIT_COUNT_DIGIT_TENS].SetVisibility(false);
-            uiElements[HIT_COUNT_DIGIT_ONES].UIPos(4.75f + cameraX, 6.0f + cameraY, 0.0f); 
-        }
 
-        DisplayNumber(HIT_COUNT_DIGIT_ONES, onesDigit);
-        uiElements[HIT_COUNT_DIGIT_ONES].SetVisibility(true);
+        DisplayNumber(P1_HIT_COUNT_DIGIT_ONES, onesDigit);
     }
 }

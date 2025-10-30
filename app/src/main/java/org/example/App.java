@@ -54,14 +54,15 @@ public class App {
         pSlotManager = new PlayerSlotManager(pWindow);
         pSlotManager.SetCamera(pCamera); // カメラを設定（境界チェック用）
         PlayerSlot slot1 = pSlotManager.GetSlot(1);
+        PlayerSlot slot2 = pSlotManager.GetSlot(2);
 
-        if (slot1 != null) 
+        if (slot1 != null && slot2 != null) 
         {
-            pUI = new UIManager(pCamera, slot1.GetCharacter());
+            pUI = new UIManager(pCamera, slot1.GetCharacter(),slot2.GetCharacter());
         }
         else 
         {
-           pUI = new UIManager(pCamera, null);
+           pUI = new UIManager(pCamera, null,null);
         }
         pUI.initUI();
     }
