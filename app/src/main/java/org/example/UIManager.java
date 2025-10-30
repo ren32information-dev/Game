@@ -17,6 +17,9 @@ public class UIManager
     private static final int P1_SKILL_ICON_1 = 13;
     private static final int P1_SKILL_ICON_2 = 14;
     private static final int P1_SKILL_ICON_3 = 15;
+    private static final int P1_SKILL_COOLDOWN_OVERLAY_1 = 27; 
+    private static final int P1_SKILL_COOLDOWN_OVERLAY_2 = 28;
+    private static final int P1_SKILL_COOLDOWN_OVERLAY_3 = 29;
     //===Skill===
 
     //===HitCount===
@@ -45,6 +48,9 @@ public class UIManager
     private static final int P2_SKILL_ICON_1 = 16;
     private static final int P2_SKILL_ICON_2 = 17;
     private static final int P2_SKILL_ICON_3 = 18;
+    private static final int P2_SKILL_COOLDOWN_OVERLAY_1 = 30; 
+    private static final int P2_SKILL_COOLDOWN_OVERLAY_2 = 31;
+    private static final int P2_SKILL_COOLDOWN_OVERLAY_3 = 32;
     //===Skill===
     //===HitCount===
     private static final int P2_HIT_COUNT_DIGIT_ONES = 24; // P2 一の位 (個位)
@@ -57,7 +63,7 @@ public class UIManager
     private static final int BACKGROUND_IMAGE = 0;
     //===背景===
     
-    private static final int MAX_UI_ELEMENTS = 27; 
+    private static final int MAX_UI_ELEMENTS = 33; 
     
     
     private Renderer[] uiElements; 
@@ -73,7 +79,7 @@ public class UIManager
     //スキルアイコン
     private final float P1_SKILL_ICON_START_X = -8.0f;
     private final float P1_SKILL_ICON_Y = 12.5f;
-    private final float P1_SKILL_ICON_SIZE = 0.8f;
+    private final float P1_SKILL_ICON_SIZE = 0.7f;
     // スキルCD
     private final float SKILL_COOLDOWN_MAX_1 = 5.0f;
     private final float SKILL_COOLDOWN_MAX_2 = 8.0f;
@@ -193,23 +199,39 @@ public class UIManager
         DisplayNumber(P1_Gauge_Number, 2);
 
         //Skill1
-        uiElements[P1_SKILL_ICON_1].Init("UI/watermelon.png");
+        uiElements[P1_SKILL_ICON_1].Init("UI/SpGauge001.png");
         uiElements[P1_SKILL_ICON_1].UIPos(P1_SKILL_ICON_START_X, P1_SKILL_ICON_Y, 0.0f); 
         uiElements[P1_SKILL_ICON_1].UISize(P1_SKILL_ICON_SIZE, P1_SKILL_ICON_SIZE, 1.0f);
         uiElements[P1_SKILL_ICON_1].UIColor(1.0f, 1.0f, 1.0f);
         
         //Skill2
-        uiElements[P1_SKILL_ICON_2].Init("UI/cherry.png");
+        uiElements[P1_SKILL_ICON_2].Init("UI/SpGauge002.png");
         uiElements[P1_SKILL_ICON_2].UIPos(P1_SKILL_ICON_START_X + 1.5f, P1_SKILL_ICON_Y, 0.0f); 
         uiElements[P1_SKILL_ICON_2].UISize(P1_SKILL_ICON_SIZE, P1_SKILL_ICON_SIZE, 1.0f);
         uiElements[P1_SKILL_ICON_2].UIColor(1.0f, 1.0f, 1.0f);
         
         //Skill3
-        uiElements[P1_SKILL_ICON_3].Init("UI/bell.png");
+        uiElements[P1_SKILL_ICON_3].Init("UI/SpGauge002.png");
         uiElements[P1_SKILL_ICON_3].UIPos(P1_SKILL_ICON_START_X + 3.0f, P1_SKILL_ICON_Y, 0.0f); 
         uiElements[P1_SKILL_ICON_3].UISize(P1_SKILL_ICON_SIZE, P1_SKILL_ICON_SIZE, 1.0f);
         uiElements[P1_SKILL_ICON_3].UIColor(1.0f, 1.0f, 1.0f);
+        // Skill1 Overlay
+        uiElements[P1_SKILL_COOLDOWN_OVERLAY_1].Init("UI/Black50%.png");
+        uiElements[P1_SKILL_COOLDOWN_OVERLAY_1].UIPos(P1_SKILL_ICON_START_X, P1_SKILL_ICON_Y, 0.0f); 
+        uiElements[P1_SKILL_COOLDOWN_OVERLAY_1].UISize(P1_SKILL_ICON_SIZE, P1_SKILL_ICON_SIZE, 1.0f);
+        uiElements[P1_SKILL_COOLDOWN_OVERLAY_1].SetVisibility(false); //
+        
+        // Skill2 Overlay
+        uiElements[P1_SKILL_COOLDOWN_OVERLAY_2].Init("UI/Black50%.png");
+        uiElements[P1_SKILL_COOLDOWN_OVERLAY_2].UIPos(P1_SKILL_ICON_START_X + 1.5f, P1_SKILL_ICON_Y, 0.0f); 
+        uiElements[P1_SKILL_COOLDOWN_OVERLAY_2].UISize(P1_SKILL_ICON_SIZE, P1_SKILL_ICON_SIZE, 1.0f);
+        uiElements[P1_SKILL_COOLDOWN_OVERLAY_2].SetVisibility(false); 
 
+        // Skill3 Overlay
+        uiElements[P1_SKILL_COOLDOWN_OVERLAY_3].Init("UI/Black50%.png");
+        uiElements[P1_SKILL_COOLDOWN_OVERLAY_3].UIPos(P1_SKILL_ICON_START_X + 3.0f, P1_SKILL_ICON_Y, 0.0f); 
+        uiElements[P1_SKILL_COOLDOWN_OVERLAY_3].UISize(P1_SKILL_ICON_SIZE, P1_SKILL_ICON_SIZE, 1.0f);
+        uiElements[P1_SKILL_COOLDOWN_OVERLAY_3].SetVisibility(false);
                 
         // =================================================
         // Hit Count Label 「HIT」の文字
@@ -289,22 +311,40 @@ public class UIManager
         DisplayNumber(P2_Gauge_Number, 2);
      
         // P2 Skill1
-        uiElements[P2_SKILL_ICON_1].Init("UI/Watermelon.png"); 
+        uiElements[P2_SKILL_ICON_1].Init("UI/SpGauge001.png"); 
         uiElements[P2_SKILL_ICON_1].UIPos(P2_SKILL_ICON_START_X, P2_SKILL_ICON_Y, 0.0f); 
         uiElements[P2_SKILL_ICON_1].UISize(P1_SKILL_ICON_SIZE, P1_SKILL_ICON_SIZE, 1.0f);
         uiElements[P2_SKILL_ICON_1].UIColor(1.0f, 1.0f, 1.0f);
         
         // P2 Skill2
-        uiElements[P2_SKILL_ICON_2].Init("UI/Cherry.png"); 
+        uiElements[P2_SKILL_ICON_2].Init("UI/SpGauge002.png"); 
         uiElements[P2_SKILL_ICON_2].UIPos(P2_SKILL_ICON_START_X - 1.5f, P2_SKILL_ICON_Y, 0.0f); // X座標を左に移動
         uiElements[P2_SKILL_ICON_2].UISize(P1_SKILL_ICON_SIZE, P1_SKILL_ICON_SIZE, 1.0f);
         uiElements[P2_SKILL_ICON_2].UIColor(1.0f, 1.0f, 1.0f);
         
         // P2 Skill3
-        uiElements[P2_SKILL_ICON_3].Init("UI/Bell.png"); 
+        uiElements[P2_SKILL_ICON_3].Init("UI/SpGauge002.png"); 
         uiElements[P2_SKILL_ICON_3].UIPos(P2_SKILL_ICON_START_X - 3.0f, P2_SKILL_ICON_Y, 0.0f); // X座標をさらに左に移動
         uiElements[P2_SKILL_ICON_3].UISize(P1_SKILL_ICON_SIZE, P1_SKILL_ICON_SIZE, 1.0f);
         uiElements[P2_SKILL_ICON_3].UIColor(1.0f, 1.0f, 1.0f);
+
+        // P2 Skill1 Overlay
+        uiElements[P2_SKILL_COOLDOWN_OVERLAY_1].Init("UI/Black50%.png");
+        uiElements[P2_SKILL_COOLDOWN_OVERLAY_1].UIPos(P2_SKILL_ICON_START_X, P2_SKILL_ICON_Y, 0.0f); 
+        uiElements[P2_SKILL_COOLDOWN_OVERLAY_1].UISize(P1_SKILL_ICON_SIZE, P1_SKILL_ICON_SIZE, 1.0f);
+        uiElements[P2_SKILL_COOLDOWN_OVERLAY_1].SetVisibility(false);
+        
+        // P2 Skill2 Overlay
+        uiElements[P2_SKILL_COOLDOWN_OVERLAY_2].Init("UI/Black50%.png");
+        uiElements[P2_SKILL_COOLDOWN_OVERLAY_2].UIPos(P2_SKILL_ICON_START_X - 1.5f, P2_SKILL_ICON_Y, 0.0f); 
+        uiElements[P2_SKILL_COOLDOWN_OVERLAY_2].UISize(P1_SKILL_ICON_SIZE, P1_SKILL_ICON_SIZE, 1.0f);
+        uiElements[P2_SKILL_COOLDOWN_OVERLAY_2].SetVisibility(false); 
+
+        // P2 Skill3 Overlay
+        uiElements[P2_SKILL_COOLDOWN_OVERLAY_3].Init("UI/Black50%.png");
+        uiElements[P2_SKILL_COOLDOWN_OVERLAY_3].UIPos(P2_SKILL_ICON_START_X - 3.0f, P2_SKILL_ICON_Y, 0.0f); 
+        uiElements[P2_SKILL_COOLDOWN_OVERLAY_3].UISize(P1_SKILL_ICON_SIZE, P1_SKILL_ICON_SIZE, 1.0f);
+        uiElements[P2_SKILL_COOLDOWN_OVERLAY_3].SetVisibility(false);
 
         // =================================================
         // P2 Hit Count Label 「HIT」の文字
@@ -452,11 +492,16 @@ public class UIManager
             DisplayNumber(P1_Gauge_Number, nBars);
         }
         //Skill
-        uiElements[P1_SKILL_ICON_1].UIPos(P1_SKILL_ICON_START_X + cameraX, P1_SKILL_ICON_Y + cameraY, 0.0f); 
-        uiElements[P1_SKILL_ICON_2].UIPos(P1_SKILL_ICON_START_X + 1.5f + cameraX, P1_SKILL_ICON_Y + cameraY, 0.0f); 
-        uiElements[P1_SKILL_ICON_3].UIPos(P1_SKILL_ICON_START_X + 3.0f + cameraX, P1_SKILL_ICON_Y + cameraY, 0.0f);
+        float p1Skill1X = P1_SKILL_ICON_START_X + cameraX;
+        float p1Skill2X = P1_SKILL_ICON_START_X + 1.5f + cameraX;
+        float p1Skill3X = P1_SKILL_ICON_START_X + 3.0f + cameraX;
+        float p1SkillY = P1_SKILL_ICON_Y + cameraY;
+        
+        uiElements[P1_SKILL_ICON_1].UIPos(p1Skill1X, p1SkillY, 0.0f); 
+        uiElements[P1_SKILL_ICON_2].UIPos(p1Skill2X, p1SkillY, 0.0f); 
+        uiElements[P1_SKILL_ICON_3].UIPos(p1Skill3X, p1SkillY, 0.0f);
 
-        //Skill1CD
+        // Skill1CD
         if (fSkillCooldownCurrent1 > 0.0f) 
         {
             fSkillCooldownCurrent1 -= deltaTime;
@@ -464,15 +509,17 @@ public class UIManager
             {
                 fSkillCooldownCurrent1 = 0.0f;
             }
-            uiElements[P1_SKILL_ICON_1].UIColor(0.5f, 0.5f, 0.5f); 
         }
-        else 
-        {
-            // クールダウン完了
-            uiElements[P1_SKILL_ICON_1].UIColor(1.0f, 1.0f, 1.0f); // 色を通常に戻す
-        }
-        
-        //Skill2CD
+
+        UpdateSkillCooldown(
+            P1_SKILL_COOLDOWN_OVERLAY_1, 
+            fSkillCooldownCurrent1, 
+            SKILL_COOLDOWN_MAX_1, 
+            p1Skill1X, 
+            p1SkillY
+        );
+
+        // Skill2CD
         if (fSkillCooldownCurrent2 > 0.0f) 
         {
             fSkillCooldownCurrent2 -= deltaTime;
@@ -480,14 +527,17 @@ public class UIManager
             {
                 fSkillCooldownCurrent2 = 0.0f;
             }
-            uiElements[P1_SKILL_ICON_2].UIColor(0.5f, 0.5f, 0.5f);
         }
-        else 
-        {
-            uiElements[P1_SKILL_ICON_2].UIColor(1.0f, 1.0f, 1.0f);
-        }
-
-        //Skill3CD
+        
+        UpdateSkillCooldown(
+            P1_SKILL_COOLDOWN_OVERLAY_2, 
+            fSkillCooldownCurrent2, 
+            SKILL_COOLDOWN_MAX_2, 
+            p1Skill2X, 
+            p1SkillY
+        );
+        
+        // Skill3CD
         if (fSkillCooldownCurrent3 > 0.0f) 
         {
             fSkillCooldownCurrent3 -= deltaTime;
@@ -495,12 +545,15 @@ public class UIManager
             {
                 fSkillCooldownCurrent3 = 0.0f;
             }
-            uiElements[P1_SKILL_ICON_3].UIColor(0.5f, 0.5f, 0.5f);
         }
-        else 
-        {
-            uiElements[P1_SKILL_ICON_3].UIColor(1.0f, 1.0f, 1.0f);
-        }
+
+        UpdateSkillCooldown(
+            P1_SKILL_COOLDOWN_OVERLAY_3, 
+            fSkillCooldownCurrent3, 
+            SKILL_COOLDOWN_MAX_3, 
+            p1Skill3X, 
+            p1SkillY
+        );
 
         // =================================================
         // Hit Count 處理
@@ -754,7 +807,7 @@ public class UIManager
         {
             if (fSkillCooldownCurrent1 == 0.0f)
             {
-            fSkillCooldownCurrent1 = SKILL_COOLDOWN_MAX_3;
+                fSkillCooldownCurrent1 = SKILL_COOLDOWN_MAX_1;
             }
         }
 
@@ -762,7 +815,7 @@ public class UIManager
         {
             if (fSkillCooldownCurrent2 == 0.0f)
             {
-            fSkillCooldownCurrent2 = SKILL_COOLDOWN_MAX_3;
+                fSkillCooldownCurrent2 = SKILL_COOLDOWN_MAX_2;
             }
         }
 
@@ -770,7 +823,7 @@ public class UIManager
         {
             if (fSkillCooldownCurrent3 == 0.0f)
             {
-            fSkillCooldownCurrent3 = SKILL_COOLDOWN_MAX_3;
+                fSkillCooldownCurrent3 = SKILL_COOLDOWN_MAX_3;
             }
         }
         //=====================DEBUG==========================
@@ -874,5 +927,35 @@ public class UIManager
         } 
 
         DisplayNumber(P2_HIT_COUNT_DIGIT_ONES, onesDigit);
+    }
+
+    //===========================
+    //スキルCD
+    //===========================
+    private void UpdateSkillCooldown(int overlayID, float currentCD, float maxCD, float iconX, float iconY) 
+    {
+        Renderer overlay = uiElements[overlayID];
+
+        if (currentCD <= 0.0f) 
+        {
+            overlay.SetVisibility(false);
+            uiElements[overlayID - 14].UIColor(1.0f, 1.0f, 1.0f); 
+            return;
+        }
+
+        overlay.SetVisibility(true);
+
+        float recoveryRatio = 1.0f - (currentCD / maxCD); 
+
+        float v = 1.0f - recoveryRatio; 
+                                    
+        overlay.SetUIUV(0.0f, 0.0f, 1.0f, v); 
+        
+        float iconSize = P1_SKILL_ICON_SIZE;
+        float currentHeight = iconSize * v; 
+        float newOverlayY = iconY + (iconSize / 2.0f) - (currentHeight / 2.5f) + (recoveryRatio / 3.0f); 
+        
+        overlay.UISize(iconSize, currentHeight, 1.0f); 
+        overlay.UIPos(iconX, newOverlayY, 0.0f);        
     }
 }
