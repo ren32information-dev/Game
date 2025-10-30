@@ -9,6 +9,7 @@ public class UIManager
     private static final int P1_MAXGauge = 3;
     private static final int P1_Gauge = 4; 
     private static final int P1_Gauge_Number = 5;
+    private static final int P1_HP_YELLOW = 22;
     //===P1===
 
     //===タイマー===
@@ -22,6 +23,7 @@ public class UIManager
     private static final int P2_MAXGauge = 10;
     private static final int P2_Gauge = 11; 
     private static final int P2_Gauge_Number = 12;
+    private static final int P2_HP_YELLOW = 23;
     // ===P2===
 
     //===P1Skill===
@@ -46,7 +48,7 @@ public class UIManager
     private static final int BACKGROUND_IMAGE = 0;
     //===背景===
     
-    private static final int MAX_UI_ELEMENTS = 22; 
+    private static final int MAX_UI_ELEMENTS = 24; 
     
     
     private Renderer[] uiElements; 
@@ -134,7 +136,17 @@ public class UIManager
         uiElements[P1_HP].UIPos(HP_BAR_MAX_X, HP_BAR_MAX_Y, 0.0f); 
         uiElements[P1_HP].UISize(MAX_HP_BAR_WIDTH, 0.4f, 1.0f);
         uiElements[P1_HP].UIColor(1.0f, 1.0f, 1.0f);
-        
+        uiElements[P1_HP].SetVisibility(true);
+
+        // =================================================
+        // P1黄色HPバー (HP<40)
+        // =================================================
+        uiElements[P1_HP_YELLOW].Init("UI/yellow.png"); 
+        uiElements[P1_HP_YELLOW].UIPos(HP_BAR_MAX_X, HP_BAR_MAX_Y, 0.0f); 
+        uiElements[P1_HP_YELLOW].UISize(MAX_HP_BAR_WIDTH, 0.4f, 1.0f);
+        uiElements[P1_HP_YELLOW].UIColor(1.0f, 1.0f, 1.0f); 
+        uiElements[P1_HP_YELLOW].SetVisibility(false);
+
         // =================================================
         // P1灰色HPバーの背景 (最大HP)
         // =================================================
@@ -150,7 +162,6 @@ public class UIManager
         uiElements[P1_Gauge].UIPos(Gauge_BAR_MAX_X, Gauge_BAR_MAX_Y, 0.0f); 
         uiElements[P1_Gauge].UISize(MAX_Gauge_BAR_WIDTH, 0.4f, 1.0f);
         uiElements[P1_Gauge].UIColor(1.0f, 1.0f, 1.0f);
-
 
         // =================================================
         // P1灰色Gaugeバーの背景 (最大Gauge)
@@ -204,6 +215,16 @@ public class UIManager
         uiElements[P2_HP].UIPos(P2_HP_BAR_MAX_X, 14.0f, 0.0f); 
         uiElements[P2_HP].UISize(MAX_HP_BAR_WIDTH, 0.4f, 1.0f);
         uiElements[P2_HP].UIColor(1.0f, 1.0f, 1.0f);
+        uiElements[P2_HP].SetVisibility(true);
+
+        // =================================================
+        // P2黄色HPバー (HP<40)
+        // =================================================
+        uiElements[P2_HP_YELLOW].Init("UI/yellow.png"); 
+        uiElements[P2_HP_YELLOW].UIPos(P2_HP_BAR_MAX_X, 14.0f, 0.0f); 
+        uiElements[P2_HP_YELLOW].UISize(MAX_HP_BAR_WIDTH, 0.4f, 1.0f);
+        uiElements[P2_HP_YELLOW].UIColor(1.0f, 1.0f, 1.0f);
+        uiElements[P2_HP_YELLOW].SetVisibility(false);
 
         // =================================================
         // P2 灰色Gaugeバーの背景 (最大Gauge)
@@ -324,38 +345,34 @@ public class UIManager
         if (player1Character != null) 
         {
             float ratio = player1Character.GetHPObject().getHealthRatio();
+            float currentHP = player1Character.GetHPObject().getCurrentHP();
+            
             float currentWidth = MAX_HP_BAR_WIDTH * ratio;
             float originalPosX = HP_BAR_MAX_X + cameraX; 
             float widthDifference = MAX_HP_BAR_WIDTH - currentWidth;
             float newPosX = originalPosX - widthDifference;
             float newPosY = HP_BAR_MAX_Y + cameraY;
 
+            // 調整 P1_HP_YELLOW 的位置和大小，使其與 P1_HP 相同
+            uiElements[P1_HP_YELLOW].UISize(currentWidth, 0.4f, 1.0f);
+            uiElements[P1_HP_YELLOW].UIPos(newPosX, newPosY, 0.0f); 
+
+            // 調整 P1_HP (紅色) 的位置和大小
             uiElements[P1_HP].UISize(currentWidth, 0.4f, 1.0f);
             uiElements[P1_HP].UIPos(newPosX, newPosY, 0.0f); 
-        }
 
-        if (player1Character != null) 
-        {
-            float ratio = player1Character.GetHPObject().getHealthRatio();
-            float currentHP = player1Character.GetHPObject().getCurrentHP();
-            
+
+            // 【P1 HP 顏色切換邏輯】
             if (currentHP < 40.0f) 
             {
-                uiElements[P1_HP].UIColor(1.0f, 1.0f, 0.0f); 
+                uiElements[P1_HP].SetVisibility(false);        // 隱藏紅色 HP
+                uiElements[P1_HP_YELLOW].SetVisibility(true);  // 顯示黃色 HP
             }
             else 
             {
-                uiElements[P1_HP].UIColor(1.0f, 1.0f, 1.0f); 
+                uiElements[P1_HP].SetVisibility(true);         // 顯示紅色 HP
+                uiElements[P1_HP_YELLOW].SetVisibility(false); // 隱藏黃色 HP
             }
-
-            float currentWidth = MAX_HP_BAR_WIDTH * ratio;
-            float originalPosX = HP_BAR_MAX_X + cameraX; 
-            float widthDifference = MAX_HP_BAR_WIDTH - currentWidth;
-            float newPosX = originalPosX - widthDifference;
-            float newPosY = HP_BAR_MAX_Y + cameraY;
-
-            uiElements[P1_HP].UISize(currentWidth, 0.4f, 1.0f);
-            uiElements[P1_HP].UIPos(newPosX, newPosY, 0.0f); 
         }
 
         //Gauge処理
@@ -453,7 +470,9 @@ public class UIManager
         // =================================================
         if (player1Character != null) 
         {
-            int hitCount = player1Character.ComboCount(); 
+            int hitCount;
+
+            hitCount = player1Character.ComboCount(); 
 
             if (hitCount >= 1) 
             {
@@ -492,6 +511,7 @@ public class UIManager
         if (player1Character != null) 
         {
             float ratio = player1Character.GetHPObject().getHealthRatio();
+            float currentHP = player1Character.GetHPObject().getCurrentHP();
             float currentWidth = MAX_HP_BAR_WIDTH * ratio;
             float originalPosX = P2_HP_BAR_MAX_X + cameraX; 
             float widthDifference = MAX_HP_BAR_WIDTH - currentWidth;
@@ -499,6 +519,20 @@ public class UIManager
             
             uiElements[P2_HP].UISize(currentWidth, 0.4f, 1.0f);
             uiElements[P2_HP].UIPos(newPosX, p2HpPosY, 0.0f); 
+            
+            uiElements[P2_HP_YELLOW].UISize(currentWidth, 0.4f, 1.0f);
+            uiElements[P2_HP_YELLOW].UIPos(newPosX, p2HpPosY, 0.0f);
+
+            if (currentHP < 40.0f) 
+            {
+                uiElements[P2_HP].SetVisibility(false);        // 隱藏紅色 HP
+                uiElements[P2_HP_YELLOW].SetVisibility(true);  // 顯示黃色 HP
+            }
+            else 
+            {
+                uiElements[P2_HP].SetVisibility(true);         // 顯示紅色 HP
+                uiElements[P2_HP_YELLOW].SetVisibility(false); // 隱藏黃色 HP
+            }
         }       
 
 
