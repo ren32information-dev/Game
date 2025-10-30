@@ -27,8 +27,8 @@ public class Result {
     }
 
     public void init() {
-        p1WinTextureId = TextureLoader.loadTexture("Image/1PWin.png");//1P勝ち
-        p2WinTextureId = TextureLoader.loadTexture("Image/2PWin.png");//2P勝ち
+        p1WinTextureId = TextureLoader.loadTexture("Image/Result_Player1.png");//1P勝ち
+        p2WinTextureId = TextureLoader.loadTexture("Image/Result_Player2.png");//2P勝ち
         drawTextureId = TextureLoader.loadTexture("Image/Draw.png");//引き分け
         continueTextureId = TextureLoader.loadTexture("Image/GG.png");//続ける
 

@@ -23,7 +23,7 @@ public class Title {
     }
 
     public void init() {
-        TitleLogoTextureId = TextureLoader.loadTexture("Image/Title.png"); 
+        TitleLogoTextureId = TextureLoader.loadTexture("Image/ETHEREALCLASH_Title.png"); 
         PressAnyButtonTextureId = TextureLoader.loadTexture("Image/Start.png"); 
 
         GL11.glEnable(GL11.GL_TEXTURE_2D);
