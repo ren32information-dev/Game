@@ -3,52 +3,61 @@ import org.lwjgl.glfw.GLFW;
 
 public class UIManager 
 {
-    //===P1===
+    ////===P1===
+    //===status===
     private static final int P1_MAXHP = 1;
     private static final int P1_HP = 2; 
     private static final int P1_MAXGauge = 3;
     private static final int P1_Gauge = 4; 
     private static final int P1_Gauge_Number = 5;
     private static final int P1_HP_YELLOW = 22;
-    //===P1===
+    //===status===
+
+    //===Skill===
+    private static final int P1_SKILL_ICON_1 = 13;
+    private static final int P1_SKILL_ICON_2 = 14;
+    private static final int P1_SKILL_ICON_3 = 15;
+    //===Skill===
+
+    //===HitCount===
+    private static final int P1_HIT_COUNT_DIGIT_ONES = 19; // 一の位 (個位)
+    private static final int P1_HIT_COUNT_DIGIT_TENS = 20; // 十の位 (十位)
+    private static final int P1_HIT_LABEL = 21; // 「HIT」の文字画像
+    //===HitCount===
+    ////===P1===
 
     //===タイマー===
     private static final int TIMER_DIGIT_TENS = 6;
     private static final int TIMER_DIGIT_ONES = 7;
     //===タイマー===
 
-    // ===P2===
+    ////===P2===
+    //===status===
     private static final int P2_MAXHP = 8;
     private static final int P2_HP = 9; 
     private static final int P2_MAXGauge = 10;
     private static final int P2_Gauge = 11; 
     private static final int P2_Gauge_Number = 12;
     private static final int P2_HP_YELLOW = 23;
-    // ===P2===
+    //===status===
 
-    //===P1Skill===
-    private static final int P1_SKILL_ICON_1 = 13;
-    private static final int P1_SKILL_ICON_2 = 14;
-    private static final int P1_SKILL_ICON_3 = 15;
-    //===P1Skill===
-
-    //===P2Skill===
+    //===Skill===
     private static final int P2_SKILL_ICON_1 = 16;
     private static final int P2_SKILL_ICON_2 = 17;
     private static final int P2_SKILL_ICON_3 = 18;
-    //===P2Skill===
-    
+    //===Skill===
     //===HitCount===
-    private static final int P1_HIT_COUNT_DIGIT_ONES = 19; // 一の位 (個位)
-    private static final int P1_HIT_COUNT_DIGIT_TENS = 20; // 十の位 (十位)
-    private static final int P1_HIT_LABEL = 21; // 「HIT」の文字画像
+    private static final int P2_HIT_COUNT_DIGIT_ONES = 24; // P2 一の位 (個位)
+    private static final int P2_HIT_COUNT_DIGIT_TENS = 25; // P2 十の位 (十位)
+    private static final int P2_HIT_LABEL = 26; // P2 「HIT」の文字画像
     //===HitCount===
+    ////===P2===
 
     //===背景===
     private static final int BACKGROUND_IMAGE = 0;
     //===背景===
     
-    private static final int MAX_UI_ELEMENTS = 24; 
+    private static final int MAX_UI_ELEMENTS = 27; 
     
     
     private Renderer[] uiElements; 
@@ -90,7 +99,9 @@ public class UIManager
     private float fP2SkillCooldownCurrent1 = 0.0f;
     private float fP2SkillCooldownCurrent2 = 0.0f;
     private float fP2SkillCooldownCurrent3 = 0.0f;
-
+    // P2 Hit
+    private final float P2_HIT_POS_X = 8.0f; 
+    private final float P2_HIT_POS_Y = 10.0f;
     float cameraX;
     float cameraY;
 
@@ -294,6 +305,30 @@ public class UIManager
         uiElements[P2_SKILL_ICON_3].UIPos(P2_SKILL_ICON_START_X - 3.0f, P2_SKILL_ICON_Y, 0.0f); // X座標をさらに左に移動
         uiElements[P2_SKILL_ICON_3].UISize(P1_SKILL_ICON_SIZE, P1_SKILL_ICON_SIZE, 1.0f);
         uiElements[P2_SKILL_ICON_3].UIColor(1.0f, 1.0f, 1.0f);
+
+        // =================================================
+        // P2 Hit Count Label 「HIT」の文字
+        // =================================================
+        uiElements[P2_HIT_LABEL].Init("UI/Hit.png"); 
+        uiElements[P2_HIT_LABEL].UIPos(P2_HIT_POS_X + cameraX, P2_HIT_POS_Y + cameraY, 0.0f);
+        uiElements[P2_HIT_LABEL].UISize(2.0f, 1.4f, 1.0f);
+        uiElements[P2_HIT_LABEL].SetVisibility(false);
+    
+        // =================================================
+        // P2 Hit Count - 十の位
+        // =================================================
+        uiElements[P2_HIT_COUNT_DIGIT_TENS].Init("UI/number.png"); 
+        uiElements[P2_HIT_COUNT_DIGIT_TENS].UISize(0.6f, 0.6f, 1.0f); 
+        uiElements[P2_HIT_COUNT_DIGIT_TENS].UIPos(P2_HIT_POS_X - 2.0f + cameraX, P2_HIT_POS_Y + cameraY, 0.0f); // X位置調整
+        uiElements[P2_HIT_COUNT_DIGIT_TENS].SetVisibility(false);
+
+        // =================================================
+        // P2 Hit Count - 一の位
+        // =================================================
+         uiElements[P2_HIT_COUNT_DIGIT_ONES].Init("UI/number.png"); 
+        uiElements[P2_HIT_COUNT_DIGIT_ONES].UISize(0.6f, 0.6f, 1.0f); 
+        uiElements[P2_HIT_COUNT_DIGIT_ONES].UIPos(P2_HIT_POS_X - 3.0f + cameraX, P2_HIT_POS_Y + cameraY, 0.0f); // X位置調整
+        uiElements[P2_HIT_COUNT_DIGIT_ONES].SetVisibility(false);
 
         ////タイマー
         // =================================================
@@ -631,7 +666,45 @@ public class UIManager
         // =================================================
         // Hit Count 處理
         // =================================================
-   
+        // =================================================
+        if (player2Character != null) 
+        {
+            int hitCount;
+            hitCount = player2Character.ComboCount();
+
+            if (hitCount >= 1) 
+            {
+                // Hit>1
+                uiElements[P2_HIT_LABEL].SetVisibility(true);
+
+                // P2 Hit Label 位置更新
+                uiElements[P2_HIT_LABEL].UIPos(P2_HIT_POS_X + cameraX, P2_HIT_POS_Y + cameraY, 0.0f);
+
+                DisplayP2MultiDigitNumber(hitCount);
+                
+                uiElements[P2_HIT_COUNT_DIGIT_TENS].UIPos(P2_HIT_POS_X - 3.0f + cameraX, P2_HIT_POS_Y + cameraY, 0.0f);
+                uiElements[P2_HIT_COUNT_DIGIT_ONES].UIPos(P2_HIT_POS_X - 2.0f + cameraX, P2_HIT_POS_Y + cameraY, 0.0f);
+                
+                if(hitCount <= 9)
+                {
+                    uiElements[P2_HIT_COUNT_DIGIT_ONES].SetVisibility(true);
+                    uiElements[P2_HIT_COUNT_DIGIT_TENS].SetVisibility(false);
+                }
+                else
+                {
+                    uiElements[P2_HIT_COUNT_DIGIT_ONES].SetVisibility(true);
+                    uiElements[P2_HIT_COUNT_DIGIT_TENS].SetVisibility(true);
+                }
+            } 
+            else 
+            {
+                // Hit<1
+                uiElements[P2_HIT_LABEL].SetVisibility(false);
+                uiElements[P2_HIT_COUNT_DIGIT_ONES].SetVisibility(false);
+                uiElements[P2_HIT_COUNT_DIGIT_TENS].SetVisibility(false);
+            }
+
+        }
         ////===P2===
         
         
@@ -786,5 +859,20 @@ public class UIManager
         } 
 
         DisplayNumber(P1_HIT_COUNT_DIGIT_ONES, onesDigit);
+    }
+    //===========================
+    // P2複数桁の数字を表示
+    //===========================
+    private void DisplayP2MultiDigitNumber(int number) 
+    {
+        int tensDigit = number / 10; // 十の位
+        int onesDigit = number % 10; // 一の位
+
+        if (tensDigit > 0) 
+        {
+            DisplayNumber(P2_HIT_COUNT_DIGIT_TENS, tensDigit);
+        } 
+
+        DisplayNumber(P2_HIT_COUNT_DIGIT_ONES, onesDigit);
     }
 }
