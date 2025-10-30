@@ -36,7 +36,12 @@ public enum InputType {
     //中攻撃6
     HEAVYATTACK3,
     //強攻撃3
-    
+    LIGHT,
+    //弱
+    MEDIUM,
+    //中
+    HEAVY,
+    //強
 
     NONE
     //入力なし

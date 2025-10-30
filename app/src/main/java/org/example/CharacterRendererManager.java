@@ -28,6 +28,10 @@ public class CharacterRendererManager {
         pCharacterRenderers.put(CharacterState.LIGHTATTACK2, new ArrayList<>());
         pCharacterRenderers.put(CharacterState.HEAVYATTACK2, new ArrayList<>());
         pCharacterRenderers.put(CharacterState.MEDIUMATTACK6, new ArrayList<>());
+        pCharacterRenderers.put(CharacterState.LIGHTJUMPATTACK, new ArrayList<>());
+        pCharacterRenderers.put(CharacterState.MEDIUMJUMPATTACK, new ArrayList<>());
+        pCharacterRenderers.put(CharacterState.HEAVYJUMPATTACK, new ArrayList<>());
+
         
 
         // 立ち状態のレンダラーを追加
@@ -112,6 +116,23 @@ public class CharacterRendererManager {
         mediumAttack6Renderers.add(new CharacterRenderer(pCamera, "Image/AtkFrontMidStart001.png"));
         mediumAttack6Renderers.add(new CharacterRenderer(pCamera, "Image/AtkFrontMid001.png"));
         mediumAttack6Renderers.add(new CharacterRenderer(pCamera, "Image/AtkFrontMidEnd001.png"));
+
+        // ジャンプ弱
+        ArrayList<CharacterRenderer> lightAttackRenderers = pCharacterRenderers.get(CharacterState.LIGHTJUMPATTACK);
+        lightAttackRenderers.add(new CharacterRenderer(pCamera, "Image/JpAtkLowStart001.png"));
+        lightAttackRenderers.add(new CharacterRenderer(pCamera, "Image/JpAtkLow001.png"));
+
+        // ジャンプ中
+        ArrayList<CharacterRenderer> mediumAttackRenderers = pCharacterRenderers.get(CharacterState.MEDIUMJUMPATTACK);
+        mediumAttackRenderers.add(new CharacterRenderer(pCamera, "Image/JpAtkMidStart001.png"));
+        mediumAttackRenderers.add(new CharacterRenderer(pCamera, "Image/JpAtkMid001.png"));
+        mediumAttackRenderers.add(new CharacterRenderer(pCamera, "Image/JpAtkMidEnd001.png"));
+
+        // ジャンプ強
+        ArrayList<CharacterRenderer> heavyAttackRenderers = pCharacterRenderers.get(CharacterState.HEAVYJUMPATTACK);
+        heavyAttackRenderers.add(new CharacterRenderer(pCamera, "Image/JpAtkHighStart002.png"));
+        heavyAttackRenderers.add(new CharacterRenderer(pCamera, "Image/JpAtkHighStart001.png"));
+        heavyAttackRenderers.add(new CharacterRenderer(pCamera, "Image/JpAtkHigh001.png"));
     }
 
     public void Uninit() {
