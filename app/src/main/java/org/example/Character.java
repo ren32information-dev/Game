@@ -43,6 +43,8 @@ public class Character extends Player {
     //現在の状態
     private CharacterState ePreviousState;
     //前フレームの状態
+    private CharacterState eOldState;
+    //ひとつ前の状態
     
     private InputCommand pInputCommand;
     //入力コマンド管理
@@ -103,6 +105,9 @@ public class Character extends Player {
     private int nConboSpanFrame = 120;
     // コンボカウンターが消えるまでの時間
     private int nConboSpanCount = 0;
+    // コンボが消えるのを数える変数
+
+    private float fJumpAttackMove;
 
     boolean bLeftMove = false;
     boolean bRightMove = false;
@@ -117,6 +122,9 @@ public class Character extends Player {
     boolean bLightAttack2 = false;
     boolean bHeavyAttack2 = false;
     boolean bMedAttack6 = false;
+    boolean bLight = false;
+    boolean bMed = false;
+    boolean bHeavy = false;
     //コントローラの入力
 
     //ジャンプの種類を定義
@@ -334,6 +342,9 @@ public class Character extends Player {
             bLightAttack2 = pInputManager.GetInput(InputType.LIGHTATTACK2);
             bHeavyAttack2 = pInputManager.GetInput(InputType.HEAVYATTACK2);
             bMedAttack6 = pInputManager.GetInput(InputType.MEDIUMATTACK6);
+            bLight = pInputManager.GetInput(InputType.LIGHT);
+            bMed = pInputManager.GetInput((InputType.MEDIUM));
+            bHeavy = pInputManager.GetInput(InputType.HEAVY);
             
             // 現在のゲーム時刻を取得
             float fCurrentTime = (float) org.lwjgl.glfw.GLFW.glfwGetTime();
@@ -582,6 +593,7 @@ public class Character extends Player {
             Damage(CharacterState.HEAVYATTACK5, 9, 24);
             Damage(CharacterState.LIGHTATTACK2, 2, 9);
             Damage(CharacterState.HEAVYATTACK2, 10, 28);
+            Damage(CharacterState.MEDIUMATTACK6, 6, 17);
         }
     }
 
@@ -759,6 +771,9 @@ public class Character extends Player {
     
     //状態遷移の処理
     private void UpdateState(boolean bDashForward, boolean bDashBackward, JumpType eRequestedJumpType, float fDeltaTime) {
+
+        float fHorizontalJumpSpeed = 3.0f; // 水平方向のジャンプ速度
+        Character pOpponent = GetOpponentCharacter();
         switch (eCurrentState) {
             case STAND:
                 nTextureId = 0; // 立ち状態のテクスチャIDを設定
@@ -878,6 +893,9 @@ public class Character extends Player {
                     System.out.println("[Player" + nPlayerNumber + "] ジャンプ実行！ 種類: " + eJumpType);
                 } else if (!bIsGrounded) {
                     // 空中にいる場合
+                    if(bLight) ChangeState(CharacterState.LIGHTJUMPATTACK);
+                    if(bMed) ChangeState(CharacterState.MEDIUMJUMPATTACK);
+                    if(bHeavy) ChangeState(CharacterState.HEAVYJUMPATTACK);
                     
                     // 空中ダッシュの処理
                     if (bIsAirDashing) {
@@ -894,8 +912,10 @@ public class Character extends Player {
                             float fInertiaSpeed = 2.0f; // 慣性による移動速度
                             if (fAirDashDirectionX > 0) {
                                 fJumpDirectionX = fInertiaSpeed; // 右方向への慣性
+                                fJumpAttackMove = fJumpDirectionX;
                             } else if (fAirDashDirectionX < 0) {
                                 fJumpDirectionX = -fInertiaSpeed; // 左方向への慣性
+                                fJumpAttackMove = fJumpDirectionX;
                             }
                             System.out.println("[Player" + nPlayerNumber + "] 空中ダッシュ終了（慣性: " + fJumpDirectionX + "）");
                         }
@@ -967,7 +987,6 @@ public class Character extends Player {
                 
                 if (fDashTimer > 0) {
                     // 相対方向でのダッシュ移動
-                    Character pOpponent = GetOpponentCharacter();
                     if (pOpponent != null) {
                         // 相手との相対位置を計算
                         float fDistanceToOpponent = pOpponent.GetPositionX() - this.fPositionX;
@@ -1202,7 +1221,26 @@ public class Character extends Player {
                 }
                 break;
             case MEDIUMATTACK6:
-                nTextureId = nFrame / 8;
+                if(nFrame == 0) nTextureId = 0;
+                if(nFrame == 7) nTextureId = 1;
+                if(nFrame == 14) nTextureId = 2;
+                if(nFrame == 21) 
+                {
+                    nTextureId = 3;
+                    if(bIsFacingRight == true)
+                    {
+                        this.pAllColliders.get("attack").AddHitCollider(new HitColliderBox(0.5f, 0.3f, 0.9f, 1.5f)); // 右下
+                    }
+                    else
+                    {
+                        this.pAllColliders.get("attack").AddHitCollider(new HitColliderBox(0.5f, 0.3f, -0.9f, 1.5f)); // 右下
+                    }
+                }
+                if(nFrame == 25)
+                {
+                    nTextureId = 4;
+                    this.pAllColliders.get("attack").ClearCollider();
+                }
 
                 if(bIsFacingRight == true)  // 右を向いているとき
                 {
@@ -1217,17 +1255,158 @@ public class Character extends Player {
                 if(!bIsGrounded) fVelocityY -= 0.00005f;
 
 
-                if(nTextureId == 5)
+                if(nFrame == 40)
                 {
                     ChangeState(CharacterState.STAND);
                 } else {
                     nFrame++;
                 }
+                break;
+            case LIGHTJUMPATTACK:
+                if(nFrame == 0) nTextureId = 0;
+                if(nFrame == 9) nTextureId = 1;
+                if(nFrame == 18) nTextureId = 2;
+
+                switch (eJumpType) {
+                    case BACK_JUMP:
+                        // バックジャンプ：相手から離れる方向
+                         System.out.println("[Player]" + pOpponent.GetPlayerNumber() + "]後ろジャンプ");
+                        if(bIsFacingRight) {
+                        fJumpDirectionX = -fHorizontalJumpSpeed; // 右向きなら左方向
+                        } else {
+                            fJumpDirectionX = fHorizontalJumpSpeed; // 左向きなら右方向
+                        }
+                    break;
+                
+                    case VERTICAL_JUMP:
+                        // 垂直ジャンプ：水平移動なし
+                        System.out.println("[Player" + pOpponent.GetPlayerNumber() + "]垂直ジャンプ");
+                        fJumpDirectionX = 0f;
+                    break;
+                
+                    case FORWARD_JUMP:
+                        // 前ジャンプ：相手に向かう方向
+                        System.out.println("[Player]" + pOpponent.GetPlayerNumber() + "]前ジャンプ");
+                        if(bIsFacingRight) {
+                        fJumpDirectionX = fHorizontalJumpSpeed; // 右向きなら右方向
+                        } else {
+                            fJumpDirectionX = -fHorizontalJumpSpeed; // 左向きなら左方向
+                        }
+                    break;
+                
+                    default:
+                        fJumpDirectionX = 0f;
+                    break;
+                }
+
+                fPositionX += fJumpDirectionX * fDeltaTime;
+                
+
+                if(bIsGrounded)
+                {
+                    ChangeState(CharacterState.STAND);
+                } else {
+                    nFrame++;
+                }
+                break;
+            case MEDIUMJUMPATTACK:
+                if(nFrame == 0) nTextureId = 0;
+                if(nFrame == 9) nTextureId = 1;
+                if(nFrame == 18) nTextureId = 2;
+
+                switch (eJumpType) {
+                    case BACK_JUMP:
+                        // バックジャンプ：相手から離れる方向
+                         System.out.println("[Player]" + pOpponent.GetPlayerNumber() + "]後ろジャンプ");
+                        if(bIsFacingRight) {
+                        fJumpDirectionX = -fHorizontalJumpSpeed; // 右向きなら左方向
+                        } else {
+                            fJumpDirectionX = fHorizontalJumpSpeed; // 左向きなら右方向
+                        }
+                    break;
+                
+                    case VERTICAL_JUMP:
+                        // 垂直ジャンプ：水平移動なし
+                        System.out.println("[Player" + pOpponent.GetPlayerNumber() + "]垂直ジャンプ");
+                        fJumpDirectionX = 0f;
+                    break;
+                
+                    case FORWARD_JUMP:
+                        // 前ジャンプ：相手に向かう方向
+                        System.out.println("[Player]" + pOpponent.GetPlayerNumber() + "]前ジャンプ");
+                        if(bIsFacingRight) {
+                        fJumpDirectionX = fHorizontalJumpSpeed; // 右向きなら右方向
+                        } else {
+                            fJumpDirectionX = -fHorizontalJumpSpeed; // 左向きなら左方向
+                        }
+                    break;
+                
+                    default:
+                        fJumpDirectionX = 0f;
+                    break;
+                }
+
+                fPositionX += fJumpDirectionX * fDeltaTime;
+
+                if(bIsGrounded)
+                {
+                    ChangeState(CharacterState.STAND);
+                } else {
+                    nFrame++;
+                }
+                break;
+            case HEAVYJUMPATTACK:
+                if(nFrame == 0) nTextureId = 0;
+                if(nFrame == 9) nTextureId = 1;
+                if(nFrame == 18) nTextureId = 2;
+
+                switch (eJumpType) {
+                    case BACK_JUMP:
+                        // バックジャンプ：相手から離れる方向
+                         System.out.println("[Player]" + pOpponent.GetPlayerNumber() + "]後ろジャンプ");
+                        if(bIsFacingRight) {
+                        fJumpDirectionX = -fHorizontalJumpSpeed; // 右向きなら左方向
+                        } else {
+                            fJumpDirectionX = fHorizontalJumpSpeed; // 左向きなら右方向
+                        }
+                    break;
+                
+                    case VERTICAL_JUMP:
+                        // 垂直ジャンプ：水平移動なし
+                        System.out.println("[Player" + pOpponent.GetPlayerNumber() + "]垂直ジャンプ");
+                        fJumpDirectionX = 0f;
+                    break;
+                
+                    case FORWARD_JUMP:
+                        // 前ジャンプ：相手に向かう方向
+                        System.out.println("[Player]" + pOpponent.GetPlayerNumber() + "]前ジャンプ");
+                        if(bIsFacingRight) {
+                        fJumpDirectionX = fHorizontalJumpSpeed; // 右向きなら右方向
+                        } else {
+                            fJumpDirectionX = -fHorizontalJumpSpeed; // 左向きなら左方向
+                        }
+                    break;
+                
+                    default:
+                        fJumpDirectionX = 0f;
+                    break;
+                }
+
+                fPositionX += fJumpDirectionX * fDeltaTime;
+
+                if(bIsGrounded)
+                {
+                    ChangeState(CharacterState.STAND);
+                } else {
+                    nFrame++;
+                }
+                break;
         }
     }
     
     //状態を変更
     private void ChangeState(CharacterState eNewState) {
+        this.eOldState = eCurrentState;
         this.eCurrentState = eNewState;
         this.fAnimationTimer = 0f; // アニメーションタイマーをリセット
         this.nFrame = 0;

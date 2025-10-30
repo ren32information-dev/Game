@@ -38,5 +38,11 @@ public enum CharacterState {
     //中攻撃6
     HEAVYATTACK3,
     //強攻撃3
+    LIGHTJUMPATTACK,
+    //弱ジャンプ攻撃
+    MEDIUMJUMPATTACK,
+    //中ジャンプ攻撃
+    HEAVYJUMPATTACK,
+    //強ジャンプ攻撃
 }
 
