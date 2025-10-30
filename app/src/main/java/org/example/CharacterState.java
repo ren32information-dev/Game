@@ -44,5 +44,9 @@ public enum CharacterState {
     //中ジャンプ攻撃
     HEAVYJUMPATTACK,
     //強ジャンプ攻撃
+    STANDGUARD,
+    // 立ガード
+    CROUCHGUARD,
+    //しゃがみガード
 }
 

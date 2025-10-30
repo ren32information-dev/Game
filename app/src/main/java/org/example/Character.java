@@ -99,6 +99,7 @@ public class Character extends Player {
 
     private int nDamageFrame = 0;
     // ひるんでいるフレーム
+    private int nGuardFrame = 0;
 
     private int nHitCount = 0;
     // コンボカウンター
@@ -108,6 +109,10 @@ public class Character extends Player {
     // コンボが消えるのを数える変数
 
     private float fJumpAttackMove;
+
+    private float fDamageMove;
+    // ひるんでいる間のノックバック
+    private float fGuardMove;
 
     boolean bLeftMove = false;
     boolean bRightMove = false;
@@ -137,6 +142,13 @@ public class Character extends Player {
         //垂直ジャンプ（8方向）
         FORWARD_JUMP
         //前ジャンプ（9方向）
+    }
+
+    // 上段、中段、下段
+    private enum GuardType{
+        HIGH,
+        MED,
+        LOW,
     }
     
     //コンストラクタ（プレイヤー番号と入力マネージャーを受け取る）
@@ -588,13 +600,17 @@ public class Character extends Player {
     {
         if(sTag1.equals("my") && sTag2.equals("attack")) {
             System.out.println("[衝突処理] プレイヤーが攻撃に当たりました！");
-            Damage(CharacterState.LIGHTATTACK5, 3, 15);
-            Damage(CharacterState.MEDIUMATTACK5, 7, 31);
-            Damage(CharacterState.HEAVYATTACK5, 9, 24);
-            Damage(CharacterState.LIGHTATTACK2, 2, 9);
-            Damage(CharacterState.HEAVYATTACK2, 10, 28);
-            Damage(CharacterState.MEDIUMATTACK6, 6, 17);
-        }
+            Damage(CharacterState.LIGHTATTACK5, 3, 15, 0.3f, 10, 0.3f, GuardType.HIGH);
+            Damage(CharacterState.MEDIUMATTACK5, 7, 31, 0.9f, 10, 0.3f, GuardType.HIGH);
+            Damage(CharacterState.HEAVYATTACK5, 9, 24, 0.9f, 13, 0.9f, GuardType.HIGH);
+            Damage(CharacterState.LIGHTATTACK2, 2, 9, 0.3f, 5, 0.3f, GuardType.LOW);
+            Damage(CharacterState.HEAVYATTACK2, 10, 28, 0.3f, 16, 0.3f, GuardType.LOW);
+            Damage(CharacterState.MEDIUMATTACK6, 6, 17, 0.3f, 12, 0.3f, GuardType.MED);
+            Damage(CharacterState.LIGHTJUMPATTACK, 3, 9, 0.3f, 6, 0.3f, GuardType.MED);
+            Damage(CharacterState.MEDIUMJUMPATTACK, 5, 11, 0.3f, 8, 0.3f, GuardType.MED);
+            Damage(CharacterState.HEAVYJUMPATTACK, 8, 15, 0.3f, 12, 0.3f, GuardType.MED);
+
+        }   
     }
 
     public void AttackCollision(Character pOther, String sTag1, String sTag2)
@@ -790,7 +806,7 @@ public class Character extends Player {
                     ChangeState(CharacterState.JUMP);
                     System.out.println("[Player" + nPlayerNumber + "] ジャンプ予備動作開始: " + eJumpType);
                 } else if (bGuard) {
-                    ChangeState(CharacterState.GUARD);
+                    //ChangeState(CharacterState.GUARD);
                 } else if (bLeftMove || bRightMove) {
                     ChangeState(CharacterState.FRONT);
                     // 移動処理はApp.javaから呼ばれるので、ここでは状態変更のみ
@@ -1070,9 +1086,30 @@ public class Character extends Player {
             case DAMAGE:
                 // 被ダメージ状態からの遷移
                 nTextureId = 0;
+                fPositionX += fDamageMove / nDamageFrame;
                 if(nFrame == nDamageFrame)
                 {
                     ChangeState(CharacterState.STAND);
+                } else {
+                    nFrame++;
+                }
+                break;
+            case STANDGUARD:
+                nTextureId = 0;
+                fPositionX += fGuardMove / nDamageFrame;
+                if(nFrame == nGuardFrame)
+                {
+                    ChangeState(CharacterState.STAND);
+                } else {
+                    nFrame++;
+                }
+                break;
+            case CROUCHGUARD:
+                nTextureId = 0;
+                fPositionX += fGuardMove / nDamageFrame;
+                if(nFrame == nGuardFrame)
+                {
+                    ChangeState(CharacterState.CROUCH);
                 } else {
                     nFrame++;
                 }
@@ -1188,6 +1225,7 @@ public class Character extends Player {
 
                 if(nFrame == 13)
                 {
+                    
                     ChangeState(CharacterState.STAND);
                 } else {
                     nFrame++;
@@ -1293,7 +1331,18 @@ public class Character extends Player {
                 break;
             case LIGHTJUMPATTACK:
                 if(nFrame == 0) nTextureId = 0;
-                if(nFrame == 9) nTextureId = 1;
+                if(nFrame == 9)
+                {
+                    nTextureId = 1;
+                    if(bIsFacingRight == true)
+                    {
+                        this.pAllColliders.get("attack").AddHitCollider(new HitColliderBox(0.5f, 0.3f, 0.9f, 1.5f)); // 右下
+                    }
+                    else
+                    {
+                        this.pAllColliders.get("attack").AddHitCollider(new HitColliderBox(0.5f, 0.3f, -0.9f, 1.5f)); // 右下
+                    }
+                } 
                 if(nFrame == 18) nTextureId = 2;
 
                 switch (eJumpType) {
@@ -1333,6 +1382,7 @@ public class Character extends Player {
 
                 if(bIsGrounded)
                 {
+                    this.pAllColliders.get("attack").ClearCollider();
                     ChangeState(CharacterState.STAND);
                 } else {
                     nFrame++;
@@ -1340,7 +1390,18 @@ public class Character extends Player {
                 break;
             case MEDIUMJUMPATTACK:
                 if(nFrame == 0) nTextureId = 0;
-                if(nFrame == 9) nTextureId = 1;
+                if(nFrame == 9)
+                {
+                    nTextureId = 1;
+                    if(bIsFacingRight == true)
+                    {
+                        this.pAllColliders.get("attack").AddHitCollider(new HitColliderBox(0.5f, 0.3f, 0.9f, 1.5f)); // 右下
+                    }
+                    else
+                    {
+                        this.pAllColliders.get("attack").AddHitCollider(new HitColliderBox(0.5f, 0.3f, -0.9f, 1.5f)); // 右下
+                    }
+                } 
                 if(nFrame == 18) nTextureId = 2;
 
                 switch (eJumpType) {
@@ -1379,6 +1440,7 @@ public class Character extends Player {
 
                 if(bIsGrounded)
                 {
+                    this.pAllColliders.get("attack").ClearCollider();
                     ChangeState(CharacterState.STAND);
                 } else {
                     nFrame++;
@@ -1386,7 +1448,18 @@ public class Character extends Player {
                 break;
             case HEAVYJUMPATTACK:
                 if(nFrame == 0) nTextureId = 0;
-                if(nFrame == 9) nTextureId = 1;
+                if(nFrame == 9)
+                {
+                    nTextureId = 1;
+                    if(bIsFacingRight == true)
+                    {
+                        this.pAllColliders.get("attack").AddHitCollider(new HitColliderBox(0.5f, 0.3f, 0.9f, 1.5f)); // 右下
+                    }
+                    else
+                    {
+                        this.pAllColliders.get("attack").AddHitCollider(new HitColliderBox(0.5f, 0.3f, -0.9f, 1.5f)); // 右下
+                    }
+                }
                 if(nFrame == 18) nTextureId = 2;
 
                 switch (eJumpType) {
@@ -1425,11 +1498,13 @@ public class Character extends Player {
 
                 if(bIsGrounded)
                 {
+                    this.pAllColliders.get("attack").ClearCollider();
                     ChangeState(CharacterState.STAND);
                 } else {
                     nFrame++;
                 }
                 break;
+            
         }
     }
     
@@ -1464,11 +1539,53 @@ public class Character extends Player {
     }
 
     // ダメージの処理をまとめた関数
-    public void Damage(CharacterState state, int damage, int frame)
+    public void Damage(CharacterState state, int damage, int damageFrame, float damageMove, int guardFrame, float guardMove, GuardType type)
     {
+        // 相手の攻撃状態を取る
         if(state != GetOpponentCharacter().GetCurrentState()) return;
+
+        nDamageFrame = damageFrame;
+        fDamageMove = damageMove;
+        nGuardFrame = guardFrame;
+        fGuardMove = guardMove;
+
+        if(bIsFacingRight)
+        {
+            fDamageMove = -fDamageMove;
+            fGuardMove = -fGuardMove;
+        } 
+
+        // 立ガードの処理
+        if(eCurrentState == CharacterState.FRONT)
+        {
+            if(type != GuardType.LOW)
+            {
+                if(bIsFacingRight && bLeftMove || !bIsFacingRight && bRightMove)
+                {
+                    ChangeState(CharacterState.STANDGUARD);
+                    return;
+                }
+
+            }
+
+        }
+
+        // しゃがみガードの処理
+        if(eCurrentState == CharacterState.CROUCH)
+        {
+            if(type != GuardType.MED)
+            {
+                if(bIsFacingRight && bLeftMove || !bIsFacingRight&& bRightMove)
+                {
+                    ChangeState(CharacterState.CROUCHGUARD);
+                    return;
+                }
+            }
+        }
+        
         DamageHP(damage);
-        nDamageFrame = frame;
+        
+        
         ChangeState(CharacterState.DAMAGE);
     }
 

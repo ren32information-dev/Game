@@ -31,6 +31,8 @@ public class CharacterRendererManager {
         pCharacterRenderers.put(CharacterState.LIGHTJUMPATTACK, new ArrayList<>());
         pCharacterRenderers.put(CharacterState.MEDIUMJUMPATTACK, new ArrayList<>());
         pCharacterRenderers.put(CharacterState.HEAVYJUMPATTACK, new ArrayList<>());
+        pCharacterRenderers.put(CharacterState.STANDGUARD, new ArrayList<>());
+        pCharacterRenderers.put(CharacterState.CROUCHGUARD, new ArrayList<>());
 
         
 
@@ -133,6 +135,14 @@ public class CharacterRendererManager {
         heavyAttackRenderers.add(new CharacterRenderer(pCamera, "Image/JpAtkHighStart002.png"));
         heavyAttackRenderers.add(new CharacterRenderer(pCamera, "Image/JpAtkHighStart001.png"));
         heavyAttackRenderers.add(new CharacterRenderer(pCamera, "Image/JpAtkHigh001.png"));
+
+        // 立ガード
+        ArrayList<CharacterRenderer> standGuardRenderers = pCharacterRenderers.get(CharacterState.STANDGUARD);
+        standGuardRenderers.add (new CharacterRenderer(pCamera, "Image/GuardStand.png"));
+
+        // しゃがみガード
+        ArrayList<CharacterRenderer> crouchGuardRenderers = pCharacterRenderers.get(CharacterState.CROUCHGUARD);
+        crouchGuardRenderers.add(new CharacterRenderer(pCamera, "Image/GuardCrouch.png"));
     }
 
     public void Uninit() {
