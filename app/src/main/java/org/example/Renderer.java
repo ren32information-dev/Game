@@ -9,13 +9,15 @@ public class Renderer
     float PosX, PosY, PosZ;
     float RtX, RtY, RtZ;
     float ColorR, ColorG, ColorB;
-    
+
     private float uv_u0 = 0.0f, uv_v0 = 0.0f; // 左上
     private float uv_u1 = 1.0f, uv_v1 = 0.0f; // 右上
     private float uv_u2 = 1.0f, uv_v2 = 1.0f; // 右下
     private float uv_u3 = 0.0f, uv_v3 = 1.0f; // 左下
 
     private final Camera camera;
+
+    private boolean bIsVisible = true;
 
     private int textureId;
 
@@ -46,10 +48,10 @@ public class Renderer
         model.scale(SizeX, SizeY, SizeZ);
 
         // 4. UV
-        uv_u0 = 0.0f; uv_v0 = 0.0f; 
-        uv_u1 = 1.0f; uv_v1 = 0.0f; 
-        uv_u2 = 1.0f; uv_v2 = 1.0f; 
-        uv_u3 = 0.0f; uv_v3 = 1.0f;
+        //uv_u0 = 0.0f; uv_v0 = 0.0f; 
+        //uv_u1 = 1.0f; uv_v1 = 0.0f; 
+        //uv_u2 = 1.0f; uv_v2 = 1.0f; 
+        //uv_u3 = 0.0f; uv_v3 = 1.0f;
     }
     //===========================
     // 初期化（画像読み込み）
@@ -71,6 +73,8 @@ public class Renderer
         RtY = 0.0f;
         RtZ = 0.0f;
 
+        this.bIsVisible = true;
+
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -90,6 +94,11 @@ public class Renderer
 
     public void Draw() 
     {
+        if (!bIsVisible)
+        {
+            return;
+        }
+
         Matrix4f mvp = new Matrix4f();
         camera.getProjectionMatrix().mul(camera.getViewMatrix(), mvp).mul(model);
         float[] mat = new float[16];
@@ -146,6 +155,11 @@ public class Renderer
 	    ColorR = r;
 	    ColorG = g;
 	    ColorB = b;
+    }
+
+    public void SetVisibility(boolean isVisible)
+    {
+        this.bIsVisible = isVisible;
     }
 
     public void SetUIUV(float u0, float v0, float u2, float v2) 
