@@ -17,9 +17,21 @@ public class App {
     private static GameState CurrentState = GameState.TITLE;
     private static Title pTitleScreen;
     private static CharacterRendererManager pCharacterRendererManager;
-    
+    private static Result pResultScreen;
+
+    //勝敗フラグ
+    private static boolean bIsP1Winner = false;
+    private static boolean bIsP2Winner = false;
+    private static boolean bIsDraw = false;
+
     public static void setGameState(GameState newState) {
         CurrentState = newState;
+
+        if (newState == GameState.INGAME) {
+            bIsP1Winner = false;
+            bIsP2Winner = false;
+            bIsDraw = false;
+        }
     }
 
     public static void Init() {
@@ -54,15 +66,14 @@ public class App {
         pSlotManager = new PlayerSlotManager(pWindow);
         pSlotManager.SetCamera(pCamera); // カメラを設定（境界チェック用）
         PlayerSlot slot1 = pSlotManager.GetSlot(1);
-        PlayerSlot slot2 = pSlotManager.GetSlot(2);
 
-        if (slot1 != null && slot2 != null) 
+        if (slot1 != null) 
         {
-            pUI = new UIManager(pCamera, slot1.GetCharacter(),slot2.GetCharacter());
+            pUI = new UIManager(pCamera, slot1.GetCharacter());
         }
         else 
         {
-           pUI = new UIManager(pCamera, null,null);
+           pUI = new UIManager(pCamera, null);
         }
         pUI.initUI();
     }
@@ -89,6 +100,10 @@ public class App {
             pCharacterRendererManager.Uninit();
             pCharacterRendererManager = null;
         }
+         if (pResultScreen != null) {
+            pResultScreen.release();
+            pResultScreen = null;
+        }
     }
 
     public static void Update(float fDeltaTime) 
@@ -103,7 +118,7 @@ public class App {
             pTitleScreen.update(fDeltaTime);
             if (pWindow.isKeyPressed(GLFW.GLFW_KEY_ENTER)) 
             {
-                setGameState(GameState.CHARACTERSELECT);
+                setGameState(GameState.PLAYGUIDE);
             } 
             else if (pWindow.isKeyPressed(GLFW.GLFW_KEY_ESCAPE)) 
             {
@@ -111,11 +126,9 @@ public class App {
             }
         }
 
-        //キャラクターセレクト
-        else if (CurrentState == GameState.CHARACTERSELECT) 
+        //プレイガイド
+        else if (CurrentState == GameState.PLAYGUIDE) 
         {
-            //キャラクター選択画面の更新処理を追加
-
             //デバッグ用にCキーでINGAMEへ
             if (pWindow.isKeyPressed(GLFW.GLFW_KEY_C)) 
             {
@@ -126,6 +139,13 @@ public class App {
         //ゲーム中
         else if (CurrentState == GameState.INGAME) 
         {
+            // デバッグ用にNキーでリザルト画面へ遷移
+            if (pWindow.isKeyPressed(GLFW.GLFW_KEY_N)) {
+                // デバッグ用にP1勝利を設定して遷移
+                pResultScreen.setResult(true, false, false); 
+                setGameState(GameState.RESULT);
+                return; // 以降の処理をスキップ
+            }
              // 各プレイヤーの入力処理と更新
             for (PlayerSlot pSlot : pSlotManager.GetAllSlots()) 
             {
@@ -141,9 +161,15 @@ public class App {
                         // キャラクター操作
                         boolean bLeftMove = pInputManager.GetInput(InputType.LEFT);
                         boolean bRightMove = pInputManager.GetInput(InputType.RIGHT);
+                        boolean bJump = pInputManager.GetInput(InputType.JUMP);
+                        boolean bDamage = pInputManager.GetInput(InputType.LEFT);   // デバッグ用
+                        boolean bHeal = pInputManager.GetInput(InputType.RIGHT);   // デバッグ用
                         
                         if (bLeftMove) pCharacter.MoveLeft(fDeltaTime);
                         if (bRightMove) pCharacter.MoveRight(fDeltaTime);
+                        if (bJump) pCharacter.Jump();
+                        if (bDamage) pCharacter.DamageHP(); // デバッグ用
+                        if (bHeal) pCharacter.HealHP();     // デバッグ用
                     }
                     
                     // キャラクター更新（入力無効でも物理演算などは動く）
@@ -164,6 +190,29 @@ public class App {
                 
                 // カメラを2キャラクターの中間点に向ける（距離に応じてズーム）
                 pCamera.UpdateFightingGameCamera(pChar1, pChar2);
+
+                // 勝敗判定
+
+                boolean bP1Dead = pChar1.IsDie();
+                boolean bP2Dead = pChar2.IsDie();
+
+                if (bP1Dead || bP2Dead)
+                {
+                    if(bP1Dead)
+                    {
+                        bIsP2Winner = true;
+                    }
+                    else if(bP2Dead)
+                    {
+                        bIsP1Winner = true;
+                    }
+                    else
+                    {
+                        bIsDraw = true;
+                    }
+                    pResultScreen.setResult(bIsP1Winner, bIsP2Winner, bIsDraw);
+                    setGameState(GameState.RESULT);
+                }
             }
             
             // UI更新
@@ -182,7 +231,7 @@ public class App {
             // 任意のキーが押されたら CHARACTERSELECT へ戻る
             if (pWindow.isKeyPressed(GLFW.GLFW_KEY_ENTER)) 
             {
-                setGameState(GameState.CHARACTERSELECT);
+                setGameState(GameState.PLAYGUIDE);
             }
         }
     }
@@ -199,10 +248,10 @@ public class App {
             pTitleScreen.draw();
         }
 
-        // キャラクターセレクト画面の描画
-        else if (CurrentState == GameState.CHARACTERSELECT)
+        // プレイガイド画面の描画
+        else if (CurrentState == GameState.PLAYGUIDE)
         {
-            // ここにキャラクター選択画面の描画処理を追加
+             //操作説明の画像を表示
         }
 
         // ゲーム中の描画
@@ -218,7 +267,7 @@ public class App {
             for (PlayerSlot pSlot : pSlotManager.GetAllSlots()) {
                 if (pSlot.IsOccupied()) {
                     pCharacterRendererManager.DrawCharacter(pSlot.GetCharacter(), pSlot.GetCharacter().GetTexture());
-                    CollisionManager.DrawCollisionBoxes(pSlot.GetCharacter(), pCamera);
+                    //CollisionManager.DrawCollisionBoxes(pSlot.GetCharacter(), pCamera);
                 }
             }
 
@@ -231,7 +280,12 @@ public class App {
                 //カメラを2キャラクターの中間点に向ける（距離に応じてズーム）
                 pCamera.UpdateFightingGameCamera(pChar1, pChar2);
             }
-
+        }
+        // Result画面の描画
+        else if (CurrentState == GameState.RESULT) {
+            if (pResultScreen != null) {
+                pResultScreen.draw();
+            }
         }
         pWindow.update();
     }
