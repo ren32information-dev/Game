@@ -893,9 +893,7 @@ public class Character extends Player {
                     System.out.println("[Player" + nPlayerNumber + "] ジャンプ実行！ 種類: " + eJumpType);
                 } else if (!bIsGrounded) {
                     // 空中にいる場合
-                    if(bLight) ChangeState(CharacterState.LIGHTJUMPATTACK);
-                    if(bMed) ChangeState(CharacterState.MEDIUMJUMPATTACK);
-                    if(bHeavy) ChangeState(CharacterState.HEAVYJUMPATTACK);
+                    
                     
                     // 空中ダッシュの処理
                     if (bIsAirDashing) {
@@ -938,6 +936,23 @@ public class Character extends Player {
                         }
                         // VERTICAL_JUMPの場合は水平移動なし
                     }
+
+                    if(bLight)
+                    {
+                        bIsAirDashing = false;
+                        ChangeState(CharacterState.LIGHTJUMPATTACK);
+                    } 
+                    if(bMed)
+                    {
+                        bIsAirDashing = false;
+                        ChangeState(CharacterState.MEDIUMJUMPATTACK);
+                    } 
+                    if(bHeavy) 
+                    {
+                        bIsAirDashing = false;
+                        ChangeState(CharacterState.HEAVYJUMPATTACK);
+                    }
+
                 } else if (bIsGrounded && nJumpPreparationFrames > JUMP_PREPARATION_FRAMES) {
                     // 着地した（予備動作完了後、空中から地上に戻った）
                     nTextureId = 5; // 着地後のテクスチャIDを設定
