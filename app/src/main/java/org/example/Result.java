@@ -27,9 +27,9 @@ public class Result {
     }
 
     public void init() {
-        p1WinTextureId = TextureLoader.loadTexture("Image/GG.png");//1P勝ち
-        p2WinTextureId = TextureLoader.loadTexture("Image/GG.png");//2P勝ち
-        drawTextureId = TextureLoader.loadTexture("Image/GG.png");//引き分け
+        p1WinTextureId = TextureLoader.loadTexture("Image/1PWin.png");//1P勝ち
+        p2WinTextureId = TextureLoader.loadTexture("Image/2PWin.png");//2P勝ち
+        drawTextureId = TextureLoader.loadTexture("Image/Draw.png");//引き分け
         continueTextureId = TextureLoader.loadTexture("Image/GG.png");//続ける
 
         GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -76,14 +76,6 @@ public class Result {
             // X=0, Y=0, 幅=画面幅, 高さ=画面高さ で画面いっぱいに描画
             drawTexture(currentResultTextureId, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT); 
         }
-
-        // 2. キャラクター選択に戻るメッセージの描画 (画面下部)
-        // メッセージは中央に小さく表示する
-        int returnWidth = 600;
-        int returnHeight = 50;
-        int returnX = (SCREEN_WIDTH - returnWidth) / 2;
-        int returnY = SCREEN_HEIGHT - 100;
-        drawTexture(continueTextureId, returnX, returnY, returnWidth, returnHeight); 
         
         GL11.glPopMatrix();
         
