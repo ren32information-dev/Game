@@ -1261,5 +1261,10 @@ public class Character extends Player {
         
         System.out.println("コンボカウンター" + nHitCount);
     }
+
+    public boolean IsDie()
+    {
+        return pHP.IsDieHP();
+    }
 }
 
