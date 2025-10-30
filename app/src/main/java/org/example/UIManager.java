@@ -334,6 +334,30 @@ public class UIManager
             uiElements[P1_HP].UIPos(newPosX, newPosY, 0.0f); 
         }
 
+        if (player1Character != null) 
+        {
+            float ratio = player1Character.GetHPObject().getHealthRatio();
+            float currentHP = player1Character.GetHPObject().getCurrentHP();
+            
+            if (currentHP < 40.0f) 
+            {
+                uiElements[P1_HP].UIColor(1.0f, 1.0f, 0.0f); 
+            }
+            else 
+            {
+                uiElements[P1_HP].UIColor(1.0f, 1.0f, 1.0f); 
+            }
+
+            float currentWidth = MAX_HP_BAR_WIDTH * ratio;
+            float originalPosX = HP_BAR_MAX_X + cameraX; 
+            float widthDifference = MAX_HP_BAR_WIDTH - currentWidth;
+            float newPosX = originalPosX - widthDifference;
+            float newPosY = HP_BAR_MAX_Y + cameraY;
+
+            uiElements[P1_HP].UISize(currentWidth, 0.4f, 1.0f);
+            uiElements[P1_HP].UIPos(newPosX, newPosY, 0.0f); 
+        }
+
         //Gauge処理
 
         float p1MaxGaugePosX = Gauge_BAR_MAX_X + cameraX;
@@ -431,10 +455,10 @@ public class UIManager
         {
             int hitCount = player1Character.ComboCount(); 
 
-            if (hitCount > 1) 
+            if (hitCount >= 1) 
             {
                 // Hit>1
-                uiElements[HIT_LABEL].SetVisibility(false);
+                uiElements[HIT_LABEL].SetVisibility(true);
                 
                 uiElements[HIT_LABEL].UIPos(HIT_POS_X + cameraX, HIT_POS_Y + cameraY, 0.0f);
 
@@ -443,16 +467,16 @@ public class UIManager
                 uiElements[HIT_COUNT_DIGIT_TENS].UIPos(HIT_POS_X + 3.0f + cameraX, HIT_POS_Y + cameraY, 0.0f);
                 uiElements[HIT_COUNT_DIGIT_ONES].UIPos(HIT_POS_X + 4.5f + cameraX, HIT_POS_Y + cameraY, 0.0f);
                 
-                uiElements[HIT_COUNT_DIGIT_ONES].SetVisibility(false);
-                uiElements[HIT_COUNT_DIGIT_TENS].SetVisibility(false);
+                uiElements[HIT_COUNT_DIGIT_ONES].SetVisibility(true);
+                uiElements[HIT_COUNT_DIGIT_TENS].SetVisibility(true);
 
             } 
             else 
             {
                 // Hit<1
-                uiElements[HIT_LABEL].SetVisibility(true);
-                uiElements[HIT_COUNT_DIGIT_ONES].SetVisibility(true);
-                uiElements[HIT_COUNT_DIGIT_TENS].SetVisibility(true);
+                uiElements[HIT_LABEL].SetVisibility(false);
+                uiElements[HIT_COUNT_DIGIT_ONES].SetVisibility(false);
+                uiElements[HIT_COUNT_DIGIT_TENS].SetVisibility(false);
             }
         }
         ////===P1===
@@ -475,8 +499,9 @@ public class UIManager
             
             uiElements[P2_HP].UISize(currentWidth, 0.4f, 1.0f);
             uiElements[P2_HP].UIPos(newPosX, p2HpPosY, 0.0f); 
-        }
-        
+        }       
+
+
         float p2MaxGaugePosX = P2_Gauge_BAR_MAX_X + cameraX;
         float p2MaxGaugePosY = P2_Gauge_BAR_MAX_Y + cameraY;
         uiElements[P2_MAXGauge].UIPos(p2MaxGaugePosX, p2MaxGaugePosY, 0.0f);
