@@ -5,6 +5,8 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import java.util.HashMap;
 import java.util.ArrayList;
+import org.lwjgl.glfw.GLFWGamepadState;
+import java.nio.ByteBuffer;
 
 public class App {
 
@@ -116,7 +118,7 @@ public class App {
         if(CurrentState == GameState.TITLE)
         {
             pTitleScreen.update(fDeltaTime);
-            if (pWindow.isKeyPressed(GLFW.GLFW_KEY_ENTER)) 
+            if (pWindow.isKeyPressed(GLFW.GLFW_KEY_ENTER)|| isAnyGamepadButtonPressed()) 
             {
                 setGameState(GameState.PLAYGUIDE);
             } 
@@ -130,7 +132,7 @@ public class App {
         else if (CurrentState == GameState.PLAYGUIDE) 
         {
             //デバッグ用にCキーでINGAMEへ
-            if (pWindow.isKeyPressed(GLFW.GLFW_KEY_C)) 
+            if (pWindow.isKeyPressed(GLFW.GLFW_KEY_ENTER)|| isAnyGamepadButtonPressed()) 
             {
                  setGameState(GameState.INGAME);
             }
@@ -229,7 +231,7 @@ public class App {
             //リザルト画面の更新処理
         
             // 任意のキーが押されたら CHARACTERSELECT へ戻る
-            if (pWindow.isKeyPressed(GLFW.GLFW_KEY_ENTER)) 
+            if (pWindow.isKeyPressed(GLFW.GLFW_KEY_ENTER)|| isAnyGamepadButtonPressed()) 
             {
                 setGameState(GameState.PLAYGUIDE);
             }
@@ -319,4 +321,50 @@ public class App {
 
         Uninit();
     }
+
+    // コントローラーの決定ボタン（●ボタン）が押されたかチェック
+    private static boolean isAnyGamepadButtonPressed() {
+        // 接続されている全てのコントローラーをチェック（JOYSTICK_1〜4）
+        for (int i = GLFW.GLFW_JOYSTICK_1; i <= GLFW.GLFW_JOYSTICK_4; i++) {
+            if (GLFW.glfwJoystickPresent(i)) {
+                // Gamepad API対応コントローラー（XInput、一部のコントローラー）
+                if (GLFW.glfwJoystickIsGamepad(i)) {
+                    GLFWGamepadState state = GLFWGamepadState.create();
+                    if (GLFW.glfwGetGamepadState(i, state)) {
+                        // Bボタン（Switch: A、PS: ○、Xbox: B）
+                        if (state.buttons(GLFW.GLFW_GAMEPAD_BUTTON_B) == GLFW.GLFW_PRESS) {
+                            return true;
+                        }
+                        // Aボタン（Switch: B、PS: ×、Xbox: A）
+                        if (state.buttons(GLFW.GLFW_GAMEPAD_BUTTON_A) == GLFW.GLFW_PRESS) {
+                            return true;
+                        }
+                        // STARTボタンも追加
+                        if (state.buttons(GLFW.GLFW_GAMEPAD_BUTTON_START) == GLFW.GLFW_PRESS) {
+                            return true;
+                        }
+                    }
+                } else {
+                    // DirectInput（Switch純正、PS4など）
+                    ByteBuffer buttons = GLFW.glfwGetJoystickButtons(i);
+                    if (buttons != null && buttons.capacity() > 0) {
+                        // ボタン0（通常は決定ボタン）
+                        if (buttons.get(0) == GLFW.GLFW_PRESS) {
+                            return true;
+                        }
+                        // ボタン1
+                        if (buttons.capacity() > 1 && buttons.get(1) == GLFW.GLFW_PRESS) {
+                            return true;
+                        }
+                        // ボタン9（STARTボタン、Switch純正プロコン）
+                        if (buttons.capacity() > 9 && buttons.get(9) == GLFW.GLFW_PRESS) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
 }
