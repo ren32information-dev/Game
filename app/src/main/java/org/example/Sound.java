@@ -95,6 +95,68 @@ public class Sound {
         }
     }
     
+    public static void playSFX(String filePath) {
+        // try-catch ブロックは BGM のものとほぼ同じ
+        try {
+            File soundFile = new File(filePath);
+
+            // ファイルの存在を確認
+            if (!soundFile.exists()) {
+                System.err.println("エラー：SFXファイルが見つかりません " + filePath);
+                return;
+            }
+            
+            // AudioInputStream をメソッドローカル変数として定義し、リスナー内で閉じる必要があるため、
+            // ここでは try-with-resources を使用せず、finally または LineListener でクローズします。
+            AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundFile);
+            AudioFormat baseFormat = audioIn.getFormat();
+
+            // BGMと同じデコードフォーマットを設定
+            AudioFormat decodedFormat = new AudioFormat(
+                    AudioFormat.Encoding.PCM_SIGNED,
+                    baseFormat.getSampleRate(),
+                    16,
+                    baseFormat.getChannels(),
+                    baseFormat.getChannels() * 2,
+                    baseFormat.getSampleRate(),
+                    false
+            );
+
+            // デコードされたオーディオストリームを取得
+            AudioInputStream decodedAudio = AudioSystem.getAudioInputStream(decodedFormat, audioIn);
+            Clip clip = AudioSystem.getClip();
+            clip.open(decodedAudio);
+
+            // ★BGMと最も異なる点：LineListenerを設定し、再生終了時にリソースをクリーンアップする
+            clip.addLineListener(event -> {
+                if (event.getType() == LineEvent.Type.STOP) {
+                    clip.close();
+                    try {
+                        decodedAudio.close();
+                        audioIn.close();
+                    } catch (IOException ignored) {
+                        // クローズ失敗は無視しても通常問題ない
+                    }
+                    System.out.println("SFX 再生終了・リソース解放: " + filePath);
+                }
+            });
+            
+            // ループは設定せず、一度だけ再生
+            clip.start();
+            System.out.println("SFX 再生開始: " + filePath);
+
+
+        } catch (UnsupportedAudioFileException e) {
+            System.err.println("SFXエラー: サポートされていないオーディオフォーマット");
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.err.println("SFXエラー: ファイル読み込みエラー");
+            e.printStackTrace();
+        } catch (LineUnavailableException e) {
+            System.err.println("SFXエラー: オーディオ再生ラインが使用できません");
+            e.printStackTrace();
+        }
+    }
     // ヒント：必要に応じて、短い効果音 (Sound Effects, SE) を再生するための別のメソッドを追加できます。
     // そのメソッドはループを必要とせず、LineListener内で Line をクローズできます。
 }

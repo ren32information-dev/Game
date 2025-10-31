@@ -132,6 +132,11 @@ public class Character extends Player {
     boolean bHeavy = false;
     //コントローラの入力
 
+    //SE
+    private static String SEHit1 = "Sound/8bitDamage1.wav";
+    private static String SEGuard = "Sound/8bitGuard.wav";
+    //SE
+
     //ジャンプの種類を定義
     private enum JumpType {
         NONE,
@@ -221,7 +226,7 @@ public class Character extends Player {
         this.fAirDashSpeed = 15.0f; // 地上ダッシュと同じ速度
         this.fAirDashDuration = 0.15f; // 地上ダッシュの半分の時間（距離半減）
         this.fAirDashDirectionX = 0f;
-        
+
         System.out.println("[Character] キャラクターを作成しました (位置: " + fX + ", " + fY + ", " + fZ + ")");
     }
     
@@ -1561,7 +1566,8 @@ public class Character extends Player {
             if(type != GuardType.LOW)
             {
                 if(bIsFacingRight && bLeftMove || !bIsFacingRight && bRightMove)
-                {
+                {   
+                    Sound.playSFX(SEGuard);
                     ChangeState(CharacterState.STANDGUARD);
                     return;
                 }
@@ -1576,13 +1582,15 @@ public class Character extends Player {
             if(type != GuardType.MED)
             {
                 if(bIsFacingRight && bLeftMove || !bIsFacingRight&& bRightMove)
-                {
+                {   
+                    Sound.playSFX(SEGuard);
                     ChangeState(CharacterState.CROUCHGUARD);
                     return;
                 }
             }
         }
-        
+
+        Sound.playSFX(SEHit1);
         DamageHP(damage);
         
         
