@@ -69,7 +69,7 @@ public class UIManager
     private static final int BACKGROUND_IMAGE = 0;
     //===背景===
     
-    private static final int MAX_UI_ELEMENTS = 39; 
+    private static final int MAX_UI_ELEMENTS = 39; //総イラスト数
     
     
     private Renderer[] uiElements; 
@@ -614,12 +614,15 @@ public class UIManager
                 // Hit>1
                 uiElements[P1_HIT_LABEL].SetVisibility(true);
                 
-                uiElements[P1_HIT_LABEL].UIPos(P1_HIT_POS_X + cameraX, P1_HIT_POS_Y + cameraY, 0.0f);
+                uiElements[P1_HIT_LABEL].UIPos(P1_HIT_POS_X + cameraX, 
+                P1_HIT_POS_Y + cameraY, 0.0f);
 
                 DisplayMultiDigitNumber(hitCount);
                 
-                uiElements[P1_HIT_COUNT_DIGIT_TENS].UIPos(P1_HIT_POS_X + 2.0f + cameraX, P1_HIT_POS_Y + cameraY, 0.0f);
-                uiElements[P1_HIT_COUNT_DIGIT_ONES].UIPos(P1_HIT_POS_X + 3.0f + cameraX, P1_HIT_POS_Y + cameraY, 0.0f);
+                uiElements[P1_HIT_COUNT_DIGIT_TENS].UIPos(P1_HIT_POS_X + 2.0f +
+                 cameraX, P1_HIT_POS_Y + cameraY, 0.0f);
+                uiElements[P1_HIT_COUNT_DIGIT_ONES].UIPos(P1_HIT_POS_X + 3.0f + 
+                cameraX, P1_HIT_POS_Y + cameraY, 0.0f);
 
                 if(hitCount <= 9)
                 {
@@ -996,10 +999,11 @@ public class UIManager
     //===========================
     //スキルCD
     //===========================
-    private void UpdateSkillCooldown(int overlayID, float currentCD, float maxCD, float iconX, float iconY) 
+    private void UpdateSkillCooldown(int overlayID, float currentCD,
+     float maxCD, float iconX, float iconY) 
     {
         Renderer overlay = uiElements[overlayID];
-
+        
         int okOverlayID = -1;
         if (overlayID == P1_SKILL_COOLDOWN_OVERLAY_1) okOverlayID = P1_SKILL_OK_OVERLAY_1;
         else if (overlayID == P1_SKILL_COOLDOWN_OVERLAY_2) okOverlayID = P1_SKILL_OK_OVERLAY_2;
@@ -1036,7 +1040,8 @@ public class UIManager
         
         float iconSize = P1_SKILL_ICON_SIZE;
         float currentHeight = iconSize * v; 
-        float newOverlayY = iconY + (iconSize / 2.0f) - (currentHeight / 2.5f) + (recoveryRatio / 3.0f); 
+        float newOverlayY = iconY + (iconSize / 2.0f) -
+         (currentHeight / 2.5f) + (recoveryRatio / 3.0f); 
         
         overlay.UISize(iconSize, currentHeight, 1.0f); 
         overlay.UIPos(iconX, newOverlayY, 0.0f);        
