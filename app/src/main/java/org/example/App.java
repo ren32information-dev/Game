@@ -93,7 +93,7 @@ public class App {
         }
 
         Sound.playWavWithConversion(bgmTitle); 
-        
+
         // プレイヤースロット管理システムを作成
         pSlotManager = new PlayerSlotManager(pWindow);
         pSlotManager.SetCamera(pCamera); // カメラを設定（境界チェック用）
@@ -300,7 +300,6 @@ public class App {
             for (PlayerSlot pSlot : pSlotManager.GetAllSlots()) {
                 if (pSlot.IsOccupied()) {
                     pCharacterRendererManager.DrawCharacter(pSlot.GetCharacter(), pSlot.GetCharacter().GetTexture());
-                    CollisionManager.DrawCollisionBoxes(pSlot.GetCharacter(), pCamera);
                 }
             }
 
