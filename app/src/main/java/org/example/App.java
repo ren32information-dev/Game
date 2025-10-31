@@ -21,20 +21,44 @@ public class App {
     private static CharacterRendererManager pCharacterRendererManager;
     private static Result pResultScreen;
 
+    //sound
+    private static String bgmTitle;    // タイトル画面BGM
+    private static String bgmGame;     // ゲーム中BGM
+    private static String bgmResult;   // リザルト画面BGM
+
+
     //勝敗フラグ
     private static boolean bIsP1Winner = false;
     private static boolean bIsP2Winner = false;
     private static boolean bIsDraw = false;
 
-    public static void setGameState(GameState newState) {
-        CurrentState = newState;
+    public static void setGameState(GameState newState) 
+    {
+    // 状態が切り替わる前に現在のBGMを停止
+    Sound.stopBGM();
+    CurrentState = newState;
 
-        if (newState == GameState.INGAME) {
-            bIsP1Winner = false;
-            bIsP2Winner = false;
-            bIsDraw = false;
-        }
+    if (newState == GameState.TITLE) 
+    {
+        // タイトルBGMを再生
+        Sound.playWavWithConversion(bgmTitle); 
+    } 
+    else if (newState == GameState.INGAME) 
+    {
+        // ゲーム中BGMを再生
+        Sound.playWavWithConversion(bgmGame); 
+
+        // 勝敗フラグをリセット
+        bIsP1Winner = false;
+        bIsP2Winner = false;
+        bIsDraw = false;
     }
+    else if (newState == GameState.RESULT) 
+    {
+        // リザルトBGMを再生
+        Sound.playWavWithConversion(bgmResult);
+    }
+}
 
     public static void Init() {
         // 初期化コード（必要に応じて追加）
@@ -50,11 +74,15 @@ public class App {
         
         pTitleScreen = new Title(1280, 720);
         pTitleScreen.init();
-
+        
         // キャラクターレンダラー作成
         pCharacterRenderer = new CharacterRenderer(pCamera, "Image/St001.png"); 
         pCharacterRendererManager = new CharacterRendererManager(pCamera);   
 
+        //sound
+        bgmTitle = "Sound/TitleBGM.wav";
+        bgmGame = "Sound/BattleBGM.wav";
+        bgmResult = "Sound/EndingBGM.wav"; 
 
         // ゲームパッドが接続されている場合の情報表示
         System.out.println("=== ゲームパッド検出 ===");
@@ -64,6 +92,8 @@ public class App {
             }
         }
 
+        Sound.playWavWithConversion(bgmTitle); 
+        
         // プレイヤースロット管理システムを作成
         pSlotManager = new PlayerSlotManager(pWindow);
         pSlotManager.SetCamera(pCamera); // カメラを設定（境界チェック用）
@@ -114,6 +144,7 @@ public class App {
 
     public static void Update(float fDeltaTime) 
     {
+
         // 更新コード（必要に応じて追加）
         // プレイヤースロット管理の更新（接続/切断の検出）
         pSlotManager.Update(fDeltaTime);
@@ -367,4 +398,5 @@ public class App {
         return false;
     }
 
+   
 }
